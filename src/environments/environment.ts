@@ -1,9 +1,7 @@
 export const environment = {
   production: false,
-  api: "http://localhost:9999/",
-  // api: "http://192.168.1.111:9999/"
-  // api: "https://api.liceolumen.com/"
-  // Configuración para la API de Claude
+  api: "http://localhost:1111/",
+  
   claudeApiUrl: 'https://api.anthropic.com/v1/messages',
   claudeApiKey: 'tu-api-key-aquí', // Reemplaza esto con tu API key real
 
