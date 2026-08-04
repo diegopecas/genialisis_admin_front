@@ -1,0 +1,102 @@
+<div class="modulo vista-360">
+  <app-header
+    [tituloModulo]="'Vista 360° del Estudiante: ' + nombreCompleto"
+    [mostrarCrear]="false"
+    [accion]="'consultar'"
+    [raiz]="'/estudiantes'"
+    [regresar]="'/estudiantes/opciones/' + idEstudiante"
+    [iconoTitulo]="'/assets/images/estudiantes.png'"
+  ></app-header>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="cargando" class="loading-container">
+    <div class="spinner-wrapper">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="loading-text">Cargando información del estudiante...</p>
+    </div>
+  </div>
+
+  <!-- Sistema de pestañas -->
+  <div class="container-fluid mt-4" *ngIf="!cargando">
+    <!-- Navegación desktop -->
+    <ul class="nav nav-tabs" id="vistaEstudianteTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" [class.active]="pestanaActiva === 'datos'" type="button" (click)="cambiarPestana('datos')">
+          <i class="fas fa-user-circle me-2"></i>Datos Personales y Acudientes
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" [class.active]="pestanaActiva === 'cuenta'" type="button" (click)="cambiarPestana('cuenta')">
+          <i class="fas fa-file-invoice-dollar me-2"></i>Estado de Cuenta
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" [class.active]="pestanaActiva === 'documentos'" type="button" (click)="cambiarPestana('documentos')">
+          <i class="fas fa-file-alt me-2"></i>Documentos
+        </button>
+      </li>
+    </ul>
+
+    <!-- Navegación móvil tipo grid -->
+    <div class="mobile-nav-grid">
+      <div class="nav-card" [class.active]="pestanaActiva === 'datos'" (click)="cambiarPestana('datos')">
+        <div class="nav-icon"><i class="fas fa-user-circle"></i></div>
+        <div class="nav-label">Datos Personales</div>
+      </div>
+      <div class="nav-card" [class.active]="pestanaActiva === 'cuenta'" (click)="cambiarPestana('cuenta')">
+        <div class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="nav-label">Estado de Cuenta</div>
+      </div>
+      <div class="nav-card" [class.active]="pestanaActiva === 'documentos'" (click)="cambiarPestana('documentos')">
+        <div class="nav-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="nav-label">Documentos</div>
+      </div>
+    </div>
+
+    <!-- Contenido de las pestañas (lazy load + keep alive) -->
+    <div class="tab-content border border-top-0 rounded-bottom shadow" id="vistaEstudianteTabContent">
+      <!-- Datos Personales y Acudientes -->
+      <div class="p-4" *ngIf="tabsCargados.has('datos')" [hidden]="pestanaActiva !== 'datos'">
+        <app-estudiante-datos [idEstudiante]="idEstudiante"></app-estudiante-datos>
+      </div>
+
+      <!-- Estado de Cuenta -->
+      <div class="p-4" *ngIf="tabsCargados.has('cuenta')" [hidden]="pestanaActiva !== 'cuenta'">
+        <app-estudiante-cuentas [idEstudiante]="idEstudiante"></app-estudiante-cuentas>
+      </div>
+
+      <!-- Documentos -->
+      <div class="p-4" *ngIf="tabsCargados.has('documentos')" [hidden]="pestanaActiva !== 'documentos'">
+        <app-documentos-persona
+          *ngIf="idPersona"
+          [idPersona]="idPersona"
+          [tipoPersona]="'estudiante'"
+          [nombrePersona]="nombreCompleto"
+          [soloLectura]="false"
+          [validarAcudientes]="false"
+        >
+        </app-documentos-persona>
+      </div>
+    </div>
+
+    <!-- Botón flotante de navegación rápida (móvil) -->
+    <div class="mobile-quick-nav">
+      <button class="quick-nav-btn" [class.open]="menuRapidoAbierto" (click)="toggleMenuRapido()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="quick-nav-menu" [class.open]="menuRapidoAbierto">
+        <div class="quick-nav-item" (click)="navegarRapido('datos')">
+          <i class="fas fa-user-circle"></i><span>Datos Personales</span>
+        </div>
+        <div class="quick-nav-item" (click)="navegarRapido('cuenta')">
+          <i class="fas fa-file-invoice-dollar"></i><span>Estado de Cuenta</span>
+        </div>
+        <div class="quick-nav-item" (click)="navegarRapido('documentos')">
+          <i class="fas fa-file-alt"></i><span>Documentos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,159 @@
+.transcribir-audio-container {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btn-outline-warning {
+  border-color: #ffbd31;
+  color: #b88a00;
+
+  &:hover {
+    background-color: #ffbd31;
+    color: #000;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 189, 49, 0.25);
+  }
+}
+
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+
+  &:hover {
+    background-color: #dc3545;
+    color: white;
+  }
+}
+
+.btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.govco-microphone-alt-slash {
+  background-image: url("/assets/govco/icons/microphone-alt-slash.svg");
+  min-width: 1rem;
+  min-height: 1rem;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 1rem 1rem;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+.grabando-indicador {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: #dc3545;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  animation: pulso-rec 1s ease-in-out infinite;
+}
+
+@keyframes pulso-rec {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.bi-hourglass-split {
+  animation: spin 2s linear infinite;
+  margin-right: 0.25rem;
+}
+// Modo ícono (soloIcono): botón redondo de micrófono para inputs compactos (ej. chat)
+.btn-mic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #cfcfcf;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.75;
+  }
+
+  &.grabando {
+    color: #ff5a5f;
+  }
+
+  &.procesando {
+    color: #cfcfcf;
+  }
+
+  .girando {
+    animation: spin 1s linear infinite;
+  }
+}
+
+// Ícono SVG y spinner del modo micrófono
+.btn-mic .mic-svg {
+  display: block;
+}
+
+.btn-mic .mic-spinner {
+  display: inline-block;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #ffbd31;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+// Modo ícono grabando: se vuelve una pastilla con punto pulsante + tiempo
+.btn-mic.grabando {
+  width: auto;
+  gap: 0.4rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  color: #ff5a5f;
+  background: rgba(255, 90, 95, 0.12);
+}
+
+.btn-mic .rec-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #ff5a5f;
+  animation: pulso-rec 1s ease-in-out infinite;
+}
+
+.btn-mic .rec-time {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}

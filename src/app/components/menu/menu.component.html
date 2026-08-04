@@ -1,0 +1,188 @@
+<div class="menu-container">
+  
+  <!-- Fondo con imagen difuminada (dinámico por tenant con fallback) -->
+  <div class="background-image" [style.background-image]="'url(' + fondoUrl + ')'"></div>
+  <div class="background-overlay"></div>
+
+  <!-- Header con 3 secciones -->
+  <header class="menu-header">
+    <div class="header-content">
+      
+      <!-- Logos (izquierda) -->
+      <div class="header-logos">
+        <img [src]="logoGenialisis" alt="Genialisis" class="genialisis-logo" decoding="async" />
+        <div class="logo-divider"></div>
+        <img [src]="logoBasicoUrl" [alt]="nombreInstitucion" class="institution-logo" decoding="async" />
+      </div>
+
+      <!-- Nombre institución (centro) -->
+      <div class="header-title">
+        <h1>{{ nombreInstitucion }}</h1>
+        <p>Sistema de Gestión Educativa</p>
+      </div>
+
+      <!-- Usuario y botón salir (derecha) -->
+      <div class="header-user">
+        <span class="user-greeting" *ngIf="nombreUsuario">Hola, {{ nombreUsuario }}</span>
+        <button class="profile-button" (click)="irAMiPerfil()">
+          <img src="/assets/images/colaboradores.png" alt="Mi Perfil" decoding="async" />
+          <span>Mi Perfil</span>
+        </button>
+        <button class="help-button" (click)="abrirAyuda()">
+          <span>?</span>
+        </button>
+        <button class="logout-button" (click)="salir()">
+          <img src="/assets/images/salir.png" alt="Salir" decoding="async" />
+          <span>Salir</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ====== BANNER DE CUMPLEAÑOS ====== -->
+  <div class="birthday-banner-wrapper" *ngIf="mostrarBannerCumple">
+    
+    <!-- Confetti animado -->
+    <div class="confetti-container">
+      <div 
+        *ngFor="let piece of confettiPieces" 
+        class="confetti-piece"
+        [style.left.%]="piece * 2"
+        [style.animation-delay.s]="piece * 0.08"
+        [style.animation-duration.s]="2.5 + (piece % 5) * 0.5"
+      ></div>
+    </div>
+
+    <div class="birthday-banner">
+      
+      <!-- Botón cerrar -->
+      <button class="birthday-close" (click)="cerrarBannerCumple()">✕</button>
+
+      <div class="birthday-content">
+        
+        <!-- Imagen de cumpleaños -->
+        <div class="birthday-image-container">
+          <img src="/assets/images/cumpleanos.png" alt="Feliz Cumpleaños" class="birthday-image" loading="lazy" decoding="async" />
+        </div>
+        
+        <!-- Mensaje -->
+        <div class="birthday-text">
+          <h2 class="birthday-title">¡Feliz Cumpleaños!</h2>
+          <p class="birthday-message">{{ mensajeCumple }}</p>
+          <p class="birthday-from">Con cariño, {{ nombreInstitucion }} 💛</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- ====== FIN BANNER DE CUMPLEAÑOS ====== -->
+
+  <!-- ====== ACCESOS RÁPIDOS ====== -->
+  <section class="accesos-rapidos-section" *ngIf="accesosRapidos.length > 0">
+    <div class="accesos-rapidos-container">
+      <div class="accesos-rapidos-header">
+        <span class="accesos-rapidos-titulo">⚡ Accesos Rápidos</span>
+      </div>
+      <div class="accesos-rapidos-list">
+        <div 
+          *ngFor="let acceso of accesosRapidos" 
+          class="acceso-rapido-chip"
+          (click)="irAccesoRapido(acceso)"
+        >
+          <span class="acceso-icono">{{ acceso.icono }}</span>
+          <span class="acceso-label">{{ acceso.label }}</span>
+          <button 
+            class="acceso-pin-btn"
+            [class.fijado]="acceso.es_fijo === 1"
+            (click)="toggleFijoAcceso($event, acceso)"
+            [title]="acceso.es_fijo === 1 ? 'Desfijar' : 'Fijar'"
+          >
+            {{ acceso.es_fijo === 1 ? '📌' : '○' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ====== FIN ACCESOS RÁPIDOS ====== -->
+
+  <!-- ====== MENÚ EN ÁRBOL CON BUSCADOR ====== -->
+  <main class="menu-arbol">
+
+    <!-- Buscador -->
+    <div class="menu-buscador">
+      <span class="buscador-icono">🔍</span>
+      <input
+        type="text"
+        class="buscador-input"
+        placeholder="Buscar una opción del menú..."
+        [value]="terminoBusqueda"
+        (input)="onBuscar($event)"
+        autocomplete="off"
+        autofocus
+      />
+      <button
+        class="buscador-limpiar"
+        *ngIf="terminoBusqueda.length > 0"
+        (click)="limpiarBusqueda()"
+        title="Limpiar"
+      >✕</button>
+    </div>
+
+    <!-- Mensaje sin resultados -->
+    <div class="menu-sin-resultados" *ngIf="enBusqueda && arbolVisible.length === 0">
+      No se encontraron opciones para "{{ terminoBusqueda }}"
+    </div>
+
+    <!-- Grilla de secciones raíz (tarjetas de vidrio) -->
+    <div class="menu-secciones">
+      <ng-container *ngFor="let seccion of arbolVisible; trackBy: trackByNodo">
+        <div class="menu-seccion-card" [class.es-link]="!esGrupo(seccion)">
+
+          <!-- Cabecera de la sección -->
+          <div class="seccion-header" (click)="seleccionarNodo(seccion)">
+            <img *ngIf="seccion.imagen" class="seccion-icono-img" [src]="seccion.imagen" [alt]="seccion.label" loading="lazy" decoding="async" />
+            <span class="seccion-icono" *ngIf="!seccion.imagen">{{ seccion.icono }}</span>
+            <span class="seccion-titulo" [innerHTML]="resaltar(seccion.label)"></span>
+            <span class="seccion-chevron" *ngIf="esGrupo(seccion)" [class.abierto]="estaExpandido(seccion)">▸</span>
+          </div>
+
+          <!-- Hijos de la sección -->
+          <div class="seccion-hijos" *ngIf="esGrupo(seccion) && estaExpandido(seccion)">
+            <ng-container *ngTemplateOutlet="nodoTpl; context: { $implicit: seccion.hijos, nivel: 1 }"></ng-container>
+          </div>
+
+        </div>
+      </ng-container>
+    </div>
+
+  </main>
+  <!-- ====== FIN MENÚ EN ÁRBOL ====== -->
+
+  <!-- Plantilla recursiva para los nodos hijos -->
+  <ng-template #nodoTpl let-nodos let-nivel="nivel">
+    <ul class="arbol-lista" [style.--nivel]="nivel">
+      <li *ngFor="let nodo of nodos; trackBy: trackByNodo" class="arbol-item">
+
+        <div
+          class="arbol-nodo"
+          [class.es-grupo]="esGrupo(nodo)"
+          (click)="seleccionarNodo(nodo)"
+        >
+          <img *ngIf="nodo.imagen" class="nodo-icono-img" [src]="nodo.imagen" [alt]="nodo.label" loading="lazy" decoding="async" />
+          <span class="nodo-icono" *ngIf="!nodo.imagen">{{ nodo.icono }}</span>
+          <span class="nodo-label" [innerHTML]="resaltar(nodo.label)"></span>
+          <span class="nodo-chevron" *ngIf="esGrupo(nodo)" [class.abierto]="estaExpandido(nodo)">▸</span>
+        </div>
+
+        <div class="arbol-subnivel" *ngIf="esGrupo(nodo) && estaExpandido(nodo)">
+          <ng-container *ngTemplateOutlet="nodoTpl; context: { $implicit: nodo.hijos, nivel: nivel + 1 }"></ng-container>
+        </div>
+
+      </li>
+    </ul>
+  </ng-template>
+
+
+
+</div>
