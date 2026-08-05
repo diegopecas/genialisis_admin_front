@@ -17,6 +17,9 @@ import { TarifasGruposService } from '../../../../services/tarifas-grupos.servic
 import { DocumentosPersonasService } from '../../../../services/documentos-personas.service';
 import { TiposDocumentosService } from '../../../../services/tipos-documentos.service';
 import { CuentasPorCobrarService } from '../../../../services/cuentas-por-cobrar.service';
+import { ConfiguracionGlobalService } from '../../../../services/configuracion-global.service';
+import { PlantillasCamposService, PlantillaCampo } from '../../../../services/plantillas-campos.service';
+import { ContratosCamposService } from '../../../../services/contratos-campos.service';
 import { 
   ContratosMatriculaValoresService, 
   ContratoValor,
@@ -57,6 +60,10 @@ export class CrearContratoComponent implements OnInit {
   public acudientesDisponibles = [] as any[];
   public tarifaGrupo: any = null;
   public emailsFirmantes: string[] = [];
+
+  // Campos que la minuta deja en blanco. Salen de plantillas_campos, asi que
+  // agregar uno nuevo no obliga a tocar este componente.
+  public camposPlantilla: PlantillaCampo[] = [];
 
   // Nuevas propiedades para valores detallados
   public valores: ContratoValor[] = [];
@@ -133,6 +140,9 @@ export class CrearContratoComponent implements OnInit {
     private utilService: UtilService,
     private documentosPersonasService: DocumentosPersonasService,
     private tiposDocumentosService: TiposDocumentosService,
+    private configuracionGlobalService: ConfiguracionGlobalService,
+    private plantillasCamposService: PlantillasCamposService,
+    private contratosCamposService: ContratosCamposService,
     private contratosMatriculaValoresService: ContratosMatriculaValoresService,
     private cuentasPorCobrarService: CuentasPorCobrarService
   ) {}
@@ -152,6 +162,7 @@ export class CrearContratoComponent implements OnInit {
 
       this.obtenerEstudiante(this.idEstudiante);
       this.obtenerAcudientes(this.idEstudiante);
+      this.cargarCamposPlantilla();
 
       switch (this.accion) {
         case 'crear':
@@ -218,8 +229,10 @@ export class CrearContratoComponent implements OnInit {
         const body = response.body as any[];
         console.log('=== ACUDIENTES RAW ===', body);
         
+        // Solo los responsables de pago participan del contrato: son los que
+        // aparecen en el listado, firman y reciben la solicitud de firma.
         this.acudientesDisponibles = body
-          .filter((a: any) => a.activo == 1)
+          .filter((a: any) => a.activo == 1 && a.es_responsable_pago == 1)
           .map((a: any) => ({
             ...a,
             nombre_completo: a.nombre_persona?.trim() || 'Sin nombre',
@@ -231,13 +244,152 @@ export class CrearContratoComponent implements OnInit {
           .map((a: any) => a.correo_electronico)
           .filter((email: string) => email && email.trim().length > 0);
 
+        // El representante legal de la institucion tambien firma el contrato.
+        // Su correo no esta en los acudientes: sale de configuracion_global.
+        this.agregarRepresentanteAFirmantes();
+
         if (this.accion === 'crear') {
           this.acudientesDisponibles.forEach((a) => {
-            if (a.es_responsable_pago == 1) {
-              this.model.acudientes?.push(a.id);
-            }
+            this.model.acudientes?.push(a.id);
           });
         }
+      });
+  }
+
+  /**
+   * Agrega el correo del representante legal de la institucion a la lista de
+   * firmantes. Sin esto, el contrato solo se enviaba a firmar al cliente.
+   */
+  agregarRepresentanteAFirmantes() {
+    this.configuracionGlobalService
+      .obtenerMultiples(['representante_legal_email'])
+      .subscribe({
+        next: (respuesta: any) => {
+          // El endpoint devuelve { clave: { valor_texto, valor_numero, ... } }
+          const config = respuesta?.body || respuesta || {};
+          const registro = config['representante_legal_email'];
+          const email = (registro?.valor_texto || registro || '').toString().trim();
+
+          if (!email) {
+            return;
+          }
+
+          const yaEsta = this.emailsFirmantes.some(
+            (e: string) => e.toLowerCase() === email.toLowerCase()
+          );
+
+          if (!yaEsta) {
+            this.emailsFirmantes = [...this.emailsFirmantes, email];
+          }
+        },
+        error: (error: any) => {
+          console.error('No se pudo obtener el correo del representante legal:', error);
+        },
+      });
+  }
+
+  /**
+   * Trae los campos configurados para la minuta del contrato y los inicializa
+   * con su valor por defecto.
+   */
+  cargarCamposPlantilla() {
+    this.plantillasCamposService.obtenerPorClave('contrato_completo').subscribe({
+      next: (response: any) => {
+        this.camposPlantilla = (response.body || []).map((campo: PlantillaCampo) => ({
+          ...campo,
+          valor: campo.valor_defecto || '',
+          opcionesLista: this.opcionesDe(campo),
+        }));
+        console.log('=== CAMPOS DE LA MINUTA ===', this.camposPlantilla);
+
+        // Se usa el id de la ruta y no model.id: cuando esto corre, la consulta
+        // del contrato todavia puede no haber respondido.
+        if (this.accion !== 'crear' && this.id) {
+          this.cargarValoresCampos(this.id);
+        }
+      },
+      error: (error: any) => {
+        console.error('No se pudieron cargar los campos de la plantilla:', error);
+        this.camposPlantilla = [];
+      },
+    });
+  }
+
+  /**
+   * Trae lo diligenciado en un contrato existente.
+   */
+  cargarValoresCampos(idContrato: string) {
+    this.contratosCamposService.obtenerPorContrato(idContrato).subscribe({
+      next: (response: any) => {
+        const filas = response.body || [];
+        filas.forEach((fila: any) => {
+          const campo = this.camposPlantilla.find((c: PlantillaCampo) => c.llave === fila.llave);
+          if (campo) {
+            campo.valor = fila.valor || '';
+          }
+        });
+        console.log('=== VALORES DILIGENCIADOS ===', this.camposPlantilla);
+      },
+      error: (error: any) => {
+        console.error('No se pudieron cargar los valores del contrato:', error);
+      },
+    });
+  }
+
+  /**
+   * Guarda los campos diligenciados. Se llama despues de crear o actualizar el
+   * contrato, cuando ya existe el id.
+   */
+  async guardarCamposContrato(idContrato: string) {
+    if (!idContrato || this.camposPlantilla.length === 0) {
+      return;
+    }
+
+    const campos = this.camposPlantilla.map((campo: PlantillaCampo) => ({
+      llave: campo.llave,
+      valor: campo.valor || '',
+    }));
+    console.log('=== GUARDANDO CAMPOS ===', idContrato, campos);
+
+    try {
+      await this.contratosCamposService.guardar(idContrato, campos).toPromise();
+    } catch (error) {
+      console.error('No se pudieron guardar los campos del contrato:', error);
+    }
+  }
+
+  /**
+   * Identidad estable de cada campo dentro del *ngFor.
+   */
+  trackByLlave(indice: number, campo: PlantillaCampo): string {
+    return campo.llave;
+  }
+
+  /**
+   * Opciones de un campo de tipo lista. Se guardan separadas por |, y cada una
+   * puede traer una etiqueta legible despues de un =, por ejemplo:
+   *   A=Cuenta propia del cliente|B=Cuenta gestionada por Genialisis
+   * Lo que se almacena en el contrato es el valor (A o B); lo que ve el usuario
+   * es la etiqueta.
+   */
+  opcionesDe(campo: PlantillaCampo): { valor: string; etiqueta: string }[] {
+    if (!campo.opciones) {
+      return [];
+    }
+
+    return campo.opciones
+      .split('|')
+      .map((o: string) => o.trim())
+      .filter((o: string) => o.length > 0)
+      .map((o: string) => {
+        const posicion = o.indexOf('=');
+        if (posicion === -1) {
+          return { valor: o, etiqueta: o };
+        }
+        return {
+          valor: o.substring(0, posicion).trim(),
+          etiqueta: o.substring(posicion + 1).trim(),
+        };
       });
   }
 
@@ -667,11 +819,33 @@ export class CrearContratoComponent implements OnInit {
     this.model.valor_total = this.resumenValores.valor_total;
   }
 
+  /**
+   * Una fecha se considera completa solo si el navegador entrego el formato
+   * aaaa-mm-dd con un anio de cuatro digitos plausible. Mientras el usuario
+   * teclea, el input de tipo date va entregando valores parciales como
+   * 0002-12-30, y validar esos valores hacia saltar la alerta a mitad de
+   * escritura y borraba lo que la persona estaba digitando.
+   */
+  private fechaCompleta(valor: string | undefined | null): valor is string {
+    if (!valor || typeof valor !== 'string') {
+      return false;
+    }
+    const partes = valor.split('-');
+    if (partes.length !== 3) {
+      return false;
+    }
+    const anio = parseInt(partes[0], 10);
+    return !isNaN(anio) && anio >= 1900 && anio <= 2999;
+  }
+
   onFechaInicioChange() {
     // Ajustar fecha fin si es necesario
-    if (this.model.fecha_inicio && this.model.fecha_fin) {
-      const inicio = new Date(this.model.fecha_inicio);
-      const fin = new Date(this.model.fecha_fin);
+    const fechaInicio = this.model.fecha_inicio;
+    const fechaFin = this.model.fecha_fin;
+
+    if (this.fechaCompleta(fechaInicio) && this.fechaCompleta(fechaFin)) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
       if (fin < inicio) {
         this.calcularFechaFinPorDefecto();
       }
@@ -680,9 +854,12 @@ export class CrearContratoComponent implements OnInit {
 
   onFechaFinChange() {
     // Validar que fecha fin sea mayor que fecha inicio
-    if (this.model.fecha_inicio && this.model.fecha_fin) {
-      const inicio = new Date(this.model.fecha_inicio);
-      const fin = new Date(this.model.fecha_fin);
+    const fechaInicio = this.model.fecha_inicio;
+    const fechaFin = this.model.fecha_fin;
+
+    if (this.fechaCompleta(fechaInicio) && this.fechaCompleta(fechaFin)) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
       if (fin < inicio) {
         Swal.fire('Error', 'La fecha fin debe ser mayor que la fecha inicio', 'error');
         this.calcularFechaFinPorDefecto();
@@ -995,6 +1172,8 @@ export class CrearContratoComponent implements OnInit {
           .guardarValores(idContrato, this.valores)
           .toPromise();
 
+        await this.guardarCamposContrato(idContrato);
+
         this.guardando = false;
         Swal.fire({
           title: 'Contrato creado',
@@ -1012,6 +1191,8 @@ export class CrearContratoComponent implements OnInit {
         await this.contratosMatriculaValoresService
           .guardarValores(this.model.id!, this.valores)
           .toPromise();
+
+        await this.guardarCamposContrato(this.model.id!);
 
         this.guardando = false;
         Swal.fire({
@@ -1074,6 +1255,8 @@ export class CrearContratoComponent implements OnInit {
       await this.contratosMatriculaValoresService
         .guardarValores(idContrato, this.valores)
         .toPromise();
+
+      await this.guardarCamposContrato(idContrato);
 
       Swal.fire({
         title: 'Generando PDF...',
@@ -1300,6 +1483,8 @@ export class CrearContratoComponent implements OnInit {
       await this.contratosMatriculaValoresService
         .guardarValores(this.model.id, this.valores)
         .toPromise();
+
+      await this.guardarCamposContrato(this.model.id);
 
       Swal.fire({
         title: 'Generando PDF...',

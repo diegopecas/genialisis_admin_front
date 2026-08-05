@@ -97,19 +97,19 @@ export class ServiciosComponent {
     console.log("Acción", $event);
     switch ($event.accion) {
       case 'academico':
-        this.router.navigate(['/servicios/administrar-servicios-estudiante/1/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/estudiantes/servicios/1/'+$event.registro.id_estudiante]);
         break;
       case 'extraacademico':
-        this.router.navigate(['/servicios/administrar-servicios-estudiante/2/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/estudiantes/servicios/2/'+$event.registro.id_estudiante]);
         break;
       case 'alimentacion':
-        this.router.navigate(['/servicios/administrar-servicios-estudiante/3/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/estudiantes/servicios/3/'+$event.registro.id_estudiante]);
         break;
       case 'vestuario':
-        this.router.navigate(['/servicios/administrar-servicios-estudiante/4/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/estudiantes/servicios/4/'+$event.registro.id_estudiante]);
         break;
       case 'insumos':
-        this.router.navigate(['/servicios/administrar-servicios-estudiante/5/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/estudiantes/servicios/5/'+$event.registro.id_estudiante]);
         break;
     }
   }

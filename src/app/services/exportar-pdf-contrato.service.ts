@@ -175,6 +175,35 @@ export class ExportarPdfContratoService {
       ),
     };
 
+    // Campos parametrizables de la plantilla. Cada llave se resuelve como
+    // {{campo_LLAVE}} y, ademas, como {{campo_LLAVE_VALOR}}, que imprime una X
+    // cuando esa es la opcion elegida (sirve para las casillas de la minuta).
+    const campos = (datos as any).campos || {};
+    Object.keys(campos).forEach((llave: string) => {
+      const valor = campos[llave] === null || campos[llave] === undefined ? '' : String(campos[llave]);
+      reemplazos['{{campo_' + llave + '}}'] = valor;
+    });
+
+    // Casillas: se resuelven contra el texto crudo de la plantilla para marcar
+    // solo la opcion elegida y dejar el resto en blanco.
+    const textoPlantilla = JSON.stringify(plantilla);
+    const marcadoresCasilla = textoPlantilla.match(/\{\{campo_\w+\}\}/g) || [];
+    marcadoresCasilla.forEach((marcador: string) => {
+      if (reemplazos[marcador] !== undefined) {
+        return;
+      }
+      const llaveCompleta = marcador.replace('{{campo_', '').replace('}}', '');
+      const posicion = llaveCompleta.lastIndexOf('_');
+      if (posicion <= 0) {
+        reemplazos[marcador] = '';
+        return;
+      }
+      const llave = llaveCompleta.substring(0, posicion);
+      const opcion = llaveCompleta.substring(posicion + 1);
+      const seleccionado = campos[llave] !== undefined && String(campos[llave]) === opcion;
+      reemplazos[marcador] = seleccionado ? 'X' : ' ';
+    });
+
     const plantillaProcesada: PlantillaContrato = JSON.parse(
       JSON.stringify(plantilla)
     );
@@ -609,7 +638,7 @@ export class ExportarPdfContratoService {
       })),
       representante: {
         tipo: 'representante',
-        firmaDigital: false
+        firmaDigital: true
       }
     };
   }
@@ -778,24 +807,59 @@ export class ExportarPdfContratoService {
 
       const linesContenido = doc.splitTextToSize(parrafoLimpio, contentWidth);
 
-      const espacioNecesario = linesContenido.length * 4.2 + 2;
-      if (yPos + espacioNecesario > pageHeight - 30) {
-        doc.addPage();
-        yPos = 15;
-        yPos = this.dibujarEncabezado(
-          doc,
-          logoBase64,
-          yPos,
-          doc.internal.pageSize.getWidth(),
-          goldColor,
-          config
-        );
-        doc.setTextColor('#222');
-        doc.setFontSize(10);
+      // Se dibuja linea a linea: si el parrafo no cabe completo, se parte y
+      // sigue en la pagina siguiente. Antes se empujaba entero y dejaba huecos
+      // grandes al pie de la pagina.
+      const altoLinea = 4.2;
+      let pendientes = linesContenido;
+
+      while (pendientes.length > 0) {
+        const disponible = pageHeight - 30 - yPos;
+        let cabenLineas = Math.floor(disponible / altoLinea);
+
+        if (cabenLineas < 1) {
+          doc.addPage();
+          yPos = 15;
+          yPos = this.dibujarEncabezado(
+            doc,
+            logoBase64,
+            yPos,
+            doc.internal.pageSize.getWidth(),
+            goldColor,
+            config
+          );
+          doc.setTextColor('#222');
+          doc.setFontSize(10);
+          continue;
+        }
+
+        // Evita dejar una sola linea colgando al final o al inicio de pagina
+        if (pendientes.length - cabenLineas === 1) {
+          cabenLineas = cabenLineas - 1;
+          if (cabenLineas < 1) {
+            doc.addPage();
+            yPos = 15;
+            yPos = this.dibujarEncabezado(
+              doc,
+              logoBase64,
+              yPos,
+              doc.internal.pageSize.getWidth(),
+              goldColor,
+              config
+            );
+            doc.setTextColor('#222');
+            doc.setFontSize(10);
+            continue;
+          }
+        }
+
+        const bloque = pendientes.slice(0, cabenLineas);
+        doc.text(bloque, marginLeft, yPos);
+        yPos += bloque.length * altoLinea;
+        pendientes = pendientes.slice(cabenLineas);
       }
 
-      doc.text(linesContenido, marginLeft, yPos);
-      yPos += espacioNecesario;
+      yPos += 2;
     });
 
     return yPos + 3;
@@ -1006,12 +1070,19 @@ export class ExportarPdfContratoService {
     // Determinar si el representante firma digitalmente
     const representanteFirmaDigital = configFirmas?.representante?.firmaDigital === true;
 
-    const numFirmas = datos.acudientes.length;
+    // Solo firman los contactos marcados como responsables de pago. Si ninguno
+    // lo esta, se cae a la lista completa para no dejar el contrato sin firmas.
+    const responsables = datos.acudientes.filter(
+      (a: any) => a.es_responsable_pago === 1 || a.es_responsable_pago === '1'
+    );
+    const firmantes = responsables.length > 0 ? responsables : datos.acudientes;
+
+    const numFirmas = firmantes.length;
     const totalWidth = firmaWidth * Math.min(numFirmas, 2) + espacioEntreFirmas;
     let xPos = (pageWidth - totalWidth) / 2;
 
     // Firmas de acudientes - primera fila (máximo 2)
-    datos.acudientes.slice(0, 2).forEach((acudiente, index) => {
+    firmantes.slice(0, 2).forEach((acudiente: any, index: number) => {
       const x = xPos + index * (firmaWidth + espacioEntreFirmas);
       const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
       const recipientIndex = index + 1; // 1-based index para Firma.dev
@@ -1051,7 +1122,7 @@ export class ExportarPdfContratoService {
     // Segunda fila de acudientes si hay más de 2
     if (numFirmas > 2) {
       xPos = (pageWidth - totalWidth) / 2;
-      datos.acudientes.slice(2, 4).forEach((acudiente, index) => {
+      firmantes.slice(2, 4).forEach((acudiente: any, index: number) => {
         const x = xPos + index * (firmaWidth + espacioEntreFirmas);
         const realIndex = index + 2;
         const usarFirmaDigital = acudientesFirmaDigital[realIndex] !== false;
@@ -1100,7 +1171,7 @@ export class ExportarPdfContratoService {
         99, // Índice especial para representante
         datos.configuracion.representante_legal_nombre || '',
         datos.configuracion.representante_legal_cedula || '',
-        'REPRESENTANTE LEGAL',
+        datos.configuracion.institucion_razon_social || 'EL PROVEEDOR',
         currentPage,
         pageWidth,
         pageHeight,
@@ -1115,7 +1186,7 @@ export class ExportarPdfContratoService {
         firmaWidth,
         datos.configuracion.representante_legal_nombre || '',
         datos.configuracion.representante_legal_cedula || '',
-        'REPRESENTANTE LEGAL',
+        datos.configuracion.institucion_razon_social || 'EL PROVEEDOR',
         firmaBase64
       );
     }
@@ -1221,7 +1292,7 @@ export class ExportarPdfContratoService {
 
     // Segunda fila si hay más de 2 acudientes
     if (numFirmas > 2) {
-      datos.acudientes.slice(2, 4).forEach((acudiente, index) => {
+      datos.acudientes.slice(2, 4).forEach((acudiente: any, index: number) => {
         const x = xPos + index * (firmaWidth + espacioEntreFirmas);
         const realIndex = index + 2;
         const usarFirmaDigital = acudientesFirmaDigital[realIndex] !== false;
@@ -1816,12 +1887,26 @@ export class ExportarPdfContratoService {
       'OCTAVA',
       'NOVENA',
       'DECIMA',
-      'UNDECIMA',
-      'DUODECIMA',
-      'DECIMOTERCERA',
-      'DECIMOCUARTA',
-      'DECIMOQUINTA',
-      'DECIMOSEXTA',
+      'DECIMA PRIMERA',
+      'DECIMA SEGUNDA',
+      'DECIMA TERCERA',
+      'DECIMA CUARTA',
+      'DECIMA QUINTA',
+      'DECIMA SEXTA',
+      'DECIMA SEPTIMA',
+      'DECIMA OCTAVA',
+      'DECIMA NOVENA',
+      'VIGESIMA',
+      'VIGESIMA PRIMERA',
+      'VIGESIMA SEGUNDA',
+      'VIGESIMA TERCERA',
+      'VIGESIMA CUARTA',
+      'VIGESIMA QUINTA',
+      'VIGESIMA SEXTA',
+      'VIGESIMA SEPTIMA',
+      'VIGESIMA OCTAVA',
+      'VIGESIMA NOVENA',
+      'TRIGESIMA',
     ];
     return numeros[numero] || numero.toString();
   }

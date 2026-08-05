@@ -127,13 +127,13 @@
           <div class="col-md-2">
             <label class="form-label">Inicio Servicio <span class="text-danger">*</span></label>
             <input type="date" class="form-control" [(ngModel)]="model.fecha_inicio" required
-              [ngClass]="{ 'is-invalid': !model.fecha_inicio && submitted }" (change)="onFechaInicioChange()" />
+              [ngClass]="{ 'is-invalid': !model.fecha_inicio && submitted }" (blur)="onFechaInicioChange()" />
             <small class="text-muted">Cuándo inicia</small>
           </div>
           <div class="col-md-2">
             <label class="form-label">Fin Servicio <span class="text-danger">*</span></label>
             <input type="date" class="form-control" [(ngModel)]="model.fecha_fin" required
-              [ngClass]="{ 'is-invalid': !model.fecha_fin && submitted }" (change)="onFechaFinChange()" />
+              [ngClass]="{ 'is-invalid': !model.fecha_fin && submitted }" (blur)="onFechaFinChange()" />
             <small class="text-muted">Cuándo termina</small>
           </div>
           <div class="col-md-2">
@@ -160,6 +160,43 @@
               <option [value]="1">Sí, incluir pagaré</option>
               <option [value]="0">No incluir pagaré</option>
             </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos de la minuta: campos parametrizados en plantillas_campos -->
+    <div class="card-simple mb-3" *ngIf="camposPlantilla.length > 0">
+      <div class="card-header-simple justify-content-start">
+        <i class="fas fa-pen-to-square me-2"></i>
+        <span>Datos de la Minuta</span>
+      </div>
+      <div class="card-body-simple">
+        <div class="row">
+          <div class="col-md-6 mt-2" *ngFor="let campo of camposPlantilla; trackBy: trackByLlave">
+            <label class="form-label">
+              {{ campo.etiqueta }}
+              <span class="text-danger" *ngIf="campo.obligatorio == 1">*</span>
+            </label>
+
+            <select class="form-select" *ngIf="campo.tipo === 'opcion'"
+              [(ngModel)]="campo.valor" [ngModelOptions]="{ standalone: true }"
+              [disabled]="!editable">
+              <option value="">Seleccionar</option>
+              <option *ngFor="let opcion of campo.opcionesLista" [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+            </select>
+
+            <input *ngIf="campo.tipo === 'numero'" type="number" class="form-control"
+              [(ngModel)]="campo.valor" [ngModelOptions]="{ standalone: true }" [disabled]="!editable" />
+
+            <input *ngIf="campo.tipo === 'fecha'" type="date" class="form-control"
+              [(ngModel)]="campo.valor" [ngModelOptions]="{ standalone: true }" [disabled]="!editable" />
+
+            <input *ngIf="campo.tipo !== 'opcion' && campo.tipo !== 'numero' && campo.tipo !== 'fecha'"
+              type="text" class="form-control"
+              [(ngModel)]="campo.valor" [ngModelOptions]="{ standalone: true }" [disabled]="!editable" />
+
+            <small class="text-muted" *ngIf="campo.ayuda">{{ campo.ayuda }}</small>
           </div>
         </div>
       </div>
