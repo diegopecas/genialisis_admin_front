@@ -43,17 +43,6 @@ export const routes: Routes = [
   // ==================================================================
 
   // ==================================================================
-  // Calificaciones
-  // ==================================================================
-  {
-    path: 'calificacion',
-    canActivate: [AuthGuard, PermisosGuard],
-    data: { permiso: 'calificaciones.ver', trackear: true, labelAcceso: 'Calificaciones', iconoAcceso: '⭐' },
-    children: [
-    ]
-  },
-
-  // ==================================================================
   // Asistencia
   // ==================================================================
 
@@ -150,7 +139,6 @@ export const routes: Routes = [
   // ==================================================================
   // Administración / Operaciones
   // ==================================================================
-  { path: 'administracion/operaciones', loadComponent: () => import('./components/administracion/administracion-operaciones/administracion-operaciones.component').then(m => m.AdministracionOperacionesComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'administracion.operaciones', trackear: true, labelAcceso: 'Operaciones', iconoAcceso: '⚙️' } },
 
   // ==================================================================
   // Administración / Otros

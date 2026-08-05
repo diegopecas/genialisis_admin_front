@@ -129,22 +129,8 @@
           <div class="submenu-container">
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.convenios')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('convenios')"
-                >
-                  <img src="assets/images/contratos.png" alt="Convenios" />
-                  <span>Convenios</span>
-                </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.reglas_cobro_automatico')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('reglas-cobro')"
-                >
-                  <img src="assets/images/productos.png" alt="Reglas de Cobro" />
-                  <span>Reglas de Cobro</span>
-                </div>
               </div>
             </div>
           </div>

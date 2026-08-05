@@ -36,41 +36,11 @@ export class DatosMaestrosComponent {
       case 'productos':
         this.router.navigate(['/administracion/datos-maestros/productos']);
         break;
-      case 'productos-mobiliario':
-        this.router.navigate(['/administracion/datos-maestros/productos-mobiliario']);
-        break;
-      case 'productos-limpieza':
-        this.router.navigate(['/administracion/datos-maestros/productos-limpieza']);
-        break;
-      case 'productos-alimentacion':
-        this.router.navigate(['/administracion/datos-maestros/productos-alimentacion']);
-        break;
-      case 'productos-academico':
-        this.router.navigate(['/administracion/datos-maestros/productos-academico']);
-        break;
-      case 'areas-fisicas':
-        this.router.navigate(['/administracion/datos-maestros/areas-fisicas']);
-        break;
-      case 'elementos-fisicos':
-        this.router.navigate(['/administracion/datos-maestros/elementos-fisicos']);
-        break;
-      case 'config-aseo':
-        this.router.navigate(['/administracion/datos-maestros/config-aseo']);
-        break;
-      case 'menus':
-        this.router.navigate(['/administracion/datos-maestros/menus']);
-        break;
-      case 'gestion-medidas':
-        this.router.navigate(['/administracion/datos-maestros/gestion-medidas']);
-        break;
       case 'configuracion-global':
         this.router.navigate(['/administracion/datos-maestros/configuracion-global']);
         break;
       case 'plantillas-institucionales':
         this.router.navigate(['/administracion/datos-maestros/plantillas']);
-        break;
-      case 'plantillas-whatsapp':
-        this.router.navigate(['/administracion/datos-maestros/plantillas-whatsapp']);
         break;
       case 'cargos':
         this.router.navigate(['/administracion/datos-maestros/cargos']);
@@ -80,9 +50,6 @@ export class DatosMaestrosComponent {
         break;
       case 'configuracion-ia':
         this.router.navigate(['/administracion/datos-maestros/configuracion-ia']);
-        break;
-      case 'configuracion-google':
-        this.router.navigate(['/administracion/datos-maestros/configuracion-google']);
         break;
       case 'permisos':
         this.router.navigate(['/administracion/datos-maestros/permisos']);
@@ -95,20 +62,11 @@ export class DatosMaestrosComponent {
       case 'usuarios-x-rol':
         this.router.navigate(['/administracion/datos-maestros/usuarios-x-rol']);
         break;
-      case 'configuracion-geofence':
-        this.router.navigate(['/administracion/datos-maestros/configuracion-geofence']);
-        break;
-      case 'datos-estudiantes':
-        this.router.navigate(['/administracion/datos-maestros/datos-estudiantes']);
-        break;
       case 'documentacion-sistema':
         this.router.navigate(['/administracion/datos-maestros/documentacion-sistema']);
         break;
       case 'institucion':
         this.router.navigate(['/administracion/datos-maestros/institucion']);
-        break;
-      case 'conectar-whatsapp':
-        this.router.navigate(['/administracion/datos-maestros/conectar-whatsapp']);
         break;
     }
   }

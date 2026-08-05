@@ -30,9 +30,6 @@ export class GestionColaboradoresComponent {
       case 'colaboradores':
         this.router.navigate(['/colaboradores']);
         break;
-      case 'casas-colaboradores':
-        this.router.navigate(['/casas-colaboradores']);
-        break;
       case 'registro-ingreso-salida':
         this.router.navigate(['/registro-ingreso-salida']);
         break;

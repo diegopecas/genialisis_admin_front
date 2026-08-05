@@ -24,20 +24,11 @@ export class AdministracionComponent {
       case 'datos-maestros':
         this.router.navigate(['/administracion/datos-maestros']);
         break;
-      case 'crm':
-        this.router.navigate(['/administracion/crm']);
-        break;
       case 'financiero':
         this.router.navigate(['/administracion/financiero']);
         break;
       case 'contabilizacion-multiple':
         this.router.navigate(['/administracion/financiero/contabilizacion-multiple']);
-        break;
-      case 'operaciones':
-        this.router.navigate(['/administracion/operaciones']);
-        break;
-      case 'auditoria-registros':
-        this.router.navigate(['/administracion/auditoria-registros']);
         break;
     }
   }

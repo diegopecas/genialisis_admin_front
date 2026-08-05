@@ -38,12 +38,6 @@ export class FinancieroComponent {
       case 'contabilizar-pagos':
         this.router.navigate(['/administracion/financiero/contabilizacion-multiple']);
         break;
-      case 'convenios':
-        this.router.navigate(['/administracion/financiero/convenios']);
-        break;
-      case 'reglas-cobro':
-        this.router.navigate(['/administracion/financiero/reglas-cobro-automatico']);
-        break;
     }
   }
 }

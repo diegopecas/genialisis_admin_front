@@ -33,66 +33,14 @@
           <div class="submenu-container">
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.calificaciones_sprint')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('calificaciones-sprint', $event)"
-                >
-                  <img
-                    src="assets/images/calificaciones-sprint.png"
-                    alt="Calificaciones Sprint"
-                  />
-                  <span>Calificaciones Sprint</span>
-                </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.calificaciones_estudiante')">
-                <div
-                  class="submenu-item"
-                  (click)="
-                    seleccionarOpcion('calificaciones-estudiante', $event)
-                  "
-                >
-                  <img
-                    src="assets/images/calificaciones-estudiante.png"
-                    alt="Calificaciones Estudiante"
-                  />
-                  <span>Calificaciones Estudiante</span>
-                </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.malla_curricular')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('malla-curricular', $event)"
-                >
-                  <img
-                    src="assets/images/malla-curricular.png"
-                    alt="Malla Curricular"
-                  />
-                  <span>Malla Curricular</span>
-                </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.cobertura_curricular')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('cobertura-curricular', $event)"
-                >
-                  <img
-                    src="assets/images/cobertura-curricular.png"
-                    alt="Cobertura Curricular"
-                  />
-                  <span>Cobertura Curricular</span>
-                </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.ejecucion_tareas')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('ejecucion-tareas', $event)"
-                >
-                  <img
-                    src="assets/images/reporte-ejecucion-tareas.png"
-                    alt="Ejecución de Tareas"
-                  />
-                  <span>Ejecución de Tareas</span>
-                </div>
               </div>
             </div>
           </div>
@@ -136,25 +84,8 @@
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.asistencia')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('asistencia', $event)"
-                >
-                  <img
-                    src="assets/images/asistencia.png"
-                    alt="Reporte Asistencia"
-                  />
-                  <span>Reporte Asistencia</span>
-                </div>
               </div>
               <div class="col-12" *ngIf="permisosService.tienePermiso('reportes.tamizajes')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('tamizajes', $event)"
-                >
-                  <img src="assets/images/tamizajes.png" alt="Tamizajes" />
-                  <span>Tamizajes de Desarrollo</span>
-                </div>
               </div>
             </div>
           </div>
@@ -295,16 +226,6 @@
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.asistencia_colaboradores')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('asistencia-colaboradores', $event)"
-                >
-                  <img
-                    src="assets/images/reporte-asistencia-colaboradores.png"
-                    alt="Asistencia Colaboradores"
-                  />
-                  <span>Asistencia Colaboradores</span>
-                </div>
               </div>
             </div>
           </div>
@@ -376,16 +297,6 @@
           <div class="submenu-container">
             <div class="row g-2">
               <div class="col-12" *ngIf="permisosService.tienePermiso('reportes.alimentacion')">
-                <div
-                  class="submenu-item"
-                  (click)="seleccionarOpcion('alimentacion', $event)"
-                >
-                  <img
-                    src="assets/images/alimentacion.png"
-                    alt="Alimentación"
-                  />
-                  <span>Alimentación</span>
-                </div>
               </div>
             </div>
           </div>
