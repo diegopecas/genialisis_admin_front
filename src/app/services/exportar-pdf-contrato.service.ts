@@ -126,6 +126,16 @@ export class ExportarPdfContratoService {
         config.representante_legal_cedula || '1.049.603.928',
       '{{representante_legal_cedula_lugar}}':
         config.representante_legal_cedula_lugar || 'Por definir',
+      '{{representante_legal_cargo}}':
+        config.representante_legal_cargo || 'Representante Legal',
+      '{{director_general_nombre}}':
+        config.director_general_nombre || 'Por definir',
+      '{{director_general_cedula}}':
+        config.director_general_cedula || 'Por definir',
+      '{{director_general_cedula_lugar}}':
+        config.director_general_cedula_lugar || 'Por definir',
+      '{{director_general_cargo}}':
+        config.director_general_cargo || 'Director General',
       '{{institucion_nombre}}': config.institucion_nombre || this.institucionConfigService.getNombreInstitucion(),
       '{{institucion_nit}}': config.institucion_nit || this.institucionConfigService.getNitInstitucion(),
       '{{representantes_nombres}}': representantesNombres,
@@ -1191,8 +1201,35 @@ export class ExportarPdfContratoService {
       );
     }
 
+    yPos += 28;
+
+    // Firma del director general: lleva la relacion y responde por la
+    // ejecucion del contrato, asi que firma junto al representante legal.
+    const nombreDirector = datos.configuracion.director_general_nombre;
+
+    if (nombreDirector) {
+      const xDirector = (pageWidth - firmaWidth) / 2;
+
+      this.dibujarCampoFirmaDigital(
+        doc,
+        xDirector,
+        yPos,
+        firmaWidth,
+        98, // Índice especial para el director general
+        nombreDirector,
+        datos.configuracion.director_general_cedula || '',
+        datos.configuracion.director_general_cargo || 'Director General',
+        currentPage,
+        pageWidth,
+        pageHeight,
+        seccion
+      );
+
+      yPos += 28;
+    }
+
     doc.setTextColor('#222');
-    return yPos + 28;
+    return yPos;
   }
 
   /**
