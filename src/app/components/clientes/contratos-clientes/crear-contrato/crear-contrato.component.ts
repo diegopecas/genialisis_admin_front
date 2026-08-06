@@ -257,29 +257,40 @@ export class CrearContratoComponent implements OnInit {
   }
 
   /**
-   * Agrega el correo del representante legal de la institucion a la lista de
-   * firmantes. Sin esto, el contrato solo se enviaba a firmar al cliente.
+   * Agrega a la lista de firmantes los correos de quienes firman por la
+   * organizacion: el representante legal y el director general.
    */
   agregarRepresentanteAFirmantes() {
     this.configuracionGlobalService
-      .obtenerMultiples(['representante_legal_email'])
+      .obtenerMultiples(['representante_legal_email', 'director_general_email'])
       .subscribe({
         next: (respuesta: any) => {
           // El endpoint devuelve { clave: { valor_texto, valor_numero, ... } }
           const config = respuesta?.body || respuesta || {};
-          const registro = config['representante_legal_email'];
-          const email = (registro?.valor_texto || registro || '').toString().trim();
+          // Firman por la organizacion el representante legal y el director
+          // general; pueden ser la misma persona o correos distintos.
+          const claves = ['representante_legal_email', 'director_general_email'];
+          const nuevos: string[] = [];
 
-          if (!email) {
-            return;
-          }
+          claves.forEach((clave: string) => {
+            const registro = config[clave];
+            const email = (registro?.valor_texto || registro || '').toString().trim();
 
-          const yaEsta = this.emailsFirmantes.some(
-            (e: string) => e.toLowerCase() === email.toLowerCase()
-          );
+            if (!email) {
+              return;
+            }
 
-          if (!yaEsta) {
-            this.emailsFirmantes = [...this.emailsFirmantes, email];
+            const yaEsta =
+              this.emailsFirmantes.some((e: string) => e.toLowerCase() === email.toLowerCase()) ||
+              nuevos.some((e: string) => e.toLowerCase() === email.toLowerCase());
+
+            if (!yaEsta) {
+              nuevos.push(email);
+            }
+          });
+
+          if (nuevos.length > 0) {
+            this.emailsFirmantes = [...this.emailsFirmantes, ...nuevos];
           }
         },
         error: (error: any) => {

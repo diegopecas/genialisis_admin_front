@@ -34,7 +34,8 @@ export class MenuArbolService {
       {
         id: 'clientes',
         label: 'Clientes',
-        icono: 'fas fa-user-tie',
+        icono: '🎓',
+        imagen: '/assets/images/clientes.png',
         permiso: 'clientes.ver',
         keywords: ['alumnos', 'niños', 'implementacion', 'implementación', 'estudiantado', 'parvulos'],
         hijos: [
@@ -54,7 +55,8 @@ export class MenuArbolService {
       {
         id: 'reportes',
         label: 'Reportes',
-        icono: 'fas fa-list',
+        icono: '📊',
+        imagen: '/assets/images/detalle.png',
         permiso: 'reportes.ver',
         keywords: ['informes', 'reporteria', 'estadisticas', 'tablero'],
         hijos: [
@@ -96,7 +98,8 @@ export class MenuArbolService {
       {
         id: 'operaciones',
         label: 'Operaciones',
-        icono: 'fas fa-gears',
+        icono: '⚙️',
+        imagen: '/assets/images/operaciones.png',
         permiso: 'operaciones.ver',
         keywords: ['operativo', 'dia a dia', 'gestion diaria'],
         hijos: [
@@ -130,7 +133,8 @@ export class MenuArbolService {
       {
         id: 'colaboradores',
         label: 'Colaboradores',
-        icono: 'fas fa-users',
+        icono: '🧑‍💼',
+        imagen: '/assets/images/colaboradores.png',
         permiso: 'colaboradores.ver',
         keywords: ['empleados', 'personal', 'trabajadores', 'staff'],
         hijos: [
@@ -171,7 +175,8 @@ export class MenuArbolService {
       {
         id: 'administracion',
         label: 'Administración',
-        icono: 'fas fa-gear',
+        icono: '🏛️',
+        imagen: '/assets/images/administracion.png',
         permiso: 'administracion.ver',
         keywords: ['admin', 'configuracion', 'ajustes', 'parametros'],
         hijos: [

@@ -42,9 +42,9 @@ export class ProductosServiciosComponent implements OnInit {
   private registrosSeleccionados = new Set<any>();
 
   public acciones = [
-    { id: 'cambiar_plan', label: 'Cambiar Plan', icono: 'fas fa-pen' },
-    { id: 'registro_medidas', label: 'Registo Medidas', icono: 'fas fa-ruler' },
-    { id: 'productos_servicios', label: 'Productos Servicios', icono: 'fas fa-bell-concierge' },
+    { id: 'cambiar_plan', label: 'Cambiar Plan', icono: '/assets/images/editar.png' },
+    { id: 'registro_medidas', label: 'Registo Medidas', icono: '/assets/images/medidas.png' },
+    { id: 'productos_servicios', label: 'Productos Servicios', icono: '/assets/images/servicios.png' },
   ] as any[];
   public columnasFiltro = [
     { columna: 'Fecha', tipoFiltro: 'fecha' as 'fecha' | 'normal' },

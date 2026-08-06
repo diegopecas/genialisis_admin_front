@@ -107,14 +107,6 @@ export class MenuComponent implements OnInit {
     }
   }
 
-  /**
-   * Los iconos pueden venir como emoji ('📢') o como clase de fuente
-   * ('fas fa-broom'). Esto decide cual de los dos se pinta.
-   */
-  esIcono(valor: any): boolean {
-    return typeof valor === 'string' && (valor.startsWith('fas') || valor.startsWith('mdi'));
-  }
-
   irAccesoRapido(acceso: AccesoRapido): void {
     this.router.navigate(['/' + acceso.ruta]);
   }

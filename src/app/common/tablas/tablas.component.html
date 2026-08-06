@@ -462,7 +462,11 @@
                     *ngIf="accionEditarActivo"
                     (click)="seleccionar('editar', dato.id, dato)"
                   >
-                    <i class="fas fa-pen icono-img me-2"></i>
+                    <img
+                      src="/assets/images/editar.png"
+                      width="20"
+                      class="me-2"
+                    />
                     Editar
                   </a>
 
@@ -476,7 +480,15 @@
                       "
                       (click)="seleccionar(accion.id, dato.id, dato)"
                     >
-                      <i class="fas fa-list icono-img me-2"></i>
+                      <img
+                        [src]="
+                          accion.icono
+                            ? accion.icono
+                            : '/assets/images/detalle.png'
+                        "
+                        width="20"
+                        class="me-2"
+                      />
                       {{ accion.label }}
                     </a>
                   </ng-container>
@@ -487,7 +499,11 @@
                     *ngIf="accionVerActivo"
                     (click)="seleccionar('consultar', dato.id, dato)"
                   >
-                    <i class="fas fa-list icono-img me-2"></i>
+                    <img
+                      src="/assets/images/detalle.png"
+                      width="20"
+                      class="me-2"
+                    />
                     Ver detalle
                   </a>
                   <a
@@ -495,7 +511,11 @@
                     *ngIf="accionEliminarActivo"
                     (click)="seleccionar('eliminar', dato.id, dato)"
                   >
-                    <i class="fas fa-trash icono-img me-2"></i>
+                    <img
+                      src="/assets/images/eliminar.png"
+                      width="20"
+                      class="me-2"
+                    />
                     Eliminar
                   </a>
                 </div>
@@ -659,7 +679,7 @@
                     [class]="
                       dato[titulo.clave + '_class'] ||
                       titulo.iconoClase ||
-                      'fas fa-circle'
+                      '/assets/images/detalle.png'
                     "
                     [style.color]="
                       dato[titulo.clave + '_color'] || titulo.iconoColor
@@ -1026,7 +1046,7 @@
                 [class]="
                   dato[titulo.clave + '_class'] ||
                   titulo.iconoClase ||
-                  'fas fa-circle'
+                  '/assets/images/detalle.png'
                 "
                 [style.color]="
                   dato[titulo.clave + '_color'] || titulo.iconoColor
@@ -1084,7 +1104,11 @@
         <!-- Acción de editar primero (similar al menú desplegable) -->
         <div class="col" *ngIf="accionEditarActivo">
           <p class="accion">
-            <i class="fas fa-pen icono-img"></i>
+            <img
+              src="/assets/images/editar.png"
+              width="50"
+              (click)="seleccionar('editar', dato.id, dato)"
+            />
           </p>
         </div>
 
@@ -1095,7 +1119,13 @@
             *ngIf="!accion.condicion || dato[accion.condicion] === accion.valor"
           >
             <p class="accion">
-              <i class="fas fa-list icono-img"></i>
+              <img
+                [src]="
+                  accion.icono ? accion.icono : '/assets/images/detalle.png'
+                "
+                width="50"
+                (click)="seleccionar(accion.id, dato.id, dato)"
+              />
             </p>
           </div>
         </ng-container>
@@ -1103,12 +1133,20 @@
         <!-- Otras acciones predefinidas al final -->
         <div class="col" *ngIf="accionVerActivo">
           <p class="accion">
-            <i class="fas fa-list icono-img"></i>
+            <img
+              src="/assets/images/detalle.png"
+              width="50"
+              (click)="seleccionar('consultar', dato.id, dato)"
+            />
           </p>
         </div>
         <div class="col" *ngIf="accionEliminarActivo">
           <p class="accion">
-            <i class="fas fa-trash icono-img"></i>
+            <img
+              src="/assets/images/eliminar.png"
+              width="50"
+              (click)="seleccionar('eliminar', dato.id, dato)"
+            />
           </p>
         </div>
       </div>

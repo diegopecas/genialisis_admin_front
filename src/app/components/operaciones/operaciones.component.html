@@ -13,7 +13,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'actividades'" (click)="toggleMenu('actividades', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container actividades">
-                            <i class="fas fa-clipboard-list icono-img"></i>
+                            <img src="assets/images/actividades.png" alt="Actividades" />
                         </div>
                         <h3 class="card-titulo">Actividades</h3>
                         <p class="card-descripcion">Registro de medidas y gestión de galerías</p>
@@ -37,7 +37,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'inventario'" (click)="toggleMenu('inventario', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container inventario">
-                            <i class="fas fa-warehouse icono-img"></i>
+                            <img src="assets/images/inventario.png" alt="Inventario" />
                         </div>
                         <h3 class="card-titulo">Inventario</h3>
                         <p class="card-descripcion">Movimientos y salidas de productos</p>
@@ -49,7 +49,7 @@
                         <div class="row g-2">
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.movimientos_productos')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('movimientos-inventario')">
-                                    <i class="fas fa-right-left icono-img"></i>
+                                    <img src="assets/images/movimientos-inventario.png" alt="Movimientos de Inventario" />
                                     <span>Movimientos de Inventario</span>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'apoyo'" (click)="toggleMenu('apoyo', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container apoyo">
-                            <i class="fas fa-life-ring icono-img"></i>
+                            <img src="assets/images/apoyo.png" alt="Apoyo" />
                         </div>
                         <h3 class="card-titulo">Apoyo</h3>
                         <p class="card-descripcion">Registro, control de limpieza y cocina</p>
@@ -77,37 +77,37 @@
                         <div class="row g-2">
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registros_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('registros-limpieza')">
-                                    <i class="fas fa-broom icono-img"></i>
+                                    <img src="assets/images/limpieza.png" alt="Registro de Limpieza" />
                                     <span>Registro de Limpieza</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_rapido_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('registro-rapido-limpieza')">
-                                    <i class="fas fa-bolt icono-img"></i>
+                                    <img src="assets/images/registro_limpieza_rapido.png" alt="Registro Rápido de Aseo" />
                                     <span>Registro Rápido de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_masivo_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('registro-masivo-limpieza')">
-                                    <i class="fas fa-square-check icono-img"></i>
+                                    <img src="assets/images/registro_masivo_limpieza.png" alt="Registro Masivo de Aseo" />
                                     <span>Registro Masivo de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.edicion_masiva_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('edicion-masiva-limpieza')">
-                                    <i class="fas fa-pen-to-square icono-img"></i>
+                                    <img src="assets/images/edicion_masiva_limpieza.png" alt="Edición Masiva de Aseo" />
                                     <span>Edición Masiva de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.supervision_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('supervision-limpieza')">
-                                    <i class="fas fa-clipboard-check icono-img"></i>
+                                    <img src="assets/images/supervision_limpieza.png" alt="Supervisión de Aseo" />
                                     <span>Supervisión de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.reporte_aseo')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('reporte-aseo')">
-                                    <i class="fas fa-file-lines icono-img"></i>
+                                    <img src="assets/images/reporte_aseo.png" alt="Reporte de Aseo" />
                                     <span>Reporte de Aseo</span>
                                 </div>
                             </div>
@@ -129,7 +129,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'clientes'" (click)="toggleMenu('clientes', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container clientes">
-                            <i class="fas fa-user-tie icono-img"></i>
+                            <img src="assets/images/clientes.png" alt="Clientes" />
                         </div>
                         <h3 class="card-titulo">Clientes</h3>
                         <p class="card-descripcion">Gestión y seguimiento de clientes</p>
@@ -149,11 +149,11 @@
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.recordatorios_generales')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('recordatorio-pagos')">
-                                    <i class="fas fa-comment-dollar icono-img"></i>
+                                    <img src="assets/images/recordatorio-pagos.png" alt="Recordatorio de Pagos" />
                                     <span>Recordatorio de Pagos</span>
                                 </div>
                                 <div class="submenu-item" (click)="seleccionarOpcion('recordatorios-generales')">
-                                    <i class="fas fa-comment-dollar icono-img"></i>
+                                    <img src="assets/images/recordatorio-pagos.png" alt="Recordatorios Generales" />
                                     <span>Recordatorios Generales</span>
                                 </div>
                             </div>
@@ -171,7 +171,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'financiero'" (click)="toggleMenu('financiero', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container financiero">
-                            <i class="fas fa-chart-line icono-img"></i>
+                            <img src="assets/images/finanzas.png" alt="Financiero" />
                         </div>
                         <h3 class="card-titulo">Financiero</h3>
                         <p class="card-descripcion">Recordatorios de cobro y gestión de pagos</p>

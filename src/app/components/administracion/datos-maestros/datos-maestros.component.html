@@ -15,7 +15,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'catalogos'" (click)="toggleMenu('catalogos', $event)">
           <div class="card-maestro-content">
             <div class="icono-container catalogos">
-              <i class="fas fa-list-check icono-img"></i>
+              <img src="assets/images/catalogos-productos.png" alt="Catálogos de Productos" />
             </div>
             <h3 class="card-titulo">Catálogos de Productos</h3>
             <p class="card-descripcion">Gestiona productos, servicios y proveedores</p>
@@ -28,19 +28,19 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.productos')">
                 <div class="submenu-item" (click)="seleccionarOpcion('productos')">
-                  <i class="fas fa-box-open icono-img"></i>
+                  <img src="assets/images/productos.png" alt="Productos" />
                   <span>Productos</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.proveedores')">
                 <div class="submenu-item" (click)="seleccionarOpcion('proveedores')">
-                  <i class="fas fa-truck icono-img"></i>
+                  <img src="assets/images/proveedores.png" alt="Proveedores" />
                   <span>Proveedores</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.productos_servicios')">
                 <div class="submenu-item" (click)="seleccionarOpcion('productos-servicios')">
-                  <i class="fas fa-concierge-bell icono-img"></i>
+                  <img src="assets/images/productos_servicios.png" alt="Productos y Servicios" />
                   <span>Productos y Servicios</span>
                 </div>
               </div>
@@ -62,7 +62,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'infraestructura'" (click)="toggleMenu('infraestructura', $event)">
           <div class="card-maestro-content">
             <div class="icono-container infraestructura">
-              <i class="fas fa-city icono-img"></i>
+              <img src="assets/images/infraestructura-espacios.png" alt="Infraestructura y Espacios" />
             </div>
             <h3 class="card-titulo">Infraestructura y Espacios</h3>
             <p class="card-descripcion">Administra áreas físicas y elementos del colegio</p>
@@ -89,7 +89,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'operaciones'" (click)="toggleMenu('operaciones', $event)">
           <div class="card-maestro-content">
             <div class="icono-container operaciones">
-              <i class="fas fa-gears icono-img"></i>
+              <img src="assets/images/operaciones.png" alt="Operaciones" />
             </div>
             <h3 class="card-titulo">Operaciones</h3>
             <p class="card-descripcion">Gestiona menús y configuraciones operativas</p>
@@ -114,7 +114,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'plantillas'" (click)="toggleMenu('plantillas', $event)">
           <div class="card-maestro-content">
             <div class="icono-container plantillas">
-              <i class="fas fa-copy icono-img"></i>
+              <img src="assets/images/plantillas.png" alt="Plantillas" />
             </div>
             <h3 class="card-titulo">Plantillas</h3>
             <p class="card-descripcion">Gestiona plantillas institucionales y de WhatsApp</p>
@@ -127,7 +127,7 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.plantillas')">
                 <div class="submenu-item" (click)="seleccionarOpcion('plantillas-institucionales')">
-                  <i class="fas fa-file-lines icono-img"></i>
+                  <img src="assets/images/plantillas_institucionales.png" alt="Institucionales" />
                   <span>Institucionales</span>
                 </div>
               </div>
@@ -143,7 +143,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'configuracion'" (click)="toggleMenu('configuracion', $event)">
           <div class="card-maestro-content">
             <div class="icono-container configuracion">
-              <i class="fas fa-gear icono-img"></i>
+              <img src="assets/images/configuracion.png" alt="Configuración" />
             </div>
             <h3 class="card-titulo">Configuración</h3>
             <p class="card-descripcion">Gestiona parámetros globales del sistema</p>
@@ -156,25 +156,25 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.configuracion_global')">
                 <div class="submenu-item" (click)="seleccionarOpcion('configuracion-global')">
-                  <i class="fas fa-gear icono-img"></i>
+                  <img src="assets/images/configuracion.png" alt="Configuración Global" />
                   <span>Configuración Global</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.cargos')">
                 <div class="submenu-item" (click)="seleccionarOpcion('cargos')">
-                  <i class="fas fa-id-badge icono-img"></i>
+                  <img src="assets/images/cargos.png" alt="Cargos" />
                   <span>Cargos</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.tipos_documentos')">
                 <div class="submenu-item" (click)="seleccionarOpcion('tipos-documentos')">
-                  <i class="fas fa-file-circle-check icono-img"></i>
+                  <img src="assets/images/tipos-documentos.png" alt="Tipos de Documentos" />
                   <span>Tipos de Documentos</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.configuracion_ia')">
                 <div class="submenu-item" (click)="seleccionarOpcion('configuracion-ia')">
-                  <i class="fas fa-robot icono-img"></i>
+                  <img src="assets/images/configuracion-ia.png" alt="Configuración IA" />
                   <span>Configuración IA</span>
                 </div>
               </div>
@@ -186,7 +186,7 @@
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.institucion')">
                 <div class="submenu-item" (click)="seleccionarOpcion('institucion')">
-                  <i class="fas fa-building icono-img"></i>
+                  <img src="assets/images/institucion.png" alt="Institución" />
                   <span>Institución</span>
                 </div>
               </div>
@@ -202,7 +202,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'seguridad'" (click)="toggleMenu('seguridad', $event)">
           <div class="card-maestro-content">
             <div class="icono-container seguridad">
-              <i class="fas fa-shield-halved icono-img"></i>
+              <img src="assets/images/seguridad.png" alt="Seguridad" />
             </div>
             <h3 class="card-titulo">Seguridad</h3>
             <p class="card-descripcion">Gestiona usuarios, roles y permisos</p>
@@ -215,54 +215,54 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.usuarios')">
                 <div class="submenu-item" (click)="seleccionarOpcion('usuarios')">
-                  <i class="fas fa-user-gear icono-img"></i>
+                  <img src="assets/images/usuarios.png" alt="Usuarios" />
                   <span>Usuarios</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.roles')">
                 <div class="submenu-item" (click)="seleccionarOpcion('roles')">
-                  <i class="fas fa-user-lock icono-img"></i>
+                  <img src="assets/images/roles.png" alt="Roles" />
                   <span>Roles</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.usuarios_x_rol')">
                 <div class="submenu-item" (click)="seleccionarOpcion('usuarios-x-rol')">
-                  <i class="fas fa-user-lock icono-img"></i>
+                  <img src="assets/images/roles.png" alt="Usuarios por Rol" />
                   <span>Usuarios por Rol</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.permisos_rol')">
                 <div class="submenu-item" (click)="seleccionarOpcion('permisos')">
-                  <i class="fas fa-key icono-img"></i>
+                  <img src="assets/images/permisos.png" alt="Permisos" />
                   <span>Permisos por Rol</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.documentacion')">
                 <div class="submenu-item" (click)="seleccionarOpcion('documentacion-sistema')">
-                  <i class="fas fa-book-open icono-img"></i>
+                  <img src="assets/images/documentacion_configuracion.png" alt="Documentación" />
                   <span>Documentación</span>
                 </div>
               </div>
             </div>
           </div>
                         <div class="submenu-item" (click)="seleccionarOpcion('productos-mobiliario')">
-                  <i class="fas fa-couch icono-img"></i>
+                  <img src="assets/images/productos-mobiliario.png" alt="Mobiliario" />
                   <span>Productos Mobiliario</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('productos-limpieza')">
-                  <i class="fas fa-spray-can icono-img"></i>
+                  <img src="assets/images/productos-limpieza.png" alt="Limpieza" />
                   <span>Productos Limpieza</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('areas-fisicas')">
-                  <i class="fas fa-vector-square icono-img"></i>
+                  <img src="assets/images/areas_fisicas.png" alt="Áreas Físicas" />
                   <span>Áreas Físicas</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('elementos-fisicos')">
-                  <i class="fas fa-lightbulb icono-img"></i>
+                  <img src="assets/images/elementos-fisicos.png" alt="Elementos Físicos" />
                   <span>Elementos Físicos</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('config-aseo')">
-                  <i class="fas fa-sliders icono-img"></i>
+                  <img src="assets/images/config_aseo.png" alt="Configuración de Aseo" />
                   <span>Configuración de Aseo</span>
                 </div>
 </div>

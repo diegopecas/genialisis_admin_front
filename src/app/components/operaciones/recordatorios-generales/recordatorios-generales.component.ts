@@ -178,9 +178,9 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
   crearAcciones(): void {
     this.acciones = [
-      { id: 'recordatorio', label: 'Enviar Recordatorio', icono: 'fas fa-bullhorn' },
-      { id: 'ver_cartera', label: 'Ver Cartera', icono: 'fas fa-chart-line' },
-      { id: 'ver_historial', label: 'Historial', icono: 'fas fa-calendar-day' },
+      { id: 'recordatorio', label: 'Enviar Recordatorio', icono: '/assets/images/recordatorio-general.png' },
+      { id: 'ver_cartera', label: 'Ver Cartera', icono: '/assets/images/finanzas.png' },
+      { id: 'ver_historial', label: 'Historial', icono: '/assets/images/seguimiento-asistencia.png' },
     ];
   }
 

@@ -4,7 +4,7 @@
     [mostrarCrear]="false"
     [raiz]="'/colaboradores/gestion'"
     [regresar]="'/colaboradores/gestion'"
-    [iconoTitulo]="'fas fa-clipboard'"
+    [iconoTitulo]="'/assets/images/actividades_colaboradores.png'"
   >
   </app-header>
 
@@ -18,7 +18,10 @@
         <div class="card-opcion" (click)="seleccionarOpcion('aprobar')">
           <div class="card-opcion-content">
             <div class="icono-container aprobar">
-              <i class="fas fa-list-check icono-img"></i>
+              <img
+                [src]="'/assets/images/aprobar_actividades.png'"
+                alt="Aprobar Actividades"
+              />
             </div>
             <h3 class="card-titulo">Aprobar Actividades</h3>
             <p class="card-descripcion">
@@ -39,7 +42,10 @@
         <div class="card-opcion" (click)="seleccionarOpcion('contabilizar')">
           <div class="card-opcion-content">
             <div class="icono-container contabilizar">
-              <i class="fas fa-business-time icono-img"></i>
+              <img
+                [src]="'/assets/images/contabilizar_actividades.png'"
+                alt="Contabilizar Actividades"
+              />
             </div>
             <h3 class="card-titulo">Contabilizar Actividades</h3>
             <p class="card-descripcion">
@@ -60,7 +66,10 @@
         <div class="card-opcion" (click)="seleccionarOpcion('calendario')">
           <div class="card-opcion-content">
             <div class="icono-container calendario">
-              <i class="fas fa-calendar-days icono-img"></i>
+              <img
+                [src]="'/assets/images/calendario_actividades.png'"
+                alt="Calendario"
+              />
             </div>
             <h3 class="card-titulo">Calendario de Actividades</h3>
             <p class="card-descripcion">

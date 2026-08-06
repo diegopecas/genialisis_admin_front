@@ -78,8 +78,8 @@ export class GestionUsuariosComponent implements OnInit {
   crearAcciones() {
     // Sin eliminar: los usuarios solo se inactivan para conservar la trazabilidad
     this.acciones = [
-      { id: 'clave', label: 'Restablecer clave', icono: 'fas fa-shield-halved' },
-      { id: 'estado', label: 'Activar / Inactivar', icono: 'fas fa-arrows-rotate' },
+      { id: 'clave', label: 'Restablecer clave', icono: '/assets/images/seguridad.png' },
+      { id: 'estado', label: 'Activar / Inactivar', icono: '/assets/images/cambio_estado.png' },
     ];
   }
 

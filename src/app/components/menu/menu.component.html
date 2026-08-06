@@ -25,14 +25,14 @@
       <div class="header-user">
         <span class="user-greeting" *ngIf="nombreUsuario">Hola, {{ nombreUsuario }}</span>
         <button class="profile-button" (click)="irAMiPerfil()">
-          <i class="fas fa-users icono-img"></i>
+          <img src="/assets/images/colaboradores.png" alt="Mi Perfil" decoding="async" />
           <span>Mi Perfil</span>
         </button>
         <button class="help-button" (click)="abrirAyuda()">
           <span>?</span>
         </button>
         <button class="logout-button" (click)="salir()">
-          <i class="fas fa-right-from-bracket icono-img"></i>
+          <img src="/assets/images/salir.png" alt="Salir" decoding="async" />
           <span>Salir</span>
         </button>
       </div>
@@ -63,7 +63,7 @@
         
         <!-- Imagen de cumpleaños -->
         <div class="birthday-image-container">
-          <i class="fas fa-cake-candles icono-img birthday-image"></i>
+          <img src="/assets/images/cumpleanos.png" alt="Feliz Cumpleaños" class="birthday-image" loading="lazy" decoding="async" />
         </div>
         
         <!-- Mensaje -->
@@ -90,8 +90,7 @@
           class="acceso-rapido-chip"
           (click)="irAccesoRapido(acceso)"
         >
-          <i *ngIf="esIcono(acceso.icono)" class="acceso-icono-fa {{ acceso.icono }}"></i>
-          <span class="acceso-icono" *ngIf="!esIcono(acceso.icono)">{{ acceso.icono }}</span>
+          <span class="acceso-icono">{{ acceso.icono }}</span>
           <span class="acceso-label">{{ acceso.label }}</span>
           <button 
             class="acceso-pin-btn"
@@ -143,8 +142,7 @@
           <!-- Cabecera de la sección -->
           <div class="seccion-header" (click)="seleccionarNodo(seccion)">
             <img *ngIf="seccion.imagen" class="seccion-icono-img" [src]="seccion.imagen" [alt]="seccion.label" loading="lazy" decoding="async" />
-            <i *ngIf="esIcono(seccion.icono)" class="seccion-icono-fa {{ seccion.icono }}"></i>
-            <span class="seccion-icono" *ngIf="!seccion.imagen && !esIcono(seccion.icono)">{{ seccion.icono }}</span>
+            <span class="seccion-icono" *ngIf="!seccion.imagen">{{ seccion.icono }}</span>
             <span class="seccion-titulo" [innerHTML]="resaltar(seccion.label)"></span>
             <span class="seccion-chevron" *ngIf="esPlan(seccion)" [class.abierto]="estaExpandido(seccion)">▸</span>
           </div>
@@ -172,8 +170,7 @@
           (click)="seleccionarNodo(nodo)"
         >
           <img *ngIf="nodo.imagen" class="nodo-icono-img" [src]="nodo.imagen" [alt]="nodo.label" loading="lazy" decoding="async" />
-          <i *ngIf="esIcono(nodo.icono)" class="nodo-icono-fa {{ nodo.icono }}"></i>
-          <span class="nodo-icono" *ngIf="!nodo.imagen && !esIcono(nodo.icono)">{{ nodo.icono }}</span>
+          <span class="nodo-icono" *ngIf="!nodo.imagen">{{ nodo.icono }}</span>
           <span class="nodo-label" [innerHTML]="resaltar(nodo.label)"></span>
           <span class="nodo-chevron" *ngIf="esPlan(nodo)" [class.abierto]="estaExpandido(nodo)">▸</span>
         </div>

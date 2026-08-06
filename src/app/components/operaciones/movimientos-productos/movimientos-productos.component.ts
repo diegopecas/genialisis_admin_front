@@ -27,11 +27,11 @@ export class MovimientosProductosComponent implements OnInit {
   public estados = [] as any[];
 
   public acciones = [
-    { id: 'registrar', label: 'Registrar', icono: 'fas fa-square-plus' }, // NUEVA ACCIÓN
-    { id: 'aprobar', label: 'Aprobar', icono: 'fas fa-circle-check' },
-    { id: 'anular', label: 'Anular', icono: 'fas fa-ban' },
-    { id: 'imprimir', label: 'Imprimir', icono: 'fas fa-file-pdf' },
-    { id: 'exportar-excel', label: 'Exportar Excel', icono: 'fas fa-file-excel' },
+    { id: 'registrar', label: 'Registrar', icono: '/assets/images/registrar.png' }, // NUEVA ACCIÓN
+    { id: 'aprobar', label: 'Aprobar', icono: '/assets/images/aprobar.png' },
+    { id: 'anular', label: 'Anular', icono: '/assets/images/anular.png' },
+    { id: 'imprimir', label: 'Imprimir', icono: '/assets/images/pdf.png' },
+    { id: 'exportar-excel', label: 'Exportar Excel', icono: '/assets/images/excel.png' },
   ] as any[];
 
   constructor(

@@ -1,7 +1,7 @@
 <div class="modulo">
   <app-header-anidado [tituloModulo]="titulo" [path]="path" [mostrarCrear]="puedeAdministrar" [accion]="'ConsultarTodos'"
     [raiz]="'/clientes-pagos-recibidos'" [regresar]="'/clientes/opciones/' + idCliente"
-    [iconoTitulo]="'fas fa-money-bills'"></app-header-anidado>
+    [iconoTitulo]="'/assets/images/pagos.png'"></app-header-anidado>
 
   <!-- Tabla de datos -->
   <app-tablas [titulos]="titulos" [datos]="datos" [raiz]="'/clientes-pagos-recibidos'" [accionVer]="puedeAdministrar"

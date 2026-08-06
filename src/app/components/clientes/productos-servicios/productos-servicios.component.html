@@ -1,7 +1,7 @@
 <div class="modulo">
   <app-header-anidado [tituloModulo]="titulo" [path]="path" [mostrarCrear]="puedeAdministrar" [accion]="'ConsultarTodos'"
     [raiz]="'/clientes/productos-servicios'" [regresar]="'/clientes/opciones/' + idCliente"
-    [iconoTitulo]="'fas fa-box-open'"></app-header-anidado>
+    [iconoTitulo]="'/assets/images/productos.png'"></app-header-anidado>
   <app-tablas [titulos]="titulos" [datos]="datos" [raiz]="'/clientes/productos-servicios'" [accionVer]="puedeAdministrar"
     [accionEditar]="puedeAdministrar" [accionEliminar]="puedeAdministrar" [columnasFiltro]="columnasFiltro"
     [prefiltrosExcluir]="{ 'Saldo': [0] }" [seleccionMultiple]="true" [campoId]="'id'"

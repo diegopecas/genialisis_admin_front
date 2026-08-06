@@ -48,17 +48,17 @@ export class OpcionesClienteComponent implements OnInit {
 
   // Catálogo completo de opciones, agrupado por categoría.
   private opciones: OpcionCliente[] = [
-    { id: 'vista_360', label: 'Vista 360', icono: 'fas fa-id-card', categoria: 'Información', permiso: 'clientes.vista_360', ruta: '/clientes/vista/' },
-    { id: 'registro_representantes', label: 'Representantes', icono: 'fas fa-user-group', categoria: 'Información', permiso: 'clientes.representantes', ruta: '/clientes/representantes/' },
-    { id: 'registro_medidas', label: 'Medidas', icono: 'fas fa-ruler', categoria: 'Información', permiso: 'clientes.medidas', ruta: '/clientes/medidas/' },
-    { id: 'observaciones', label: 'Observaciones', icono: 'fas fa-comment-dots', categoria: 'Información', permiso: 'clientes.observaciones', ruta: '/clientes/observaciones/' },
-    { id: 'pagos', label: 'Pagos', icono: 'fas fa-money-bills', categoria: 'Servicios y cobros', permiso: 'clientes.pagos', ruta: '/clientes/pagos/' },
-    { id: 'productos_servicios', label: 'Productos', icono: 'fas fa-box-open', categoria: 'Servicios y cobros', permiso: 'clientes.productos_servicios', ruta: '/clientes/productos-servicios/' },
-    { id: 'contratos', label: 'Contratos', icono: 'fas fa-file-pen', categoria: 'Servicios y cobros', permiso: 'clientes.contratos', ruta: '/clientes/contratos/' },
-    { id: 'cursos_extra', label: 'Cursos Extra', icono: 'fas fa-book-medical', categoria: 'Servicios y cobros', permiso: null, ruta: '/clientes/cursos-extra/' },
-    { id: 'onces', label: 'Onces', icono: 'fas fa-apple-whole', categoria: 'Servicios y cobros', permiso: 'clientes.onces', ruta: '/clientes/onces/' },
-    { id: 'editar', label: 'Editar', icono: 'fas fa-pen', categoria: 'Gestión', permiso: 'clientes.administrar', ruta: 'clientes/editar/' },
-    { id: 'cambiar_plan', label: 'Cambio Plan', icono: 'fas fa-user-pen', categoria: 'Gestión', permiso: 'clientes.cambio_plan', ruta: null },
+    { id: 'vista_360', label: 'Vista 360', icono: '/assets/images/vista_360.png', categoria: 'Información', permiso: 'clientes.vista_360', ruta: '/clientes/vista/' },
+    { id: 'registro_representantes', label: 'Representantes', icono: '/assets/images/familia.png', categoria: 'Información', permiso: 'clientes.representantes', ruta: '/clientes/representantes/' },
+    { id: 'registro_medidas', label: 'Medidas', icono: '/assets/images/medidas.png', categoria: 'Información', permiso: 'clientes.medidas', ruta: '/clientes/medidas/' },
+    { id: 'observaciones', label: 'Observaciones', icono: '/assets/images/observaciones.png', categoria: 'Información', permiso: 'clientes.observaciones', ruta: '/clientes/observaciones/' },
+    { id: 'pagos', label: 'Pagos', icono: '/assets/images/pagos.png', categoria: 'Servicios y cobros', permiso: 'clientes.pagos', ruta: '/clientes/pagos/' },
+    { id: 'productos_servicios', label: 'Productos', icono: '/assets/images/productos.png', categoria: 'Servicios y cobros', permiso: 'clientes.productos_servicios', ruta: '/clientes/productos-servicios/' },
+    { id: 'contratos', label: 'Contratos', icono: '/assets/images/contratos.png', categoria: 'Servicios y cobros', permiso: 'clientes.contratos', ruta: '/clientes/contratos/' },
+    { id: 'cursos_extra', label: 'Cursos Extra', icono: '/assets/images/cursos-extra.png', categoria: 'Servicios y cobros', permiso: null, ruta: '/clientes/cursos-extra/' },
+    { id: 'onces', label: 'Onces', icono: '/assets/images/onces.png', categoria: 'Servicios y cobros', permiso: 'clientes.onces', ruta: '/clientes/onces/' },
+    { id: 'editar', label: 'Editar', icono: '/assets/images/editar.png', categoria: 'Gestión', permiso: 'clientes.administrar', ruta: 'clientes/editar/' },
+    { id: 'cambiar_plan', label: 'Cambio Plan', icono: '/assets/images/cambio_plan.png', categoria: 'Gestión', permiso: 'clientes.cambio_plan', ruta: null },
   ];
 
   // Orden de presentación de las categorías

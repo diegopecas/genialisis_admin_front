@@ -17,7 +17,11 @@
                 [src]="obtenerUrlFoto()" 
                 [alt]="nombrePersona"
                 class="foto-img">
-            <i class="fas fa-camera icono-img foto-img" *ngIf="!fotoActual"></i>
+            <img 
+                *ngIf="!fotoActual" 
+                src="/assets/images/foto.png" 
+                alt="Foto por defecto"
+                class="foto-img">
             <div class="foto-overlay">
                 <i class="fas fa-search-plus"></i>
             </div>
@@ -29,7 +33,7 @@
                 class="btn-accion btn-cambiar"
                 (click)="abrirModal()"
                 [title]="fotoActual ? 'Cambiar foto' : 'Subir foto'">
-                <i [class]="fotoActual ? 'fas fa-edit' : 'fas fa-camera'"></i>
+                <i [class]="fotoActual ? '/assets/images/foto.png' : 'fas fa-camera'"></i>
             </button>
             <button 
                 *ngIf="fotoActual"
@@ -54,7 +58,7 @@
         <button class="lightbox-cerrar" (click)="cerrarLightbox()" title="Cerrar">
             <i class="fas fa-times"></i>
         </button>
-        <i class="fas fa-camera icono-img lightbox-img"></i>
+        <img [src]="fotoActual ? obtenerUrlFoto() : '/assets/images/foto.png'" [alt]="nombrePersona" class="lightbox-img">
         <div *ngIf="nombrePersona" class="lightbox-nombre">{{ nombrePersona }}</div>
     </div>
 </div>

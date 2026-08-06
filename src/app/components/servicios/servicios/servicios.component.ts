@@ -23,11 +23,11 @@ export class ServiciosComponent {
   public planes = [] as any[];
 
   public acciones = [
-    { id: 'academico', label: 'Académico', icono: 'fas fa-graduation-cap' },
-    { id: 'extraacademico', label: 'Extra académico', icono: 'fas fa-basketball' },
-    { id: 'alimentacion', label: 'Alimentación', icono: 'fas fa-utensils' },
-    { id: 'vestuario', label: 'Vestuario', icono: 'fas fa-shirt' },
-    { id: 'insumos', label: 'Insumos', icono: 'fas fa-box-open' }
+    { id: 'academico', label: 'Académico', icono: '/assets/images/servicios/servicios-academico.png' },
+    { id: 'extraacademico', label: 'Extra académico', icono: '/assets/images/servicios/servicios-extra-academico.png' },
+    { id: 'alimentacion', label: 'Alimentación', icono: '/assets/images/servicios/servicios-alimentacion.png' },
+    { id: 'vestuario', label: 'Vestuario', icono: '/assets/images/servicios/servicios-vestuario.png' },
+    { id: 'insumos', label: 'Insumos', icono: '/assets/images/servicios/servicios-insumos.png' }
   ] as any[];
 
   constructor(

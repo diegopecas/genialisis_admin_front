@@ -41,7 +41,7 @@ export class ReportePagosRecibidosComponent implements OnInit {
   };
 
   public acciones = [
-    { id: 'imprimir', label: 'Imprimir', icono: 'fas fa-receipt' }
+    { id: 'imprimir', label: 'Imprimir', icono: '/assets/images/comprobante_pago.png' }
   ] as any[];
 
   constructor(

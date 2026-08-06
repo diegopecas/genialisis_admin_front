@@ -30,8 +30,8 @@ export class ContratosClientesComponent {
   public columnasFiltro = ['Año', 'Plan', 'Estado'];
 
   public acciones = [
-    { id: 'descargar_pdf', label: 'Descargar PDF', icono: 'fas fa-file-pdf', condicion: 'mostrar_descargar', valor: true },
-    { id: 'desmarcar_firmado', label: 'Desmarcar Firmado', icono: 'fas fa-signature', condicion: 'mostrar_desmarcar_firmado', valor: true },
+    { id: 'descargar_pdf', label: 'Descargar PDF', icono: '/assets/images/pdf.png', condicion: 'mostrar_descargar', valor: true },
+    { id: 'desmarcar_firmado', label: 'Desmarcar Firmado', icono: '/assets/images/quitar_firma.png', condicion: 'mostrar_desmarcar_firmado', valor: true },
   ] as any[];
 
   // Variables de permisos

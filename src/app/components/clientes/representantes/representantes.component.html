@@ -1,7 +1,7 @@
 <div class="modulo">
     <app-header-anidado [tituloModulo]="titulo" [path]="path" [mostrarCrear]="puedeAdministrar" [accion]="'ConsultarTodos'"
       [raiz]="'/clientes/representantes'" [regresar]="'/clientes/opciones/' + idCliente"
-      [iconoTitulo]="'fas fa-user-group'"
+      [iconoTitulo]="'/assets/images/familia.png'"
       ></app-header-anidado>
     <app-tablas [titulos]="titulos" [datos]="datos" [raiz]="'/clientes/representantes'" [accionVer]="puedeAdministrar"
       [accionEditar]="puedeAdministrar" [accionEliminar]="puedeAdministrar" [columnasFiltro]="columnasFiltro" (clicAccion)="seleccionar($event)"></app-tablas>
