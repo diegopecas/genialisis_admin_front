@@ -4,7 +4,7 @@
     [mostrarCrear]="false"
     [raiz]="'/'"
     [regresar]="'/administracion/operaciones'"
-    [iconoTitulo]="'/assets/images/consulta-entes-control.png'"
+    [iconoTitulo]="'mdi mdi-file-search'"
   ></app-header>
 
   <div class="container-fluid mt-4">
@@ -107,23 +107,23 @@
           </div>
         </div>
 
-        <!-- ESTUDIANTES -->
-        <div *ngIf="tabActiva === 'estudiantes'">
-          <div class="buscador-estudiantes">
+        <!-- CLIENTES -->
+        <div *ngIf="tabActiva === 'clientes'">
+          <div class="buscador-clientes">
             <i class="fas fa-search"></i>
-            <input type="text" [(ngModel)]="busqueda" placeholder="Buscar estudiante..." />
+            <input type="text" [(ngModel)]="busqueda" placeholder="Buscar cliente..." />
           </div>
 
-          <div *ngIf="estudiantesFiltrados.length === 0" class="text-center text-muted py-4">
-            Ningún estudiante coincide con la búsqueda.
+          <div *ngIf="clientesFiltrados.length === 0" class="text-center text-muted py-4">
+            Ningún cliente coincide con la búsqueda.
           </div>
 
           <div class="grilla-carpetas">
-            <div class="carpeta" *ngFor="let c of estudiantesFiltrados" (click)="abrirCarpetaEstudiante(c)">
+            <div class="carpeta" *ngFor="let c of clientesFiltrados" (click)="abrirCarpetaCliente(c)">
               <div class="pestana"></div>
               <div class="cuerpo">
                 <span class="badge-conteo">{{ c.total_documentos }}</span>
-                <span class="nombre">{{ c.nombre_estudiante }}</span>
+                <span class="nombre">{{ c.nombre_cliente }}</span>
                 <small class="identificacion">{{ c.numero_identificacion }}</small>
               </div>
             </div>
@@ -143,7 +143,7 @@
         <div class="titulo-carpeta">
           <i class="fas fa-folder-open"></i>
           <div>
-            <span class="nombre">{{ tipoCarpetaAbierta === 'estudiante' ? carpetaAbierta.nombre_estudiante : carpetaAbierta.nombre }}</span>
+            <span class="nombre">{{ tipoCarpetaAbierta === 'cliente' ? carpetaAbierta.nombre_cliente : carpetaAbierta.nombre }}</span>
             <small class="identificacion">{{ carpetaAbierta.numero_identificacion }}</small>
           </div>
         </div>
@@ -169,11 +169,11 @@
           </div>
         </div>
 
-        <ng-container *ngIf="tipoCarpetaAbierta === 'estudiante'">
-        <!-- Documentos del estudiante -->
-        <div class="seccion" *ngIf="carpetaAbierta.documentos_estudiante.length > 0">
-          <h6 class="titulo-seccion"><i class="fas fa-user-graduate me-2"></i>Documentos del estudiante</h6>
-          <div class="doc" *ngFor="let d of carpetaAbierta.documentos_estudiante">
+        <ng-container *ngIf="tipoCarpetaAbierta === 'cliente'">
+        <!-- Documentos del cliente -->
+        <div class="seccion" *ngIf="carpetaAbierta.documentos_cliente.length > 0">
+          <h6 class="titulo-seccion"><i class="fas fa-user-graduate me-2"></i>Documentos del cliente</h6>
+          <div class="doc" *ngFor="let d of carpetaAbierta.documentos_cliente">
             <div class="doc-info">
               <span class="doc-tipo">{{ d.tipo_documento }}</span>
               <span class="doc-archivo">{{ d.nombre_archivo }}</span>
@@ -188,11 +188,11 @@
           </div>
         </div>
 
-        <!-- Documentos de acudientes -->
-        <div class="seccion" *ngIf="carpetaAbierta.documentos_acudientes.length > 0">
-          <h6 class="titulo-seccion"><i class="fas fa-users me-2"></i>Documentos de acudientes</h6>
-          <div class="acudiente-grupo" *ngFor="let a of acudientesAgrupados(carpetaAbierta)">
-            <div class="acudiente-nombre"><i class="fas fa-user me-1"></i>{{ a.nombre }}</div>
+        <!-- Documentos de representantes -->
+        <div class="seccion" *ngIf="carpetaAbierta.documentos_representantes.length > 0">
+          <h6 class="titulo-seccion"><i class="fas fa-users me-2"></i>Documentos de representantes</h6>
+          <div class="representante-plan" *ngFor="let a of representantesAgrupados(carpetaAbierta)">
+            <div class="representante-nombre"><i class="fas fa-user me-1"></i>{{ a.nombre }}</div>
             <div class="doc" *ngFor="let d of a.documentos">
               <div class="doc-info">
                 <span class="doc-tipo">{{ d.tipo_documento }}</span>

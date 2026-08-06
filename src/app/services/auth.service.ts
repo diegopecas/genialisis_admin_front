@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 /**
- * AuthService unificado — idéntico en el portal de acudientes y en el
+ * AuthService unificado — idéntico en el portal de representantes y en el
  * institucional. Se copia igual entre ambos repos.
  *
  * - La lógica de habeas data es genérica: no menciona ningún portal. Lee el
@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
  *   ninguna app. Los que un repo no use quedan inertes, no estorban.
  * - No depende de ningún otro servicio (solo Router), por eso el archivo es
  *   portable entre repos sin arrastrar dependencias. Lo específico de
- *   acudientes (IDs de estudiantes) vive en EstudiantesSessionService.
+ *   representantes (IDs de clientes) vive en ClientesSessionService.
  */
 @Injectable({
   providedIn: 'root'
@@ -72,13 +72,13 @@ export class AuthService {
   /**
    * Limpia las claves de sesión. removeItem sobre una clave inexistente no
    * hace nada, así que sirve igual en ambos repos aunque unas claves sean
-   * propias de acudientes.
+   * propias de representantes.
    */
   limpiarSesion(): void {
     sessionStorage.removeItem('usuario');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('institucion_actual');
-    sessionStorage.removeItem('estudiantesIds');
+    sessionStorage.removeItem('clientesIds');
     sessionStorage.removeItem('cumpleanos_cache');
   }
 

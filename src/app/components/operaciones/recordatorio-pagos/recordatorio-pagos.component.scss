@@ -51,7 +51,7 @@ $tablet: 768px;
   }
 }
 
-.estudiantes-bg {
+.clientes-bg {
   background-color: rgba($primary-color, 0.1);
   color: darken($primary-color, 10%);
 }
@@ -90,7 +90,7 @@ $tablet: 768px;
     z-index: 1;
   }
 
-  .columna-grupo {
+  .columna-plan {
     min-width: 120px;
   }
 
@@ -253,8 +253,8 @@ $tablet: 768px;
   }
 }
 
-// Card de acudiente en el modal
-.acudiente-card {
+// Card de representante en el modal
+.representante-card {
   padding: 1rem;
   border: 1px solid $border-color;
   border-radius: 0.5rem;

@@ -7,16 +7,16 @@ import * as XLSX from 'xlsx';
 
 import { HeaderComponent } from '../../../common/header/header.component';
 import { CuentasPorCobrarService } from '../../../services/cuentas-por-cobrar.service';
-import { GruposService } from '../../../services/grupos.service';
+import { PlanesService } from '../../../services/planes.service';
 
 // Interfaces
-interface EstudianteCartera {
+interface ClienteCartera {
   id_persona: string;
-  id_estudiante: string;
+  id_cliente: string;
   id_colaborador: string;
-  nombre_estudiante: string;
+  nombre_cliente: string;
   numero_identificacion: string;
-  grupo_estudiante: string;
+  plan_cliente: string;
   tipo_persona: string;
   activo: number;
   totalCobrado: number;
@@ -41,7 +41,7 @@ interface EstudianteCartera {
 }
 
 // Interfaz extendida para cuando necesitamos totalSaldoPendiente como requerido
-interface EstudianteCarteraConSaldoPendiente extends EstudianteCartera {
+interface ClienteCarteraConSaldoPendiente extends ClienteCartera {
   totalSaldoPendiente: number;
 }
 
@@ -80,10 +80,10 @@ interface PagoDiario {
   total_pagado: number;
   total_recibido?: number;
   cantidad_pagos: number;
-  id_estudiante?: string;
+  id_cliente?: string;
   id_colaborador?: string;
   id_persona?: string;
-  nombre_estudiante?: string;
+  nombre_cliente?: string;
   tipo_persona?: string;
 }
 
@@ -109,7 +109,7 @@ interface ProductoCartera {
   saldo_total: number;
   saldo_vencido: number;
   saldo_pendiente: number;
-  cantidad_estudiantes: number;
+  cantidad_clientes: number;
   porcentaje_recaudo: number;
 }
 interface MovimientoAnulado {
@@ -123,10 +123,10 @@ interface MovimientoAnulado {
   grupo_cartera: string;
   nombre_tipo_pago: string;
   fecha_original: string;
-  id_estudiante?: string;
+  id_cliente?: string;
   id_colaborador?: string;
   id_persona?: string;
-  nombre_estudiante?: string;
+  nombre_cliente?: string;
   tipo_persona?: string;
   id_producto_servicio?: string;
   nombre_producto?: string;
@@ -155,17 +155,17 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   // Filtros
   public anioSeleccionado: number = new Date().getFullYear();
   public aniosDisponibles: number[] = [];
-  public grupoSeleccionado: string = '';
+  public planSeleccionado: string = '';
   public estadoSeleccionado: string = '';
-  public busquedaEstudiante: string = '';
+  public busquedaCliente: string = '';
   public mesDiarioSeleccionado: string = '';
 
   // Datos
-  public grupos: any[] = [];
-  public estudiantes: EstudianteCartera[] = [];
-  public estudiantesFiltrados: EstudianteCartera[] = [];
-  public colaboradores: EstudianteCartera[] = [];
-  public colaboradoresFiltrados: EstudianteCartera[] = [];
+  public planes: any[] = [];
+  public clientes: ClienteCartera[] = [];
+  public clientesFiltrados: ClienteCartera[] = [];
+  public colaboradores: ClienteCartera[] = [];
+  public colaboradoresFiltrados: ClienteCartera[] = [];
   public datosClasificaciones: ClasificacionCartera[] = [];
   public datosPagosDiarios: PagoDiario[] = [];
   public movimientoDiarioFiltrado: PagoDiario[] = [];
@@ -176,19 +176,19 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   public datosMensualesFiltrados: DatoMensual[] = [];
 
   // Filtros de activos/inactivos ('todos' | 'activos' | 'inactivos')
-  public filtroActivoEstudiantes: string = 'activos';
+  public filtroActivoClientes: string = 'activos';
   public filtroActivoColaboradores: string = 'activos';
-  public filtroActivoSaldosEstudiantes: string = 'activos';
+  public filtroActivoSaldosClientes: string = 'activos';
   public filtroActivoSaldosColaboradores: string = 'activos';
 
-  // Variables para saldos pendientes mensuales (estudiantes)
-  public estudiantesSaldosPendientesFiltrados: EstudianteCarteraConSaldoPendiente[] = [];
+  // Variables para saldos pendientes mensuales (clientes)
+  public clientesSaldosPendientesFiltrados: ClienteCarteraConSaldoPendiente[] = [];
   public mostrarSoloConSaldoPendiente: boolean = true;
   public columnaOrdenamientoSaldos: string = 'totalSaldoPendiente';
   public ordenAscendenteSaldos: boolean = false;
 
   // Variables para saldos pendientes mensuales (colaboradores)
-  public colaboradoresSaldosPendientesFiltrados: EstudianteCarteraConSaldoPendiente[] = [];
+  public colaboradoresSaldosPendientesFiltrados: ClienteCarteraConSaldoPendiente[] = [];
   public mostrarSoloConSaldoPendienteColaboradores: boolean = true;
   public columnaOrdenamientoSaldosColaboradores: string = 'totalSaldoPendiente';
   public ordenAscendenteSaldosColaboradores: boolean = false;
@@ -208,7 +208,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     saldoTotal: 0,
     saldoVencido: 0,
     saldoPendiente: 0,
-    cantidadEstudiantes: 0,
+    cantidadClientes: 0,
     cantidadVencidos: 0,
     porcentajeRecaudo: 0
   };
@@ -218,10 +218,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   public registrosPorPagina: number = 20;
   public totalPaginas: number = 1;
 
-  // Detalle estudiante
-  public estudianteSeleccionado: EstudianteCartera | null = null;
-  public detalleEstudianteMensual: any[] = [];
-  public detalleEstudianteTiposPago: any[] = [];
+  // Detalle cliente
+  public clienteSeleccionado: ClienteCartera | null = null;
+  public detalleClienteMensual: any[] = [];
+  public detalleClienteTiposPago: any[] = [];
 
   // Gráficos
   private charts: { [key: string]: Chart } = {};
@@ -309,7 +309,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   public productosUnicos: { id: string, nombre: string }[] = [];
   constructor(
     private cuentasPorCobrarService: CuentasPorCobrarService,
-    private gruposService: GruposService
+    private planesService: PlanesService
   ) {
     Chart.register(...registerables);
   }
@@ -370,7 +370,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   };
   ngOnInit(): void {
     this.inicializarAnios();
-    this.cargarGrupos();
+    this.cargarPlanes();
     this.inicializarFechasFiltro();
     this.cargarDatosCartera();
   }
@@ -401,13 +401,13 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     this.anioSeleccionado = anioActual;
   }
 
-  cargarGrupos(): void {
-    const sub = this.gruposService.obtenerTodos().subscribe({
+  cargarPlanes(): void {
+    const sub = this.planesService.obtenerTodos().subscribe({
       next: (response: any) => {
-        this.grupos = response.body || [];
+        this.planes = response.body || [];
       },
       error: (error) => {
-        console.error('Error al cargar grupos:', error);
+        console.error('Error al cargar planes:', error);
       }
     });
 
@@ -422,7 +422,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       next: (response: any) => {
         const data = response.body;
         console.log("obtenerReporteAnual", data)
-        if (data && data.reporte_estudiantes && data.reporte_valores) {
+        if (data && data.reporte_clientes && data.reporte_valores) {
           this.procesarDatosCartera(data);
           this.datosDisponibles = true;
 
@@ -448,18 +448,18 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   procesarDatosCartera(data: any): void {
-    const estudiantesMap = new Map<string, EstudianteCartera>();
+    const clientesMap = new Map<string, ClienteCartera>();
 
-    // Inicializar personas (estudiantes + colaboradores) desde reporte_estudiantes
-    data.reporte_estudiantes.forEach((est: any) => {
-      estudiantesMap.set(est.id_persona, {
+    // Inicializar personas (clientes + colaboradores) desde reporte_clientes
+    data.reporte_clientes.forEach((est: any) => {
+      clientesMap.set(est.id_persona, {
         id_persona: est.id_persona,
-        id_estudiante: est.id_estudiante || 0,
+        id_cliente: est.id_cliente || 0,
         id_colaborador: est.id_colaborador || 0,
-        nombre_estudiante: est.nombre_estudiante,
+        nombre_cliente: est.nombre_cliente,
         numero_identificacion: est.numero_identificacion,
-        grupo_estudiante: est.grupo_estudiante || 'Sin grupo',
-        tipo_persona: est.tipo_persona || 'Estudiante',
+        plan_cliente: est.plan_cliente || 'Sin plan',
+        tipo_persona: est.tipo_persona || 'Cliente',
         activo: est.activo ?? 1,
         totalCobrado: 0,
         totalCobradoAnulado: 0,
@@ -477,8 +477,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
     // Procesar valores desde reporte_valores
     data.reporte_valores.forEach((valor: ValorCartera) => {
-      const estudiante = estudiantesMap.get(valor.id_persona);
-      if (!estudiante) return;
+      const cliente = clientesMap.get(valor.id_persona);
+      if (!cliente) return;
 
       // Procesar clasificaciones cobradas
       if (valor.tipo_valor.startsWith('Clasificacion_') &&
@@ -488,15 +488,15 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         const match = valor.tipo_valor.match(/^Clasificacion_([^_]+)_(.+)$/);
         if (match) {
           const idClasificacion = match[1];
-          if (!estudiante.clasificaciones[idClasificacion]) {
-            estudiante.clasificaciones[idClasificacion] = {
+          if (!cliente.clasificaciones[idClasificacion]) {
+            cliente.clasificaciones[idClasificacion] = {
               cobrado: 0,
               pagado: 0,
               cobradoAEsteMes: 0,
               cobradoFuturo: 0
             };
           }
-          estudiante.clasificaciones[idClasificacion].cobrado = valor.valor;
+          cliente.clasificaciones[idClasificacion].cobrado = valor.valor;
         }
       }
       // Procesar clasificaciones pagadas
@@ -504,15 +504,15 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         const match = valor.tipo_valor.match(/^Clasificacion_Pagado_([^_]+)_(.+)$/);
         if (match) {
           const idClasificacion = match[1];
-          if (!estudiante.clasificaciones[idClasificacion]) {
-            estudiante.clasificaciones[idClasificacion] = {
+          if (!cliente.clasificaciones[idClasificacion]) {
+            cliente.clasificaciones[idClasificacion] = {
               cobrado: 0,
               pagado: 0,
               cobradoAEsteMes: 0,
               cobradoFuturo: 0
             };
           }
-          estudiante.clasificaciones[idClasificacion].pagado = valor.valor;
+          cliente.clasificaciones[idClasificacion].pagado = valor.valor;
         }
       }
       // Procesar clasificaciones cobrado a este mes
@@ -520,15 +520,15 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         const match = valor.tipo_valor.match(/^Clasificacion_AEsteMes_([^_]+)_(.+)$/);
         if (match) {
           const idClasificacion = match[1];
-          if (!estudiante.clasificaciones[idClasificacion]) {
-            estudiante.clasificaciones[idClasificacion] = {
+          if (!cliente.clasificaciones[idClasificacion]) {
+            cliente.clasificaciones[idClasificacion] = {
               cobrado: 0,
               pagado: 0,
               cobradoAEsteMes: 0,
               cobradoFuturo: 0
             };
           }
-          estudiante.clasificaciones[idClasificacion].cobradoAEsteMes = valor.valor;
+          cliente.clasificaciones[idClasificacion].cobradoAEsteMes = valor.valor;
         }
       }
       // Procesar clasificaciones cobrado futuro
@@ -536,15 +536,15 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         const match = valor.tipo_valor.match(/^Clasificacion_Futuro_([^_]+)_(.+)$/);
         if (match) {
           const idClasificacion = match[1];
-          if (!estudiante.clasificaciones[idClasificacion]) {
-            estudiante.clasificaciones[idClasificacion] = {
+          if (!cliente.clasificaciones[idClasificacion]) {
+            cliente.clasificaciones[idClasificacion] = {
               cobrado: 0,
               pagado: 0,
               cobradoAEsteMes: 0,
               cobradoFuturo: 0
             };
           }
-          estudiante.clasificaciones[idClasificacion].cobradoFuturo = valor.valor;
+          cliente.clasificaciones[idClasificacion].cobradoFuturo = valor.valor;
         }
       }
       // Procesar productos cobrados
@@ -552,10 +552,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         const match = valor.tipo_valor.match(/^Producto_([^_]+)_(.+)$/);
         if (match) {
           const idProducto = match[1];
-          if (!estudiante.productos[idProducto]) {
-            estudiante.productos[idProducto] = { cobrado: 0, pagado: 0 };
+          if (!cliente.productos[idProducto]) {
+            cliente.productos[idProducto] = { cobrado: 0, pagado: 0 };
           }
-          estudiante.productos[idProducto].cobrado = valor.valor;
+          cliente.productos[idProducto].cobrado = valor.valor;
         }
       }
       // Procesar productos pagados
@@ -563,53 +563,53 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         const match = valor.tipo_valor.match(/^Producto_Pagado_([^_]+)_(.+)$/);
         if (match) {
           const idProducto = match[1];
-          if (!estudiante.productos[idProducto]) {
-            estudiante.productos[idProducto] = { cobrado: 0, pagado: 0 };
+          if (!cliente.productos[idProducto]) {
+            cliente.productos[idProducto] = { cobrado: 0, pagado: 0 };
           }
-          estudiante.productos[idProducto].pagado = valor.valor;
+          cliente.productos[idProducto].pagado = valor.valor;
         }
       }
       // Procesar otros valores
       else {
         switch (valor.tipo_valor) {
           case 'Total Cobrado':
-            estudiante.totalCobrado = valor.valor;
+            cliente.totalCobrado = valor.valor;
             break;
           case 'Total Cobrado Anulado':
-            estudiante.totalCobradoAnulado = valor.valor;
+            cliente.totalCobradoAnulado = valor.valor;
             break;
           case 'Total Pagado':
-            estudiante.totalPagado = valor.valor;
+            cliente.totalPagado = valor.valor;
             break;
           case 'Total Pagado Anulado':
-            estudiante.totalPagadoAnulado = valor.valor;
+            cliente.totalPagadoAnulado = valor.valor;
             break;
           case 'Saldo Total':
-            estudiante.saldoTotal = valor.valor;
+            cliente.saldoTotal = valor.valor;
             break;
           case 'Saldo Vencido':
-            estudiante.saldoVencido = valor.valor;
+            cliente.saldoVencido = valor.valor;
             break;
           case 'Saldo Pendiente':
-            estudiante.saldoPendiente = valor.valor;
+            cliente.saldoPendiente = valor.valor;
             break;
           default:
             if (valor.tipo_valor.startsWith('Pago Tipo ')) {
-              estudiante.tiposPago[valor.tipo_valor] = valor.valor;
+              cliente.tiposPago[valor.tipo_valor] = valor.valor;
             }
             else if (valor.mes !== null) {
-              if (!estudiante.valoresMensuales[valor.mes]) {
-                estudiante.valoresMensuales[valor.mes] = {};
+              if (!cliente.valoresMensuales[valor.mes]) {
+                cliente.valoresMensuales[valor.mes] = {};
               }
-              estudiante.valoresMensuales[valor.mes][valor.tipo_valor] = valor.valor;
+              cliente.valoresMensuales[valor.mes][valor.tipo_valor] = valor.valor;
             }
             break;
         }
       }
     });
 
-    const todasLasPersonas = Array.from(estudiantesMap.values());
-    this.estudiantes = todasLasPersonas.filter(p => p.tipo_persona === 'Estudiante');
+    const todasLasPersonas = Array.from(clientesMap.values());
+    this.clientes = todasLasPersonas.filter(p => p.tipo_persona === 'Cliente');
     this.colaboradores = todasLasPersonas.filter(p => p.tipo_persona === 'Colaborador');
 
     // Procesar clasificaciones
@@ -629,7 +629,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         saldo_total: parseFloat(prod.saldo_total) || 0,
         saldo_vencido: parseFloat(prod.saldo_vencido) || 0,
         saldo_pendiente: parseFloat(prod.saldo_pendiente) || 0,
-        cantidad_estudiantes: parseInt(prod.cantidad_estudiantes) || 0,
+        cantidad_clientes: parseInt(prod.cantidad_clientes) || 0,
         porcentaje_recaudo: 0
       }));
 
@@ -640,9 +640,9 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         }
       });
 
-      // Procesar estudiante_producto para actualizar los datos de estudiantes
-      if (data.estudiante_producto) {
-        this.procesarEstudianteProducto(data.estudiante_producto);
+      // Procesar cliente_producto para actualizar los datos de clientes
+      if (data.cliente_producto) {
+        this.procesarClienteProducto(data.cliente_producto);
       }
     }
 
@@ -689,10 +689,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     this.aplicarFiltrosColaboradores();
   }
 
-  private procesarEstudianteProducto(estudianteProducto: any[]): void {
-    estudianteProducto.forEach(ep => {
-      // Buscar en estudiantes primero, luego en colaboradores
-      let persona = this.estudiantes.find(e => e.id_persona === ep.id_persona);
+  private procesarClienteProducto(clienteProducto: any[]): void {
+    clienteProducto.forEach(ep => {
+      // Buscar en clientes primero, luego en colaboradores
+      let persona = this.clientes.find(e => e.id_persona === ep.id_persona);
       if (!persona) {
         persona = this.colaboradores.find(c => c.id_persona === ep.id_persona);
       }
@@ -731,8 +731,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         porcentajeRecaudo: 0
       };
 
-      // Sumar valores de todos los estudiantes para este mes
-      this.estudiantes.forEach(est => {
+      // Sumar valores de todos los clientes para este mes
+      this.clientes.forEach(est => {
         const valoresMes = est.valoresMensuales[mes];
         if (valoresMes) {
           datoMes.cobrado += valoresMes[`Cobrado ${datoMes.nombreMes}`] || 0;
@@ -759,12 +759,12 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       saldoTotal: 0,
       saldoVencido: 0,
       saldoPendiente: 0,
-      cantidadEstudiantes: this.estudiantes.length,
+      cantidadClientes: this.clientes.length,
       cantidadVencidos: 0,
       porcentajeRecaudo: 0
     };
 
-    this.estudiantes.forEach(est => {
+    this.clientes.forEach(est => {
       this.totalesGenerales.totalCobrado += est.totalCobrado;
       this.totalesGenerales.totalPagado += est.totalPagado;
       this.totalesGenerales.saldoTotal += est.saldoTotal;
@@ -788,13 +788,13 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   filtrarTodosLosComponentes(): void {
-    // Filtrar clasificaciones basándose en los estudiantes filtrados
+    // Filtrar clasificaciones basándose en los clientes filtrados
     this.filtrarClasificaciones();
 
-    // Filtrar productos basándose en los estudiantes filtrados
+    // Filtrar productos basándose en los clientes filtrados
     this.filtrarProductos();
 
-    // Filtrar datos mensuales basándose en los estudiantes filtrados
+    // Filtrar datos mensuales basándose en los clientes filtrados
     this.filtrarDatosMensuales();
 
     // Actualizar totales generales con datos filtrados
@@ -808,15 +808,15 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
   filtrarClasificaciones(): void {
     // Si no hay filtros, usar datos originales
-    if (!this.grupoSeleccionado && !this.estadoSeleccionado && !this.busquedaEstudiante) {
+    if (!this.planSeleccionado && !this.estadoSeleccionado && !this.busquedaCliente) {
       this.datosClasificacionesFiltradas = [...this.datosClasificaciones];
 
-      // Calcular totales desde los estudiantes
+      // Calcular totales desde los clientes
       this.datosClasificacionesFiltradas.forEach(clasif => {
         clasif.total_cobrado_a_este_mes = 0;
         clasif.total_cobrado_futuro = 0;
 
-        this.estudiantes.forEach(est => {
+        this.clientes.forEach(est => {
           if (est.clasificaciones[clasif.id_clasificacion]) {
             clasif.total_cobrado_a_este_mes! += est.clasificaciones[clasif.id_clasificacion].cobradoAEsteMes || 0;
             clasif.total_cobrado_futuro! += est.clasificaciones[clasif.id_clasificacion].cobradoFuturo || 0;
@@ -845,8 +845,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       });
     });
 
-    // Sumar solo estudiantes filtrados
-    this.estudiantesFiltrados.forEach(est => {
+    // Sumar solo clientes filtrados
+    this.clientesFiltrados.forEach(est => {
       Object.keys(est.clasificaciones).forEach(idClasificacion => {
         const clasificacion = clasificacionesMap.get(idClasificacion);
         if (clasificacion && clasificacion.total_cobrado_a_este_mes !== undefined && clasificacion.total_cobrado_futuro !== undefined) {
@@ -870,12 +870,12 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
   filtrarDatosMensuales(): void {
     // Si no hay filtros, mostrar todos los datos mensuales
-    if (!this.grupoSeleccionado && !this.estadoSeleccionado && !this.busquedaEstudiante) {
+    if (!this.planSeleccionado && !this.estadoSeleccionado && !this.busquedaCliente) {
       this.datosMensualesFiltrados = [...this.datosMensuales];
       return;
     }
 
-    // Recalcular datos mensuales basándose en estudiantes filtrados
+    // Recalcular datos mensuales basándose en clientes filtrados
     this.datosMensualesFiltrados = [];
 
     for (let mes = 1; mes <= 12; mes++) {
@@ -890,8 +890,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         porcentajeRecaudo: 0
       };
 
-      // Sumar valores solo de estudiantes filtrados
-      this.estudiantesFiltrados.forEach(est => {
+      // Sumar valores solo de clientes filtrados
+      this.clientesFiltrados.forEach(est => {
         const valoresMes = est.valoresMensuales[mes];
         if (valoresMes) {
           datoMes.cobrado += valoresMes[`Cobrado ${datoMes.nombreMes}`] || 0;
@@ -913,24 +913,24 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
   calcularTotalesGeneralesFiltrados(): void {
     // Si no hay filtros, usar totales generales originales
-    if (!this.grupoSeleccionado && !this.estadoSeleccionado && !this.busquedaEstudiante) {
+    if (!this.planSeleccionado && !this.estadoSeleccionado && !this.busquedaCliente) {
       this.calcularTotalesGenerales();
       return;
     }
 
-    // Recalcular totales basándose en estudiantes filtrados
+    // Recalcular totales basándose en clientes filtrados
     this.totalesGenerales = {
       totalCobrado: 0,
       totalPagado: 0,
       saldoTotal: 0,
       saldoVencido: 0,
       saldoPendiente: 0,
-      cantidadEstudiantes: this.estudiantesFiltrados.length,
+      cantidadClientes: this.clientesFiltrados.length,
       cantidadVencidos: 0,
       porcentajeRecaudo: 0
     };
 
-    this.estudiantesFiltrados.forEach(est => {
+    this.clientesFiltrados.forEach(est => {
       this.totalesGenerales.totalCobrado += est.totalCobrado;
       this.totalesGenerales.totalPagado += est.totalPagado;
       this.totalesGenerales.saldoTotal += est.saldoTotal;
@@ -950,20 +950,20 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   aplicarFiltros(): void {
-    let filtrados = [...this.estudiantes];
+    let filtrados = [...this.clientes];
 
     // Filtrar por activos/inactivos
-    if (this.filtroActivoEstudiantes === 'activos') {
+    if (this.filtroActivoClientes === 'activos') {
       filtrados = filtrados.filter(est => est.activo === 1);
-    } else if (this.filtroActivoEstudiantes === 'inactivos') {
+    } else if (this.filtroActivoClientes === 'inactivos') {
       filtrados = filtrados.filter(est => est.activo === 0);
     }
 
-    // Filtrar por grupo
-    if (this.grupoSeleccionado) {
-      const grupoSeleccionado = this.grupos.find(g => g.id.toString() === this.grupoSeleccionado);
-      if (grupoSeleccionado) {
-        filtrados = filtrados.filter(est => est.grupo_estudiante === grupoSeleccionado.nombre);
+    // Filtrar por plan
+    if (this.planSeleccionado) {
+      const planSeleccionado = this.planes.find(g => g.id.toString() === this.planSeleccionado);
+      if (planSeleccionado) {
+        filtrados = filtrados.filter(est => est.plan_cliente === planSeleccionado.nombre);
       }
     }
 
@@ -983,14 +983,14 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     // Filtrar por búsqueda
-    if (this.busquedaEstudiante) {
-      const busqueda = this.busquedaEstudiante.toLowerCase();
+    if (this.busquedaCliente) {
+      const busqueda = this.busquedaCliente.toLowerCase();
       filtrados = filtrados.filter(est =>
-        est.nombre_estudiante.toLowerCase().includes(busqueda)
+        est.nombre_cliente.toLowerCase().includes(busqueda)
       );
     }
 
-    this.estudiantesFiltrados = filtrados;
+    this.clientesFiltrados = filtrados;
 
     this.aplicarOrdenamiento();
     this.calcularPaginacion();
@@ -1025,10 +1025,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     // Filtrar por búsqueda
-    if (this.busquedaEstudiante) {
-      const busqueda = this.busquedaEstudiante.toLowerCase();
+    if (this.busquedaCliente) {
+      const busqueda = this.busquedaCliente.toLowerCase();
       filtrados = filtrados.filter(col =>
-        col.nombre_estudiante.toLowerCase().includes(busqueda)
+        col.nombre_cliente.toLowerCase().includes(busqueda)
       );
     }
 
@@ -1042,9 +1042,9 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   aplicarOrdenamiento(): void {
     const multiplicador = this.ordenAscendente ? 1 : -1;
 
-    this.estudiantesFiltrados.sort((a, b) => {
-      let valorA: any = a[this.columnaOrdenamiento as keyof EstudianteCartera];
-      let valorB: any = b[this.columnaOrdenamiento as keyof EstudianteCartera];
+    this.clientesFiltrados.sort((a, b) => {
+      let valorA: any = a[this.columnaOrdenamiento as keyof ClienteCartera];
+      let valorB: any = b[this.columnaOrdenamiento as keyof ClienteCartera];
 
       // Si es string, convertir a minúsculas para comparación
       if (typeof valorA === 'string') {
@@ -1066,28 +1066,28 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       // Si es una columna diferente, establecer como nueva columna
       this.columnaOrdenamiento = columna;
       // Por defecto, las columnas numéricas ordenan descendente, las de texto ascendente
-      this.ordenAscendente = ['nombre_estudiante', 'numero_identificacion', 'grupo_estudiante'].includes(columna);
+      this.ordenAscendente = ['nombre_cliente', 'numero_identificacion', 'plan_cliente'].includes(columna);
     }
 
     this.aplicarOrdenamiento();
   }
 
-  getEstudiantesPaginados(): EstudianteCartera[] {
+  getClientesPaginados(): ClienteCartera[] {
     const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
     const fin = inicio + this.registrosPorPagina;
-    return this.estudiantesFiltrados.slice(inicio, fin);
+    return this.clientesFiltrados.slice(inicio, fin);
   }
 
-  buscarEstudiante(): void {
+  buscarCliente(): void {
     this.aplicarFiltros();
     this.aplicarFiltrosColaboradores();
     this.filtrarTodosLosComponentes();
   }
 
   resetearFiltros(): void {
-    this.grupoSeleccionado = '';
+    this.planSeleccionado = '';
     this.estadoSeleccionado = '';
-    this.busquedaEstudiante = '';
+    this.busquedaCliente = '';
 
     this.inicializarFechasFiltro();
 
@@ -1109,7 +1109,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   calcularPaginacion(): void {
-    this.totalPaginas = Math.ceil(this.estudiantesFiltrados.length / this.registrosPorPagina);
+    this.totalPaginas = Math.ceil(this.clientesFiltrados.length / this.registrosPorPagina);
     this.paginaActual = 1;
   }
 
@@ -1135,37 +1135,37 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     return paginas;
   }
 
-  getEstadoBadgeClass(estudiante: EstudianteCartera): string {
-    if (estudiante.saldoTotal === 0) {
+  getEstadoBadgeClass(cliente: ClienteCartera): string {
+    if (cliente.saldoTotal === 0) {
       return 'bg-success';
-    } else if (estudiante.saldoVencido > 0) {
+    } else if (cliente.saldoVencido > 0) {
       return 'bg-danger';
     } else {
       return 'bg-warning';
     }
   }
 
-  getEstadoTexto(estudiante: EstudianteCartera): string {
-    if (estudiante.saldoTotal === 0) {
+  getEstadoTexto(cliente: ClienteCartera): string {
+    if (cliente.saldoTotal === 0) {
       return 'Al día';
-    } else if (estudiante.saldoVencido > 0) {
+    } else if (cliente.saldoVencido > 0) {
       return 'Vencido';
     } else {
       return 'Pendiente';
     }
   }
 
-  verDetalleEstudiante(estudiante: EstudianteCartera): void {
-    this.estudianteSeleccionado = estudiante;
+  verDetalleCliente(cliente: ClienteCartera): void {
+    this.clienteSeleccionado = cliente;
 
     // Generar detalle mensual
-    this.detalleEstudianteMensual = [];
+    this.detalleClienteMensual = [];
     for (let mes = 1; mes <= 12; mes++) {
-      const valoresMes = estudiante.valoresMensuales[mes];
+      const valoresMes = cliente.valoresMensuales[mes];
       const nombreMes = this.mesesDisponibles[mes - 1].nombre;
 
       if (valoresMes) {
-        this.detalleEstudianteMensual.push({
+        this.detalleClienteMensual.push({
           mes: nombreMes,
           cobrado: valoresMes[`Cobrado ${nombreMes}`] || 0,
           pagado: valoresMes[`Pagado ${nombreMes}`] || 0,
@@ -1175,7 +1175,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     // Generar detalle de tipos de pago
-    this.detalleEstudianteTiposPago = Object.entries(estudiante.tiposPago)
+    this.detalleClienteTiposPago = Object.entries(cliente.tiposPago)
       .map(([nombre, valor]) => ({
         nombre: nombre.replace('Pago Tipo ', ''),
         valor: valor
@@ -1183,7 +1183,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       .filter(tp => tp.valor > 0);
 
     // Mostrar modal
-    const modal = new (window as any).bootstrap.Modal(document.getElementById('modalDetalleEstudiante'));
+    const modal = new (window as any).bootstrap.Modal(document.getElementById('modalDetalleCliente'));
     modal.show();
   }
 
@@ -1199,10 +1199,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       filtrados = filtrados.filter(mov => mov.fecha <= this.fechaFinSeleccionada);
     }
 
-    // NUEVO: Filtrar por grupo y estado si están seleccionados
-    if (this.grupoSeleccionado || this.estadoSeleccionado) {
-      // Obtener los IDs de personas que cumplen con los filtros de grupo/estado
-      const personasFiltradas = new Set(this.estudiantesFiltrados.map(est => est.id_persona));
+    // NUEVO: Filtrar por plan y estado si están seleccionados
+    if (this.planSeleccionado || this.estadoSeleccionado) {
+      // Obtener los IDs de personas que cumplen con los filtros de plan/estado
+      const personasFiltradas = new Set(this.clientesFiltrados.map(est => est.id_persona));
 
       // Filtrar movimientos solo para las personas que cumplen los criterios
       filtrados = filtrados.filter(mov => {
@@ -1210,9 +1210,9 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         if (mov.id_persona) {
           return personasFiltradas.has(mov.id_persona);
         }
-        // Si no tiene id_persona (podría ser un movimiento sin estudiante asociado)
+        // Si no tiene id_persona (podría ser un movimiento sin cliente asociado)
         // decidir si incluirlo o no según tu lógica de negocio
-        return false; // o true si quieres incluir movimientos sin estudiante
+        return false; // o true si quieres incluir movimientos sin cliente
       });
     }
 
@@ -1275,7 +1275,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     // Resto del código existente...
-    if (!this.grupoSeleccionado && !this.estadoSeleccionado && !this.busquedaEstudiante) {
+    if (!this.planSeleccionado && !this.estadoSeleccionado && !this.busquedaCliente) {
       switch (campo) {
         case 'total_cobrado':
           return this.totalesGenerales.totalCobrado;
@@ -1289,7 +1289,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     let total = 0;
-    this.estudiantesFiltrados.forEach(est => {
+    this.clientesFiltrados.forEach(est => {
       switch (campo) {
         case 'total_cobrado':
           total += est.totalCobrado;
@@ -1526,8 +1526,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   // Métodos para saldos pendientes mensuales
-  getSaldoPendienteMes(estudiante: EstudianteCartera, mes: number): number {
-    const valoresMes = estudiante.valoresMensuales[mes];
+  getSaldoPendienteMes(cliente: ClienteCartera, mes: number): number {
+    const valoresMes = cliente.valoresMensuales[mes];
     if (!valoresMes) return 0;
 
     const nombreMes = this.mesesDisponibles[mes - 1].nombre;
@@ -1536,29 +1536,29 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     return saldo > 0 ? saldo : 0;
   }
 
-  calcularTotalSaldoPendienteEstudiante(estudiante: EstudianteCartera): number {
+  calcularTotalSaldoPendienteCliente(cliente: ClienteCartera): number {
     let total = 0;
     for (let mes = 1; mes <= 12; mes++) {
-      total += this.getSaldoPendienteMes(estudiante, mes);
+      total += this.getSaldoPendienteMes(cliente, mes);
     }
     return total;
   }
 
   aplicarFiltrosSaldosPendientes(): void {
-    let filtrados = [...this.estudiantes];
+    let filtrados = [...this.clientes];
 
     // Filtrar por activos/inactivos (filtro propio de este tab)
-    if (this.filtroActivoSaldosEstudiantes === 'activos') {
+    if (this.filtroActivoSaldosClientes === 'activos') {
       filtrados = filtrados.filter(est => est.activo === 1);
-    } else if (this.filtroActivoSaldosEstudiantes === 'inactivos') {
+    } else if (this.filtroActivoSaldosClientes === 'inactivos') {
       filtrados = filtrados.filter(est => est.activo === 0);
     }
 
-    // Aplicar filtros globales de grupo, estado y búsqueda
-    if (this.grupoSeleccionado) {
-      const grupoSel = this.grupos.find(g => g.id.toString() === this.grupoSeleccionado);
-      if (grupoSel) {
-        filtrados = filtrados.filter(est => est.grupo_estudiante === grupoSel.nombre);
+    // Aplicar filtros globales de plan, estado y búsqueda
+    if (this.planSeleccionado) {
+      const planSel = this.planes.find(g => g.id.toString() === this.planSeleccionado);
+      if (planSel) {
+        filtrados = filtrados.filter(est => est.plan_cliente === planSel.nombre);
       }
     }
     if (this.estadoSeleccionado) {
@@ -1568,21 +1568,21 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         case 'vencido': filtrados = filtrados.filter(est => est.saldoVencido > 0); break;
       }
     }
-    if (this.busquedaEstudiante) {
-      const busqueda = this.busquedaEstudiante.toLowerCase();
-      filtrados = filtrados.filter(est => est.nombre_estudiante.toLowerCase().includes(busqueda));
+    if (this.busquedaCliente) {
+      const busqueda = this.busquedaCliente.toLowerCase();
+      filtrados = filtrados.filter(est => est.nombre_cliente.toLowerCase().includes(busqueda));
     }
 
-    let filtradosConSaldo: EstudianteCarteraConSaldoPendiente[] = filtrados.map(est => ({
+    let filtradosConSaldo: ClienteCarteraConSaldoPendiente[] = filtrados.map(est => ({
       ...est,
-      totalSaldoPendiente: this.calcularTotalSaldoPendienteEstudiante(est)
+      totalSaldoPendiente: this.calcularTotalSaldoPendienteCliente(est)
     }));
 
     if (this.mostrarSoloConSaldoPendiente) {
       filtradosConSaldo = filtradosConSaldo.filter(est => est.totalSaldoPendiente > 0);
     }
 
-    this.estudiantesSaldosPendientesFiltrados = filtradosConSaldo;
+    this.clientesSaldosPendientesFiltrados = filtradosConSaldo;
     this.aplicarOrdenamientoSaldosPendientes();
   }
 
@@ -1591,7 +1591,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       this.ordenAscendenteSaldos = !this.ordenAscendenteSaldos;
     } else {
       this.columnaOrdenamientoSaldos = columna;
-      this.ordenAscendenteSaldos = columna === 'nombre_estudiante' || columna === 'grupo_estudiante';
+      this.ordenAscendenteSaldos = columna === 'nombre_cliente' || columna === 'plan_cliente';
     }
 
     this.aplicarOrdenamientoSaldosPendientes();
@@ -1600,7 +1600,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   aplicarOrdenamientoSaldosPendientes(): void {
     const multiplicador = this.ordenAscendenteSaldos ? 1 : -1;
 
-    this.estudiantesSaldosPendientesFiltrados.sort((a, b) => {
+    this.clientesSaldosPendientesFiltrados.sort((a, b) => {
       let valorA: any;
       let valorB: any;
 
@@ -1608,8 +1608,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         valorA = a.totalSaldoPendiente || 0;
         valorB = b.totalSaldoPendiente || 0;
       } else {
-        valorA = a[this.columnaOrdenamientoSaldos as keyof EstudianteCartera];
-        valorB = b[this.columnaOrdenamientoSaldos as keyof EstudianteCartera];
+        valorA = a[this.columnaOrdenamientoSaldos as keyof ClienteCartera];
+        valorB = b[this.columnaOrdenamientoSaldos as keyof ClienteCartera];
       }
 
       if (typeof valorA === 'string') {
@@ -1624,19 +1624,19 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   getTotalSaldoPendienteMes(mes: number): number {
-    return this.estudiantesSaldosPendientesFiltrados.reduce((total, est) => {
+    return this.clientesSaldosPendientesFiltrados.reduce((total, est) => {
       return total + this.getSaldoPendienteMes(est, mes);
     }, 0);
   }
 
   getTotalSaldosPendientes(): number {
-    return this.estudiantesSaldosPendientesFiltrados.reduce((total, est) => {
+    return this.clientesSaldosPendientesFiltrados.reduce((total, est) => {
       return total + (est.totalSaldoPendiente || 0);
     }, 0);
   }
 
-  getEstudiantesConSaldoPendiente(): number {
-    return this.estudiantesSaldosPendientesFiltrados.filter(est =>
+  getClientesConSaldoPendiente(): number {
+    return this.clientesSaldosPendientesFiltrados.filter(est =>
       (est.totalSaldoPendiente || 0) > 0
     ).length;
   }
@@ -1657,26 +1657,26 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   getPromedioSaldoPendiente(): number {
-    const estudiantesConSaldo = this.getEstudiantesConSaldoPendiente();
-    if (estudiantesConSaldo === 0) return 0;
+    const clientesConSaldo = this.getClientesConSaldoPendiente();
+    if (clientesConSaldo === 0) return 0;
 
-    return this.getTotalSaldosPendientes() / estudiantesConSaldo;
+    return this.getTotalSaldosPendientes() / clientesConSaldo;
   }
 
   exportarSaldosPendientesMensuales(): void {
     // Preparar encabezados
-    const headers = ['Estudiante', 'Identificación', 'Grupo'];
+    const headers = ['Cliente', 'Identificación', 'Plan'];
     this.mesesDisponibles.forEach(mes => {
       headers.push(mes.nombre);
     });
     headers.push('Total');
 
     // Preparar datos
-    const datos = this.estudiantesSaldosPendientesFiltrados.map(est => {
+    const datos = this.clientesSaldosPendientesFiltrados.map(est => {
       const fila: any = {
-        'Estudiante': est.nombre_estudiante,
+        'Cliente': est.nombre_cliente,
         'Identificación': est.numero_identificacion,
-        'Grupo': est.grupo_estudiante
+        'Plan': est.plan_cliente
       };
 
       // Agregar saldos por mes
@@ -1692,9 +1692,9 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
     // Agregar fila de totales
     const totales: any = {
-      'Estudiante': 'TOTALES',
+      'Cliente': 'TOTALES',
       'Identificación': '',
-      'Grupo': ''
+      'Plan': ''
     };
 
     this.mesesDisponibles.forEach(mes => {
@@ -1712,10 +1712,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     // Agregar hoja de resumen
     const resumenData = [
       ['Concepto', 'Valor'],
-      ['Total Estudiantes', this.estudiantesSaldosPendientesFiltrados.length],
-      ['Estudiantes con Saldo Pendiente', this.getEstudiantesConSaldoPendiente()],
+      ['Total Clientes', this.clientesSaldosPendientesFiltrados.length],
+      ['Clientes con Saldo Pendiente', this.getClientesConSaldoPendiente()],
       ['Total Saldo Pendiente', this.getTotalSaldosPendientes()],
-      ['Promedio por Estudiante', this.getPromedioSaldoPendiente()],
+      ['Promedio por Cliente', this.getPromedioSaldoPendiente()],
       ['Mes con Mayor Saldo', this.getMesConMayorSaldoPendiente()]
     ];
 
@@ -1738,14 +1738,14 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     mensaje += `📊 *Saldo Total:* ${this.formatearMoneda(this.totalesGenerales.saldoTotal)}\n`;
     mensaje += `⚠️ *Saldo Vencido:* ${this.formatearMoneda(this.totalesGenerales.saldoVencido)}\n`;
     mensaje += `📈 *% Recaudo:* ${this.totalesGenerales.porcentajeRecaudo}%\n`;
-    mensaje += `👥 *Total Estudiantes:* ${this.totalesGenerales.cantidadEstudiantes}\n\n`;
+    mensaje += `👥 *Total Clientes:* ${this.totalesGenerales.cantidadClientes}\n\n`;
 
-    // Agregar estudiantes con saldo vencido
-    const estudiantesVencidos = this.estudiantes.filter(est => est.saldoVencido > 0);
-    if (estudiantesVencidos.length > 0) {
-      mensaje += `*ESTUDIANTES CON SALDO VENCIDO*\n`;
-      estudiantesVencidos.forEach(est => {
-        mensaje += `• ${est.nombre_estudiante} - ${this.formatearMoneda(est.saldoVencido)}\n`;
+    // Agregar clientes con saldo vencido
+    const clientesVencidos = this.clientes.filter(est => est.saldoVencido > 0);
+    if (clientesVencidos.length > 0) {
+      mensaje += `*CLIENTES CON SALDO VENCIDO*\n`;
+      clientesVencidos.forEach(est => {
+        mensaje += `• ${est.nombre_cliente} - ${this.formatearMoneda(est.saldoVencido)}\n`;
       });
     }
 
@@ -1759,10 +1759,10 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
   exportarCSV(): void {
     // Preparar datos para exportar
-    const datosExportar = this.estudiantesFiltrados.map(est => ({
-      'Estudiante': est.nombre_estudiante,
+    const datosExportar = this.clientesFiltrados.map(est => ({
+      'Cliente': est.nombre_cliente,
       'Identificación': est.numero_identificacion,
-      'Grupo': est.grupo_estudiante,
+      'Plan': est.plan_cliente,
       'Total Cobrado': est.totalCobrado,
       'Total Pagado': est.totalPagado,
       'Saldo Total': est.saldoTotal,
@@ -1784,8 +1784,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       ['Saldo Total', this.totalesGenerales.saldoTotal],
       ['Saldo Vencido', this.totalesGenerales.saldoVencido],
       ['% Recaudo', this.totalesGenerales.porcentajeRecaudo],
-      ['Total Estudiantes', this.totalesGenerales.cantidadEstudiantes],
-      ['Estudiantes con Saldo Vencido', this.totalesGenerales.cantidadVencidos]
+      ['Total Clientes', this.totalesGenerales.cantidadClientes],
+      ['Clientes con Saldo Vencido', this.totalesGenerales.cantidadVencidos]
     ];
 
     const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
@@ -1807,40 +1807,40 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     XLSX.writeFile(wb, `cartera_${this.anioSeleccionado}_${new Date().getTime()}.xlsx`);
   }
 
-  exportarDetalleEstudiante(): void {
-    if (!this.estudianteSeleccionado) return;
+  exportarDetalleCliente(): void {
+    if (!this.clienteSeleccionado) return;
 
     // Crear datos para Excel
     const datosDetalle: any[] = [];
 
     // Agregar encabezado
     datosDetalle.push({
-      'Campo': 'Estudiante',
-      'Valor': this.estudianteSeleccionado.nombre_estudiante
+      'Campo': 'Cliente',
+      'Valor': this.clienteSeleccionado.nombre_cliente
     });
     datosDetalle.push({
       'Campo': 'Identificación',
-      'Valor': this.estudianteSeleccionado.numero_identificacion
+      'Valor': this.clienteSeleccionado.numero_identificacion
     });
     datosDetalle.push({
-      'Campo': 'Grupo',
-      'Valor': this.estudianteSeleccionado.grupo_estudiante
+      'Campo': 'Plan',
+      'Valor': this.clienteSeleccionado.plan_cliente
     });
     datosDetalle.push({
       'Campo': 'Total Cobrado',
-      'Valor': this.estudianteSeleccionado.totalCobrado
+      'Valor': this.clienteSeleccionado.totalCobrado
     });
     datosDetalle.push({
       'Campo': 'Total Pagado',
-      'Valor': this.estudianteSeleccionado.totalPagado
+      'Valor': this.clienteSeleccionado.totalPagado
     });
     datosDetalle.push({
       'Campo': 'Saldo Total',
-      'Valor': this.estudianteSeleccionado.saldoTotal
+      'Valor': this.clienteSeleccionado.saldoTotal
     });
     datosDetalle.push({
       'Campo': 'Saldo Vencido',
-      'Valor': this.estudianteSeleccionado.saldoVencido
+      'Valor': this.clienteSeleccionado.saldoVencido
     });
 
     // Crear hoja de resumen
@@ -1849,7 +1849,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
 
     // Agregar detalle mensual
-    const detalleMensualExport = this.detalleEstudianteMensual.map(d => ({
+    const detalleMensualExport = this.detalleClienteMensual.map(d => ({
       'Mes': d.mes,
       'Cobrado': d.cobrado,
       'Pagado': d.pagado,
@@ -1860,7 +1860,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     XLSX.utils.book_append_sheet(wb, wsMensual, 'Detalle Mensual');
 
     // Guardar archivo
-    const nombreArchivo = `detalle_${this.estudianteSeleccionado.nombre_estudiante.replace(/ /g, '_')}_${new Date().getTime()}.xlsx`;
+    const nombreArchivo = `detalle_${this.clienteSeleccionado.nombre_cliente.replace(/ /g, '_')}_${new Date().getTime()}.xlsx`;
     XLSX.writeFile(wb, nombreArchivo);
   }
 
@@ -1872,60 +1872,60 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       currencyDisplay: 'narrowSymbol'
     }).format(valor);
   }
-  // Método para obtener totales de estudiantes filtrados
-  getTotalEstudiantes(campo: string): number {
-    // Si hay búsqueda o filtros, usar estudiantes filtrados
-    const estudiantesParaTotalizar = this.estudiantesFiltrados.length > 0
-      ? this.estudiantesFiltrados
-      : this.estudiantes;
+  // Método para obtener totales de clientes filtrados
+  getTotalClientes(campo: string): number {
+    // Si hay búsqueda o filtros, usar clientes filtrados
+    const clientesParaTotalizar = this.clientesFiltrados.length > 0
+      ? this.clientesFiltrados
+      : this.clientes;
 
     switch (campo) {
       case 'totalCobrado':
-        return estudiantesParaTotalizar.reduce((sum, est) => sum + est.totalCobrado, 0);
+        return clientesParaTotalizar.reduce((sum, est) => sum + est.totalCobrado, 0);
 
       case 'totalPagado':
-        return estudiantesParaTotalizar.reduce((sum, est) => sum + est.totalPagado, 0);
+        return clientesParaTotalizar.reduce((sum, est) => sum + est.totalPagado, 0);
 
       case 'saldoTotal':
-        return estudiantesParaTotalizar.reduce((sum, est) => sum + est.saldoTotal, 0);
+        return clientesParaTotalizar.reduce((sum, est) => sum + est.saldoTotal, 0);
 
       case 'saldoVencido':
-        return estudiantesParaTotalizar.reduce((sum, est) => sum + est.saldoVencido, 0);
+        return clientesParaTotalizar.reduce((sum, est) => sum + est.saldoVencido, 0);
 
       case 'saldoPendiente':
-        return estudiantesParaTotalizar.reduce((sum, est) => sum + est.saldoPendiente, 0);
+        return clientesParaTotalizar.reduce((sum, est) => sum + est.saldoPendiente, 0);
 
       default:
         return 0;
     }
   }
 
-  // Método para calcular el porcentaje de recaudo de los estudiantes filtrados
-  getPorcentajeRecaudoEstudiantes(): number {
-    const totalCobrado = this.getTotalEstudiantes('totalCobrado');
-    const totalPagado = this.getTotalEstudiantes('totalPagado');
+  // Método para calcular el porcentaje de recaudo de los clientes filtrados
+  getPorcentajeRecaudoClientes(): number {
+    const totalCobrado = this.getTotalClientes('totalCobrado');
+    const totalPagado = this.getTotalClientes('totalPagado');
 
     if (totalCobrado === 0) return 0;
 
     return Math.round((totalPagado / totalCobrado) * 100);
   }
 
-  // Método adicional para obtener estadísticas de estudiantes
-  getEstadisticasEstudiantes(): any {
-    const estudiantesParaEstadisticas = this.estudiantesFiltrados.length > 0
-      ? this.estudiantesFiltrados
-      : this.estudiantes;
+  // Método adicional para obtener estadísticas de clientes
+  getEstadisticasClientes(): any {
+    const clientesParaEstadisticas = this.clientesFiltrados.length > 0
+      ? this.clientesFiltrados
+      : this.clientes;
 
     return {
-      totalEstudiantes: estudiantesParaEstadisticas.length,
-      estudiantesAlDia: estudiantesParaEstadisticas.filter(est => est.saldoTotal === 0).length,
-      estudiantesConSaldo: estudiantesParaEstadisticas.filter(est => est.saldoTotal > 0).length,
-      estudiantesConSaldoVencido: estudiantesParaEstadisticas.filter(est => est.saldoVencido > 0).length,
-      promedioDeuda: estudiantesParaEstadisticas.length > 0
-        ? this.getTotalEstudiantes('saldoTotal') / estudiantesParaEstadisticas.length
+      totalClientes: clientesParaEstadisticas.length,
+      clientesAlDia: clientesParaEstadisticas.filter(est => est.saldoTotal === 0).length,
+      clientesConSaldo: clientesParaEstadisticas.filter(est => est.saldoTotal > 0).length,
+      clientesConSaldoVencido: clientesParaEstadisticas.filter(est => est.saldoVencido > 0).length,
+      promedioDeuda: clientesParaEstadisticas.length > 0
+        ? this.getTotalClientes('saldoTotal') / clientesParaEstadisticas.length
         : 0,
-      promedioSaldoVencido: estudiantesParaEstadisticas.filter(est => est.saldoVencido > 0).length > 0
-        ? this.getTotalEstudiantes('saldoVencido') / estudiantesParaEstadisticas.filter(est => est.saldoVencido > 0).length
+      promedioSaldoVencido: clientesParaEstadisticas.filter(est => est.saldoVencido > 0).length > 0
+        ? this.getTotalClientes('saldoVencido') / clientesParaEstadisticas.filter(est => est.saldoVencido > 0).length
         : 0
     };
   }
@@ -1940,7 +1940,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   getTotalPagado(): number {
-    // Usar movimientoDiarioFiltrado que ya está filtrado por grupo/estado
+    // Usar movimientoDiarioFiltrado que ya está filtrado por plan/estado
     return this.movimientoDiarioFiltrado
       .filter(m => !!m.id_tipo_pago)
       .reduce((sum, m) => sum + m.total_pagado, 0);
@@ -2343,13 +2343,13 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     this.calcularPaginacionMovimientoDiario();
   }
   private obtenerPersonasFiltradas(): Set<string> {
-    let filtrados = [...this.estudiantes];
+    let filtrados = [...this.clientes];
 
     // Aplicar los mismos filtros que en aplicarFiltros()
-    if (this.grupoSeleccionado) {
-      const grupoSeleccionado = this.grupos.find(g => g.id.toString() === this.grupoSeleccionado);
-      if (grupoSeleccionado) {
-        filtrados = filtrados.filter(est => est.grupo_estudiante === grupoSeleccionado.nombre);
+    if (this.planSeleccionado) {
+      const planSeleccionado = this.planes.find(g => g.id.toString() === this.planSeleccionado);
+      if (planSeleccionado) {
+        filtrados = filtrados.filter(est => est.plan_cliente === planSeleccionado.nombre);
       }
     }
 
@@ -2367,23 +2367,23 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       }
     }
 
-    if (this.busquedaEstudiante) {
-      const busqueda = this.busquedaEstudiante.toLowerCase();
+    if (this.busquedaCliente) {
+      const busqueda = this.busquedaCliente.toLowerCase();
       filtrados = filtrados.filter(est =>
-        est.nombre_estudiante.toLowerCase().includes(busqueda)
+        est.nombre_cliente.toLowerCase().includes(busqueda)
       );
     }
 
     return new Set(filtrados.map(est => est.id_persona));
   }
-  private movimientoPerteneceAEstudianteFiltrado(movimiento: PagoDiario): boolean {
+  private movimientoPerteneceAClienteFiltrado(movimiento: PagoDiario): boolean {
     if (!movimiento.id_persona) {
       // Si no tiene id_persona, decidir si incluirlo
       return false; // o true según tu lógica
     }
 
-    // Verificar si el id_persona está en la lista de estudiantes filtrados
-    return this.estudiantesFiltrados.some(est => est.id_persona === movimiento.id_persona);
+    // Verificar si el id_persona está en la lista de clientes filtrados
+    return this.clientesFiltrados.some(est => est.id_persona === movimiento.id_persona);
   }
 
   obtenerNombreClasificacion(idClasificacion: string): string {
@@ -2448,8 +2448,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       );
     }
 
-    // Si hay filtros de grupo o estado aplicados
-    if (this.grupoSeleccionado || this.estadoSeleccionado || this.busquedaEstudiante) {
+    // Si hay filtros de plan o estado aplicados
+    if (this.planSeleccionado || this.estadoSeleccionado || this.busquedaCliente) {
       // Los datos ya vienen correctos del backend
     }
 
@@ -2479,8 +2479,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         return productos.reduce((sum, p) => sum + p.saldo_total, 0);
       case 'saldo_vencido':
         return productos.reduce((sum, p) => sum + p.saldo_vencido, 0);
-      case 'cantidad_estudiantes':
-        return productos.reduce((sum, p) => sum + p.cantidad_estudiantes, 0);
+      case 'cantidad_clientes':
+        return productos.reduce((sum, p) => sum + p.cantidad_clientes, 0);
       case 'porcentaje_recaudo':
         const totalCobrado = this.getSubtotalClasificacionProductos(nombreClasificacion, 'total_cobrado');
         const totalPagado = this.getSubtotalClasificacionProductos(nombreClasificacion, 'total_pagado');
@@ -2504,8 +2504,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         return this.datosProductosFiltrados.reduce((sum, p) => sum + p.saldo_total, 0);
       case 'saldo_vencido':
         return this.datosProductosFiltrados.reduce((sum, p) => sum + p.saldo_vencido, 0);
-      case 'cantidad_estudiantes':
-        return this.datosProductosFiltrados.reduce((sum, p) => sum + p.cantidad_estudiantes, 0);
+      case 'cantidad_clientes':
+        return this.datosProductosFiltrados.reduce((sum, p) => sum + p.cantidad_clientes, 0);
       case 'porcentaje_recaudo':
         const totalCobrado = this.getTotalProductos('total_cobrado');
         const totalPagado = this.getTotalProductos('total_pagado');
@@ -2555,7 +2555,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         'Saldo Total': '',
         'Saldo Vencido': '',
         '% Recaudo': '',
-        'Cant. Estudiantes': ''
+        'Cant. Clientes': ''
       });
 
       datosExportar.push({
@@ -2568,7 +2568,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         'Saldo Total': '',
         'Saldo Vencido': '',
         '% Recaudo': '',
-        'Cant. Estudiantes': ''
+        'Cant. Clientes': ''
       });
 
       datosExportar.push({}); // Línea vacía
@@ -2587,7 +2587,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         'Saldo Total': '',
         'Saldo Vencido': '',
         '% Recaudo': '',
-        'Cant. Estudiantes': ''
+        'Cant. Clientes': ''
       });
 
       // Agregar productos
@@ -2602,7 +2602,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
           'Saldo Total': producto.saldo_total,
           'Saldo Vencido': producto.saldo_vencido,
           '% Recaudo': producto.porcentaje_recaudo,
-          'Cant. Estudiantes': producto.cantidad_estudiantes
+          'Cant. Clientes': producto.cantidad_clientes
         });
       });
 
@@ -2617,7 +2617,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         'Saldo Total': this.getSubtotalClasificacionProductos(clasificacion, 'saldo_total'),
         'Saldo Vencido': this.getSubtotalClasificacionProductos(clasificacion, 'saldo_vencido'),
         '% Recaudo': this.getSubtotalClasificacionProductos(clasificacion, 'porcentaje_recaudo'),
-        'Cant. Estudiantes': this.getSubtotalClasificacionProductos(clasificacion, 'cantidad_estudiantes')
+        'Cant. Clientes': this.getSubtotalClasificacionProductos(clasificacion, 'cantidad_clientes')
       });
 
       // Línea vacía
@@ -2635,7 +2635,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       'Saldo Total': this.getTotalProductos('saldo_total'),
       'Saldo Vencido': this.getTotalProductos('saldo_vencido'),
       '% Recaudo': this.getTotalProductos('porcentaje_recaudo'),
-      'Cant. Estudiantes': this.getTotalProductos('cantidad_estudiantes')
+      'Cant. Clientes': this.getTotalProductos('cantidad_clientes')
     });
 
     const ws = XLSX.utils.json_to_sheet(datosExportar);
@@ -2767,9 +2767,9 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       );
     }
 
-    // Aplicar filtros de grupo y estado si están activos
-    if (this.grupoSeleccionado || this.estadoSeleccionado) {
-      const personasFiltradas = new Set(this.estudiantesFiltrados.map(est => est.id_persona));
+    // Aplicar filtros de plan y estado si están activos
+    if (this.planSeleccionado || this.estadoSeleccionado) {
+      const personasFiltradas = new Set(this.clientesFiltrados.map(est => est.id_persona));
 
       filtrados = filtrados.filter(mov => {
         if (mov.id_persona) {
@@ -2958,8 +2958,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   aplicarOrdenamientoColaboradores(): void {
     const multiplicador = this.ordenAscendenteColaboradores ? 1 : -1;
     this.colaboradoresFiltrados.sort((a, b) => {
-      let valorA: any = a[this.columnaOrdenamientoColaboradores as keyof EstudianteCartera];
-      let valorB: any = b[this.columnaOrdenamientoColaboradores as keyof EstudianteCartera];
+      let valorA: any = a[this.columnaOrdenamientoColaboradores as keyof ClienteCartera];
+      let valorB: any = b[this.columnaOrdenamientoColaboradores as keyof ClienteCartera];
       if (typeof valorA === 'string') {
         valorA = valorA.toLowerCase();
         valorB = valorB.toLowerCase();
@@ -2975,7 +2975,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       this.ordenAscendenteColaboradores = !this.ordenAscendenteColaboradores;
     } else {
       this.columnaOrdenamientoColaboradores = columna;
-      this.ordenAscendenteColaboradores = ['nombre_estudiante', 'numero_identificacion', 'grupo_estudiante'].includes(columna);
+      this.ordenAscendenteColaboradores = ['nombre_cliente', 'numero_identificacion', 'plan_cliente'].includes(columna);
     }
     this.aplicarOrdenamientoColaboradores();
   }
@@ -3004,7 +3004,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     return paginas;
   }
 
-  getColaboradoresPaginados(): EstudianteCartera[] {
+  getColaboradoresPaginados(): ClienteCartera[] {
     const inicio = (this.paginaActualColaboradores - 1) * this.registrosPorPagina;
     const fin = inicio + this.registrosPorPagina;
     return this.colaboradoresFiltrados.slice(inicio, fin);
@@ -3029,8 +3029,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     return Math.round((totalPagado / totalCobrado) * 100);
   }
 
-  verDetalleColaborador(colaborador: EstudianteCartera): void {
-    this.verDetalleEstudiante(colaborador);
+  verDetalleColaborador(colaborador: ClienteCartera): void {
+    this.verDetalleCliente(colaborador);
   }
 
   // =====================================================
@@ -3055,14 +3055,14 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         case 'vencido': filtrados = filtrados.filter(col => col.saldoVencido > 0); break;
       }
     }
-    if (this.busquedaEstudiante) {
-      const busqueda = this.busquedaEstudiante.toLowerCase();
-      filtrados = filtrados.filter(col => col.nombre_estudiante.toLowerCase().includes(busqueda));
+    if (this.busquedaCliente) {
+      const busqueda = this.busquedaCliente.toLowerCase();
+      filtrados = filtrados.filter(col => col.nombre_cliente.toLowerCase().includes(busqueda));
     }
 
-    let filtradosConSaldo: EstudianteCarteraConSaldoPendiente[] = filtrados.map(col => ({
+    let filtradosConSaldo: ClienteCarteraConSaldoPendiente[] = filtrados.map(col => ({
       ...col,
-      totalSaldoPendiente: this.calcularTotalSaldoPendienteEstudiante(col)
+      totalSaldoPendiente: this.calcularTotalSaldoPendienteCliente(col)
     }));
 
     if (this.mostrarSoloConSaldoPendienteColaboradores) {
@@ -3078,7 +3078,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
       this.ordenAscendenteSaldosColaboradores = !this.ordenAscendenteSaldosColaboradores;
     } else {
       this.columnaOrdenamientoSaldosColaboradores = columna;
-      this.ordenAscendenteSaldosColaboradores = columna === 'nombre_estudiante' || columna === 'grupo_estudiante';
+      this.ordenAscendenteSaldosColaboradores = columna === 'nombre_cliente' || columna === 'plan_cliente';
     }
     this.aplicarOrdenamientoSaldosPendientesColaboradores();
   }
@@ -3092,8 +3092,8 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
         valorA = a.totalSaldoPendiente || 0;
         valorB = b.totalSaldoPendiente || 0;
       } else {
-        valorA = a[this.columnaOrdenamientoSaldosColaboradores as keyof EstudianteCartera];
-        valorB = b[this.columnaOrdenamientoSaldosColaboradores as keyof EstudianteCartera];
+        valorA = a[this.columnaOrdenamientoSaldosColaboradores as keyof ClienteCartera];
+        valorB = b[this.columnaOrdenamientoSaldosColaboradores as keyof ClienteCartera];
       }
       if (typeof valorA === 'string') {
         valorA = valorA.toLowerCase();
@@ -3149,9 +3149,9 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
 
     const datos = this.colaboradoresSaldosPendientesFiltrados.map(col => {
       const fila: any = {
-        'Colaborador': col.nombre_estudiante,
+        'Colaborador': col.nombre_cliente,
         'Identificación': col.numero_identificacion,
-        'Cargo': col.grupo_estudiante
+        'Cargo': col.plan_cliente
       };
       this.mesesDisponibles.forEach(mes => {
         fila[mes.nombre] = this.getSaldoPendienteMes(col, mes.valor);
@@ -3181,7 +3181,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
   exportarCobrosExcel(): void {
     const datos = this.movimientoCobros.map(m => ({
       'Fecha': this.formatearFecha(m.fecha),
-      'Persona': m.nombre_estudiante || '-',
+      'Persona': m.nombre_cliente || '-',
       'Tipo Persona': m.tipo_persona || '-',
       'Monto': m.total_cobrado,
       'Cantidad': m.cantidad_cobros
@@ -3196,7 +3196,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
     const datos = ingresos.map(m => ({
       'Fecha': this.formatearFecha(m.fecha),
-      'Persona': m.nombre_estudiante || '-',
+      'Persona': m.nombre_cliente || '-',
       'Tipo Persona': m.tipo_persona || '-',
       'Tipo Pago': this.obtenerNombreTipoPago(m.id_tipo_pago),
       'Recibido': m.total_recibido || 0,
@@ -3213,7 +3213,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
     const datos = descuentos.map(m => ({
       'Fecha': this.formatearFecha(m.fecha),
-      'Persona': m.nombre_estudiante || '-',
+      'Persona': m.nombre_cliente || '-',
       'Tipo Persona': m.tipo_persona || '-',
       'Tipo Pago': this.obtenerNombreTipoPago(m.id_tipo_pago),
       'Recibido': m.total_recibido || 0,
@@ -3230,7 +3230,7 @@ export class ReporteCarteraComponent implements OnInit, OnDestroy, AfterViewInit
     }
     const datos = extracurricular.map(m => ({
       'Fecha': this.formatearFecha(m.fecha),
-      'Persona': m.nombre_estudiante || '-',
+      'Persona': m.nombre_cliente || '-',
       'Tipo Persona': m.tipo_persona || '-',
       'Tipo Pago': this.obtenerNombreTipoPago(m.id_tipo_pago),
       'Recibido': m.total_recibido || 0,

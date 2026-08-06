@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { HeaderComponent } from '../../../common/header/header.component';
 import { TablasComponent } from '../../../common/tablas/tablas.component';
 import Swal from 'sweetalert2';
-import { EstudiantesService } from '../../../services/estudiantes.service';
+import { ClientesService } from '../../../services/clientes.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -20,30 +20,30 @@ export class ServiciosComponent {
   public titulos = [] as any[];
 
   public datos = [] as any[];
-  public grupos = [] as any[];
+  public planes = [] as any[];
 
   public acciones = [
-    { id: 'academico', label: 'Académico', icono: '/assets/images/servicios/servicios-academico.png' },
-    { id: 'extraacademico', label: 'Extra académico', icono: '/assets/images/servicios/servicios-extra-academico.png' },
-    { id: 'alimentacion', label: 'Alimentación', icono: '/assets/images/servicios/servicios-alimentacion.png' },
-    { id: 'vestuario', label: 'Vestuario', icono: '/assets/images/servicios/servicios-vestuario.png' },
-    { id: 'insumos', label: 'Insumos', icono: '/assets/images/servicios/servicios-insumos.png' }
+    { id: 'academico', label: 'Académico', icono: 'mdi mdi-school' },
+    { id: 'extraacademico', label: 'Extra académico', icono: 'mdi mdi-basketball' },
+    { id: 'alimentacion', label: 'Alimentación', icono: 'mdi mdi-food' },
+    { id: 'vestuario', label: 'Vestuario', icono: 'mdi mdi-tshirt-crew' },
+    { id: 'insumos', label: 'Insumos', icono: 'mdi mdi-package-variant' }
   ] as any[];
 
   constructor(
-    private estudiantesService: EstudiantesService,
+    private clientesService: ClientesService,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
     this.crearTitulos();
-    this.obtenerEstudiantesXGrupo();
+    this.obtenerClientesXPlan();
   }
 
-  obtenerEstudiantesXGrupo() {
-    this.estudiantesService.obtenerTodosXGrupo(0).subscribe((response: any) => {
+  obtenerClientesXPlan() {
+    this.clientesService.obtenerTodosXPlan(0).subscribe((response: any) => {
       const body = response.body as any[];
-      console.log("consumo servicio obtenerEstudiantesXGrupo", body);
+      console.log("consumo servicio obtenerClientesXPlan", body);
 
       this.datos = body;
 
@@ -66,8 +66,8 @@ export class ServiciosComponent {
     this.titulos = [
 
       {
-        clave: 'nombre_grupo',
-        alias: 'Grupo',
+        clave: 'nombre_plan',
+        alias: 'Plan',
         alinear: 'izquierda',
       },
       {
@@ -97,19 +97,19 @@ export class ServiciosComponent {
     console.log("Acción", $event);
     switch ($event.accion) {
       case 'academico':
-        this.router.navigate(['/estudiantes/servicios/1/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/clientes/servicios/1/'+$event.registro.id_cliente]);
         break;
       case 'extraacademico':
-        this.router.navigate(['/estudiantes/servicios/2/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/clientes/servicios/2/'+$event.registro.id_cliente]);
         break;
       case 'alimentacion':
-        this.router.navigate(['/estudiantes/servicios/3/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/clientes/servicios/3/'+$event.registro.id_cliente]);
         break;
       case 'vestuario':
-        this.router.navigate(['/estudiantes/servicios/4/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/clientes/servicios/4/'+$event.registro.id_cliente]);
         break;
       case 'insumos':
-        this.router.navigate(['/estudiantes/servicios/5/'+$event.registro.id_estudiante]);
+        this.router.navigate(['/clientes/servicios/5/'+$event.registro.id_cliente]);
         break;
     }
   }

@@ -57,10 +57,10 @@ $wa-green: #25D366;
   }
 
   .col-check { width: 35px; }
-  .col-estudiante { min-width: 130px; max-width: 170px; }
-  .col-grupo { width: 65px; }
+  .col-cliente { min-width: 130px; max-width: 170px; }
+  .col-plan { width: 65px; }
   .col-saldo { width: 85px; }
-  .col-acudiente { min-width: 110px; max-width: 150px; }
+  .col-representante { min-width: 110px; max-width: 150px; }
   .col-tipo-pago { width: 95px; }
   .col-documento { width: 65px; }
   .col-fecha { width: 110px; }
@@ -78,9 +78,9 @@ $wa-green: #25D366;
 .fila-sin-saldo { opacity: 0.5; }
 .fila-lista { border-left: 3px solid $success-color !important; }
 
-.nombre-estudiante { font-weight: 500; color: $text-dark; font-size: 0.8rem; }
+.nombre-cliente { font-weight: 500; color: $text-dark; font-size: 0.8rem; }
 
-.badge-grupo {
+.badge-plan {
   background-color: #e8f4f8; color: #2980b9; padding: 2px 6px;
   border-radius: 10px; font-size: 0.72rem; font-weight: 500; white-space: nowrap;
 }
@@ -196,7 +196,7 @@ $wa-green: #25D366;
   }
 }
 
-.acudiente-card {
+.representante-card {
   padding: 1rem;
   border: 1px solid $border-color;
   border-radius: 0.5rem;
@@ -223,7 +223,7 @@ $wa-green: #25D366;
   .tabla-pagos {
     font-size: 0.72rem;
     th, td { padding: 0.25rem; }
-    .col-acudiente, .col-grupo, .col-dist, .col-observaciones { display: none; }
+    .col-representante, .col-plan, .col-dist, .col-observaciones { display: none; }
   }
   .resumen-container { padding: 0.5rem 0.75rem; }
   .resumen-datos { flex-direction: column; align-items: flex-start; gap: 0.25rem; }

@@ -7,14 +7,14 @@ import { PlantillasService, PlantillaContrato } from './plantillas.service';
 
 export interface DatosContratoPDF {
   contrato: any;
-  estudiante: any;
-  acudientes: any[];
+  cliente: any;
+  representantes: any[];
   configuracion: any;
 }
 
 // Interfaz para la configuración de firmas desde el JSON
 export interface ConfiguracionFirma {
-  tipo: 'acudiente' | 'representante';
+  tipo: 'representante' | 'representante';
   placeholder: string;
   label: string;
   cedula: string;
@@ -78,7 +78,7 @@ export class ExportarPdfContratoService {
     try {
       const response: any = await firstValueFrom(
         this.plantillasService.obtenerByTipoClave(
-          'contrato_matricula',
+          'contrato_implementacion',
           'contrato_completo'
         )
       );
@@ -102,13 +102,13 @@ export class ExportarPdfContratoService {
   ): PlantillaContrato {
     const config = datos.configuracion;
     const contrato = datos.contrato;
-    const estudiante = datos.estudiante;
-    const acudientes = datos.acudientes;
+    const cliente = datos.cliente;
+    const representantes = datos.representantes;
 
-    const acudientesNombres = acudientes
+    const representantesNombres = representantes
       .map((a) => a.nombre_completo)
       .join(' y ');
-    const acudientesDomicilio = acudientes[0]?.ciudad || this.institucionConfigService.getDireccionInstitucion();
+    const representantesDomicilio = representantes[0]?.ciudad || this.institucionConfigService.getDireccionInstitucion();
 
     let textoPrimeraCuota = '';
     let numeroCuotasRestantes = contrato.numero_cuotas;
@@ -128,22 +128,22 @@ export class ExportarPdfContratoService {
         config.representante_legal_cedula_lugar || 'Por definir',
       '{{institucion_nombre}}': config.institucion_nombre || this.institucionConfigService.getNombreInstitucion(),
       '{{institucion_nit}}': config.institucion_nit || this.institucionConfigService.getNitInstitucion(),
-      '{{acudientes_nombres}}': acudientesNombres,
-      '{{acudientes_domicilio}}': acudientesDomicilio,
-      '{{estudiante_nombre}}': estudiante.nombre_completo,
-      '{{estudiante_documento}}': estudiante.numero_identificacion,
-      '{{nombre_grupo}}': estudiante.nombre_grupo || contrato.nombre_grupo,
+      '{{representantes_nombres}}': representantesNombres,
+      '{{representantes_domicilio}}': representantesDomicilio,
+      '{{cliente_nombre}}': cliente.nombre_completo,
+      '{{cliente_documento}}': cliente.numero_identificacion,
+      '{{nombre_plan}}': cliente.nombre_plan || contrato.nombre_plan,
       '{{valor_total_formateado}}': this.formatearMoneda(contrato.valor_total),
-      '{{valor_matricula_formateado}}': this.formatearMoneda(
-        contrato.valor_matricula
+      '{{valor_implementacion_formateado}}': this.formatearMoneda(
+        contrato.valor_implementacion
       ),
-      '{{valor_pension_formateado}}': this.formatearMoneda(
-        contrato.valor_pension
+      '{{valor_suscripcion_formateado}}': this.formatearMoneda(
+        contrato.valor_suscripcion
       ),
-      '{{valor_pension_mensual_formateado}}': this.formatearMoneda(
+      '{{valor_suscripcion_mensual_formateado}}': this.formatearMoneda(
         contrato.numero_cuotas > 0 
-          ? Math.round(contrato.valor_pension / contrato.numero_cuotas) 
-          : contrato.valor_pension
+          ? Math.round(contrato.valor_suscripcion / contrato.numero_cuotas) 
+          : contrato.valor_suscripcion
       ),
       '{{numero_cuotas}}': contrato.numero_cuotas.toString(),
       '{{texto_primera_cuota}}': textoPrimeraCuota,
@@ -450,10 +450,10 @@ export class ExportarPdfContratoService {
       datos.configuracion
     );
     yPos = this.dibujarTitulo(doc, plantilla.titulo, yPos, pageWidth);
-    // Seleccionar versión singular o plural según número de acudientes
-    const numAcudientes = datos.acudientes.length;
+    // Seleccionar versión singular o plural según número de representantes
+    const numRepresentantes = datos.representantes.length;
     const introduccionFinal =
-      numAcudientes === 1 && (plantilla as any).introduccion_singular
+      numRepresentantes === 1 && (plantilla as any).introduccion_singular
         ? (plantilla as any).introduccion_singular
         : plantilla.introduccion;
 
@@ -485,11 +485,11 @@ export class ExportarPdfContratoService {
       const clausulaFinal = {
         numero: clausula.numero,
         titulo:
-          numAcudientes === 1 && (clausula as any).titulo_singular
+          numRepresentantes === 1 && (clausula as any).titulo_singular
             ? (clausula as any).titulo_singular
             : clausula.titulo,
         contenido:
-          numAcudientes === 1 && (clausula as any).contenido_singular
+          numRepresentantes === 1 && (clausula as any).contenido_singular
             ? (clausula as any).contenido_singular
             : clausula.contenido,
       };
@@ -620,7 +620,7 @@ export class ExportarPdfContratoService {
       );
     }
 
-    const nombreArchivo = `Contrato_${datos.estudiante.nombre_completo?.replace(
+    const nombreArchivo = `Contrato_${datos.cliente.nombre_completo?.replace(
       /\s+/g,
       '_'
     )}_${datos.contrato.anio}.pdf`;
@@ -632,8 +632,8 @@ export class ExportarPdfContratoService {
    */
   private getConfiguracionFirmasDefault(datos: DatosContratoPDF): any {
     return {
-      acudientes: datos.acudientes.map((_, index) => ({
-        tipo: 'acudiente',
+      representantes: datos.representantes.map((_, index) => ({
+        tipo: 'representante',
         firmaDigital: true
       })),
       representante: {
@@ -1046,7 +1046,7 @@ export class ExportarPdfContratoService {
   }
 
   /**
-   * Dibuja firmas de acudientes con campos de firma digital
+   * Dibuja firmas de representantes con campos de firma digital
    */
   private async dibujarFirmas(
     doc: jsPDF,
@@ -1063,28 +1063,28 @@ export class ExportarPdfContratoService {
     const pageHeight = doc.internal.pageSize.getHeight();
     const currentPage = doc.getCurrentPageInfo().pageNumber;
 
-    // Determinar si los acudientes firman digitalmente
-    const acudientesFirmaDigital = configFirmas?.acudientes?.map((a: any) => a.firmaDigital !== false) 
-      || datos.acudientes.map(() => true);
+    // Determinar si los representantes firman digitalmente
+    const representantesFirmaDigital = configFirmas?.representantes?.map((a: any) => a.firmaDigital !== false) 
+      || datos.representantes.map(() => true);
     
     // Determinar si el representante firma digitalmente
     const representanteFirmaDigital = configFirmas?.representante?.firmaDigital === true;
 
     // Solo firman los contactos marcados como responsables de pago. Si ninguno
     // lo esta, se cae a la lista completa para no dejar el contrato sin firmas.
-    const responsables = datos.acudientes.filter(
+    const responsables = datos.representantes.filter(
       (a: any) => a.es_responsable_pago === 1 || a.es_responsable_pago === '1'
     );
-    const firmantes = responsables.length > 0 ? responsables : datos.acudientes;
+    const firmantes = responsables.length > 0 ? responsables : datos.representantes;
 
     const numFirmas = firmantes.length;
     const totalWidth = firmaWidth * Math.min(numFirmas, 2) + espacioEntreFirmas;
     let xPos = (pageWidth - totalWidth) / 2;
 
-    // Firmas de acudientes - primera fila (máximo 2)
-    firmantes.slice(0, 2).forEach((acudiente: any, index: number) => {
+    // Firmas de representantes - primera fila (máximo 2)
+    firmantes.slice(0, 2).forEach((representante: any, index: number) => {
       const x = xPos + index * (firmaWidth + espacioEntreFirmas);
-      const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
+      const usarFirmaDigital = representantesFirmaDigital[index] !== false;
       const recipientIndex = index + 1; // 1-based index para Firma.dev
 
       if (usarFirmaDigital) {
@@ -1095,9 +1095,9 @@ export class ExportarPdfContratoService {
           yPos,
           firmaWidth,
           recipientIndex,
-          acudiente.nombre_completo || '',
-          acudiente.numero_identificacion || '',
-          acudiente.tipo_acudiente || 'ACUDIENTE',
+          representante.nombre_completo || '',
+          representante.numero_identificacion || '',
+          representante.tipo_representante || 'REPRESENTANTE',
           currentPage,
           pageWidth,
           pageHeight,
@@ -1110,22 +1110,22 @@ export class ExportarPdfContratoService {
           x,
           yPos,
           firmaWidth,
-          acudiente.nombre_completo || '',
-          acudiente.numero_identificacion || '',
-          acudiente.tipo_acudiente || 'ACUDIENTE'
+          representante.nombre_completo || '',
+          representante.numero_identificacion || '',
+          representante.tipo_representante || 'REPRESENTANTE'
         );
       }
     });
 
     yPos += 28;
 
-    // Segunda fila de acudientes si hay más de 2
+    // Segunda fila de representantes si hay más de 2
     if (numFirmas > 2) {
       xPos = (pageWidth - totalWidth) / 2;
-      firmantes.slice(2, 4).forEach((acudiente: any, index: number) => {
+      firmantes.slice(2, 4).forEach((representante: any, index: number) => {
         const x = xPos + index * (firmaWidth + espacioEntreFirmas);
         const realIndex = index + 2;
-        const usarFirmaDigital = acudientesFirmaDigital[realIndex] !== false;
+        const usarFirmaDigital = representantesFirmaDigital[realIndex] !== false;
         const recipientIndex = realIndex + 1; // 1-based index para Firma.dev
 
         if (usarFirmaDigital) {
@@ -1135,9 +1135,9 @@ export class ExportarPdfContratoService {
             yPos,
             firmaWidth,
             recipientIndex,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE',
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE',
             currentPage,
             pageWidth,
             pageHeight,
@@ -1149,9 +1149,9 @@ export class ExportarPdfContratoService {
             x,
             yPos,
             firmaWidth,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE'
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE'
           );
         }
       });
@@ -1246,18 +1246,18 @@ export class ExportarPdfContratoService {
     // FIRMAS CON CAMPO DE FIRMA DIGITAL
     const firmaWidth = 70;
     const espacioEntreFirmas = 10;
-    const numFirmas = datos.acudientes.length;
+    const numFirmas = datos.representantes.length;
     const totalWidth = firmaWidth * Math.min(numFirmas, 2) + espacioEntreFirmas;
     let xPos = (pageWidth - totalWidth) / 2;
 
-    // Determinar si los acudientes firman digitalmente
-    const acudientesFirmaDigital = configFirmas?.acudientes?.map((a: any) => a.firmaDigital !== false) 
-      || datos.acudientes.map(() => true);
+    // Determinar si los representantes firman digitalmente
+    const representantesFirmaDigital = configFirmas?.representantes?.map((a: any) => a.firmaDigital !== false) 
+      || datos.representantes.map(() => true);
 
     // Primera fila de firmas
-    datos.acudientes.slice(0, 2).forEach((acudiente, index) => {
+    datos.representantes.slice(0, 2).forEach((representante, index) => {
       const x = xPos + index * (firmaWidth + espacioEntreFirmas);
-      const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
+      const usarFirmaDigital = representantesFirmaDigital[index] !== false;
       const recipientIndex = index + 1;
 
       if (usarFirmaDigital) {
@@ -1267,9 +1267,9 @@ export class ExportarPdfContratoService {
           yPos,
           firmaWidth,
           recipientIndex,
-          acudiente.nombre_completo || '',
-          acudiente.numero_identificacion || '',
-          acudiente.tipo_acudiente || 'ACUDIENTE',
+          representante.nombre_completo || '',
+          representante.numero_identificacion || '',
+          representante.tipo_representante || 'REPRESENTANTE',
           currentPage,
           pageWidth,
           pageHeight,
@@ -1281,21 +1281,21 @@ export class ExportarPdfContratoService {
           x,
           yPos,
           firmaWidth,
-          acudiente.nombre_completo || '',
-          acudiente.numero_identificacion || '',
-          acudiente.tipo_acudiente || 'ACUDIENTE'
+          representante.nombre_completo || '',
+          representante.numero_identificacion || '',
+          representante.tipo_representante || 'REPRESENTANTE'
         );
       }
     });
 
     yPos += 28;
 
-    // Segunda fila si hay más de 2 acudientes
+    // Segunda fila si hay más de 2 representantes
     if (numFirmas > 2) {
-      datos.acudientes.slice(2, 4).forEach((acudiente: any, index: number) => {
+      datos.representantes.slice(2, 4).forEach((representante: any, index: number) => {
         const x = xPos + index * (firmaWidth + espacioEntreFirmas);
         const realIndex = index + 2;
-        const usarFirmaDigital = acudientesFirmaDigital[realIndex] !== false;
+        const usarFirmaDigital = representantesFirmaDigital[realIndex] !== false;
         const recipientIndex = realIndex + 1;
 
         if (usarFirmaDigital) {
@@ -1305,9 +1305,9 @@ export class ExportarPdfContratoService {
             yPos,
             firmaWidth,
             recipientIndex,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE',
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE',
             currentPage,
             pageWidth,
             pageHeight,
@@ -1319,9 +1319,9 @@ export class ExportarPdfContratoService {
             x,
             yPos,
             firmaWidth,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE'
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE'
           );
         }
       });
@@ -1487,17 +1487,17 @@ export class ExportarPdfContratoService {
     // FIRMAS CON CAMPO DE FIRMA DIGITAL
     const firmaWidth = 70;
     const espacioEntreFirmas = 10;
-    const numFirmas = datos.acudientes.length;
+    const numFirmas = datos.representantes.length;
     const totalWidth = firmaWidth * Math.min(numFirmas, 2) + espacioEntreFirmas;
     let xPos = (pageWidth - totalWidth) / 2;
 
-    // Determinar si los acudientes firman digitalmente
-    const acudientesFirmaDigital = configFirmas?.acudientes?.map((a: any) => a.firmaDigital !== false) 
-      || datos.acudientes.map(() => true);
+    // Determinar si los representantes firman digitalmente
+    const representantesFirmaDigital = configFirmas?.representantes?.map((a: any) => a.firmaDigital !== false) 
+      || datos.representantes.map(() => true);
 
     if (numFirmas === 1) {
       xPos = (pageWidth - firmaWidth) / 2;
-      const usarFirmaDigital = acudientesFirmaDigital[0] !== false;
+      const usarFirmaDigital = representantesFirmaDigital[0] !== false;
       
       if (usarFirmaDigital) {
         this.dibujarCampoFirmaDigital(
@@ -1506,21 +1506,21 @@ export class ExportarPdfContratoService {
           yPos,
           firmaWidth,
           1,
-          datos.acudientes[0].nombre_completo || '',
-          datos.acudientes[0].numero_identificacion || '',
-          datos.acudientes[0].tipo_acudiente || 'ACUDIENTE',
+          datos.representantes[0].nombre_completo || '',
+          datos.representantes[0].numero_identificacion || '',
+          datos.representantes[0].tipo_representante || 'REPRESENTANTE',
           currentPage,
           pageWidth,
           pageHeight,
           'CARTA_INSTRUCCIONES'
         );
       } else {
-        this.dibujarFirmaPagare(doc, datos.acudientes[0], xPos, yPos, firmaWidth);
+        this.dibujarFirmaPagare(doc, datos.representantes[0], xPos, yPos, firmaWidth);
       }
     } else if (numFirmas === 2) {
-      datos.acudientes.forEach((acudiente, index) => {
+      datos.representantes.forEach((representante, index) => {
         const x = xPos + index * (firmaWidth + espacioEntreFirmas);
-        const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
+        const usarFirmaDigital = representantesFirmaDigital[index] !== false;
         const recipientIndex = index + 1;
 
         if (usarFirmaDigital) {
@@ -1530,27 +1530,27 @@ export class ExportarPdfContratoService {
             yPos,
             firmaWidth,
             recipientIndex,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE',
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE',
             currentPage,
             pageWidth,
             pageHeight,
             'CARTA_INSTRUCCIONES'
           );
         } else {
-          this.dibujarFirmaPagare(doc, acudiente, x, yPos, firmaWidth);
+          this.dibujarFirmaPagare(doc, representante, x, yPos, firmaWidth);
         }
       });
     } else {
       // Más de 2 firmas
       const firmasPorFila = 2;
-      datos.acudientes.forEach((acudiente, index) => {
+      datos.representantes.forEach((representante, index) => {
         const fila = Math.floor(index / firmasPorFila);
         const columna = index % firmasPorFila;
         const x = xPos + columna * (firmaWidth + espacioEntreFirmas);
         const y = yPos + fila * 30;
-        const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
+        const usarFirmaDigital = representantesFirmaDigital[index] !== false;
         const recipientIndex = index + 1;
 
         if (usarFirmaDigital) {
@@ -1560,16 +1560,16 @@ export class ExportarPdfContratoService {
             y,
             firmaWidth,
             recipientIndex,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE',
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE',
             currentPage,
             pageWidth,
             pageHeight,
             'CARTA_INSTRUCCIONES'
           );
         } else {
-          this.dibujarFirmaPagare(doc, acudiente, x, y, firmaWidth);
+          this.dibujarFirmaPagare(doc, representante, x, y, firmaWidth);
         }
       });
     }
@@ -1682,17 +1682,17 @@ export class ExportarPdfContratoService {
     // FIRMAS CON CAMPO DE FIRMA DIGITAL
     const firmaWidth = 70;
     const espacioEntreFirmas = 10;
-    const numFirmas = datos.acudientes.length;
+    const numFirmas = datos.representantes.length;
     const totalWidth = firmaWidth * Math.min(numFirmas, 2) + espacioEntreFirmas;
     let xPos = (pageWidth - totalWidth) / 2;
 
-    // Determinar si los acudientes firman digitalmente
-    const acudientesFirmaDigital = configFirmas?.acudientes?.map((a: any) => a.firmaDigital !== false) 
-      || datos.acudientes.map(() => true);
+    // Determinar si los representantes firman digitalmente
+    const representantesFirmaDigital = configFirmas?.representantes?.map((a: any) => a.firmaDigital !== false) 
+      || datos.representantes.map(() => true);
 
     if (numFirmas === 1) {
       xPos = (pageWidth - firmaWidth) / 2;
-      const usarFirmaDigital = acudientesFirmaDigital[0] !== false;
+      const usarFirmaDigital = representantesFirmaDigital[0] !== false;
       
       if (usarFirmaDigital) {
         this.dibujarCampoFirmaDigital(
@@ -1701,21 +1701,21 @@ export class ExportarPdfContratoService {
           yPos,
           firmaWidth,
           1,
-          datos.acudientes[0].nombre_completo || '',
-          datos.acudientes[0].numero_identificacion || '',
-          datos.acudientes[0].tipo_acudiente || 'ACUDIENTE',
+          datos.representantes[0].nombre_completo || '',
+          datos.representantes[0].numero_identificacion || '',
+          datos.representantes[0].tipo_representante || 'REPRESENTANTE',
           currentPage,
           pageWidth,
           pageHeight,
           'PAGARE'
         );
       } else {
-        this.dibujarFirmaPagare(doc, datos.acudientes[0], xPos, yPos, firmaWidth);
+        this.dibujarFirmaPagare(doc, datos.representantes[0], xPos, yPos, firmaWidth);
       }
     } else if (numFirmas === 2) {
-      datos.acudientes.forEach((acudiente, index) => {
+      datos.representantes.forEach((representante, index) => {
         const x = xPos + index * (firmaWidth + espacioEntreFirmas);
-        const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
+        const usarFirmaDigital = representantesFirmaDigital[index] !== false;
         const recipientIndex = index + 1;
 
         if (usarFirmaDigital) {
@@ -1725,26 +1725,26 @@ export class ExportarPdfContratoService {
             yPos,
             firmaWidth,
             recipientIndex,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE',
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE',
             currentPage,
             pageWidth,
             pageHeight,
             'PAGARE'
           );
         } else {
-          this.dibujarFirmaPagare(doc, acudiente, x, yPos, firmaWidth);
+          this.dibujarFirmaPagare(doc, representante, x, yPos, firmaWidth);
         }
       });
     } else {
       const firmasPorFila = 2;
-      datos.acudientes.forEach((acudiente, index) => {
+      datos.representantes.forEach((representante, index) => {
         const fila = Math.floor(index / firmasPorFila);
         const columna = index % firmasPorFila;
         const x = xPos + columna * (firmaWidth + espacioEntreFirmas);
         const y = yPos + fila * 30;
-        const usarFirmaDigital = acudientesFirmaDigital[index] !== false;
+        const usarFirmaDigital = representantesFirmaDigital[index] !== false;
         const recipientIndex = index + 1;
 
         if (usarFirmaDigital) {
@@ -1754,16 +1754,16 @@ export class ExportarPdfContratoService {
             y,
             firmaWidth,
             recipientIndex,
-            acudiente.nombre_completo || '',
-            acudiente.numero_identificacion || '',
-            acudiente.tipo_acudiente || 'ACUDIENTE',
+            representante.nombre_completo || '',
+            representante.numero_identificacion || '',
+            representante.tipo_representante || 'REPRESENTANTE',
             currentPage,
             pageWidth,
             pageHeight,
             'PAGARE'
           );
         } else {
-          this.dibujarFirmaPagare(doc, acudiente, x, y, firmaWidth);
+          this.dibujarFirmaPagare(doc, representante, x, y, firmaWidth);
         }
       });
     }
@@ -1773,7 +1773,7 @@ export class ExportarPdfContratoService {
 
   private dibujarFirmaPagare(
     doc: jsPDF,
-    acudiente: any,
+    representante: any,
     x: number,
     y: number,
     width: number
@@ -1785,20 +1785,20 @@ export class ExportarPdfContratoService {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor('#222');
-    doc.text(acudiente.nombre_completo || '', x + width / 2, y + 20, {
+    doc.text(representante.nombre_completo || '', x + width / 2, y + 20, {
       align: 'center',
     });
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
-    doc.text(`CC. ${acudiente.numero_identificacion}`, x + width / 2, y + 24, {
+    doc.text(`CC. ${representante.numero_identificacion}`, x + width / 2, y + 24, {
       align: 'center',
     });
 
     doc.setTextColor('#666');
     doc.setFontSize(7);
     doc.text(
-      acudiente.tipo_acudiente || 'ACUDIENTE',
+      representante.tipo_representante || 'REPRESENTANTE',
       x + width / 2,
       y + 28,
       { align: 'center' }

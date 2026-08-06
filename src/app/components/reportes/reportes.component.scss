@@ -8,7 +8,7 @@ $hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 
 // Colores específicos para cada categoría
 $color-academicos: #3498db;
-$color-estudiantes: #e74c3c;
+$color-clientes: #e74c3c;
 $color-administracion: #27ae60;
 $color-apoyo: #f39c12;
 $color-financiero: #8e44ad;
@@ -122,10 +122,10 @@ $color-colaboradores: #2980b9;
     --color-secundario: #{lighten($color-academicos, 10%)};
   }
 
-  &.estudiantes {
+  &.clientes {
     background: linear-gradient(135deg, #ffd4d4 0%, #ffb3b3 100%);
-    --color-principal: #{$color-estudiantes};
-    --color-secundario: #{lighten($color-estudiantes, 10%)};
+    --color-principal: #{$color-clientes};
+    --color-secundario: #{lighten($color-clientes, 10%)};
   }
 
   &.administracion {

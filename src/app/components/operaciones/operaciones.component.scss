@@ -10,7 +10,7 @@ $hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 $color-actividades: #27ae60;
 $color-inventario: #e67e22;
 $color-apoyo: #3498db;
-$color-estudiantes: #9b59b6;
+$color-clientes: #9b59b6;
 $color-financiero: #2ecc71;
 
 .modulo {
@@ -133,10 +133,10 @@ $color-financiero: #2ecc71;
     --color-secundario: #{lighten($color-apoyo, 10%)};
   }
 
-  &.estudiantes {
+  &.clientes {
     background: linear-gradient(135deg, #e8d5f2 0%, #d4b5e8 100%);
-    --color-principal: #{$color-estudiantes};
-    --color-secundario: #{lighten($color-estudiantes, 10%)};
+    --color-principal: #{$color-clientes};
+    --color-secundario: #{lighten($color-clientes, 10%)};
   }
 
   &.financiero {

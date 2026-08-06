@@ -359,14 +359,14 @@
   line-height: 1.2;
 }
 
-.horario-grupo {
+.horario-plan {
   font-size: 0.7rem;
   color: #757575;
 }
 
 // ==================== TÍTULO COMPACTO Y BLOQUES CORTOS ====================
 
-// Título compacto en una sola línea con truncado (Grupo - Área - Horario)
+// Título compacto en una sola línea con truncado (Plan - Área - Horario)
 .titulo-compacto {
   display: flex;
   align-items: center;
@@ -851,7 +851,7 @@
   }
 
   .actividad-tiempo,
-  .horario-grupo {
+  .horario-plan {
     font-size: 0.6rem;
   }
 

@@ -165,10 +165,10 @@ export class CuentasPorCobrarService {
       );
   }
 
-  obtenerReporteCarteraEstudiantes(anio: number, idEstudiante: string | null = null) {
-    let url = this.servicio + `/reporte-cartera-estudiantes/${anio}`;
-    if (idEstudiante !== null) {
-      url += `/${idEstudiante}`;
+  obtenerReporteCarteraClientes(anio: number, idCliente: string | null = null) {
+    let url = this.servicio + `/reporte-cartera-clientes/${anio}`;
+    if (idCliente !== null) {
+      url += `/${idCliente}`;
     }
     return this.http
       .get<HttpResponse<Object>>(url, { observe: 'response' })
@@ -216,7 +216,7 @@ export class CuentasPorCobrarService {
     );
   }
 
-  // Reporte desagregado de cobros (incluye estudiantes y colaboradores)
+  // Reporte desagregado de cobros (incluye clientes y colaboradores)
   obtenerReporteCobrosAnual(anio: number) {
     return this.http
       .get<HttpResponse<Object>>(this.servicio + `/reporte-cobros-anual/${anio}`, { observe: 'response' })

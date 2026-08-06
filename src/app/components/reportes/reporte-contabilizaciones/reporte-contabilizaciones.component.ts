@@ -220,7 +220,7 @@ export class ReporteContabilizacionesComponent implements OnInit {
   }
 
   agruparPorColaboradores() {
-    const gruposMap = new Map<number, ColaboradorAgrupado>();
+    const planesMap = new Map<number, ColaboradorAgrupado>();
     
     // Iterar sobre todas las contabilizaciones y cargar sus detalles
     const promises = this.contabilizaciones.map(c => 
@@ -230,8 +230,8 @@ export class ReporteContabilizacionesComponent implements OnInit {
             const detalle = response.body || [];
             
             detalle.forEach((d: any) => {
-              if (!gruposMap.has(d.id_colaborador)) {
-                gruposMap.set(d.id_colaborador, {
+              if (!planesMap.has(d.id_colaborador)) {
+                planesMap.set(d.id_colaborador, {
                   nombre: d.colaborador,
                   id_colaborador: d.id_colaborador,
                   total_minutos: 0,
@@ -241,10 +241,10 @@ export class ReporteContabilizacionesComponent implements OnInit {
                 });
               }
               
-              const grupo = gruposMap.get(d.id_colaborador)!;
+              const plan = planesMap.get(d.id_colaborador)!;
               
-              // Buscar si ya existe esta contabilización en el grupo
-              let contabColaborador = grupo.contabilizaciones.find(
+              // Buscar si ya existe esta contabilización en el plan
+              let contabColaborador = plan.contabilizaciones.find(
                 cc => cc.id_contabilizacion === c.id
               );
               
@@ -259,12 +259,12 @@ export class ReporteContabilizacionesComponent implements OnInit {
                   expandido: false,
                   detalle: []
                 };
-                grupo.contabilizaciones.push(contabColaborador);
+                plan.contabilizaciones.push(contabColaborador);
               }
               
               // Sumar minutos
               contabColaborador.minutos_contabilizados += d.minutos_cruzados;
-              grupo.total_minutos += d.minutos_cruzados;
+              plan.total_minutos += d.minutos_cruzados;
               
               // Agregar detalle
               contabColaborador.detalle!.push(d);
@@ -278,7 +278,7 @@ export class ReporteContabilizacionesComponent implements OnInit {
     );
     
     Promise.all(promises).then(() => {
-      this.colaboradoresAgrupados = Array.from(gruposMap.values())
+      this.colaboradoresAgrupados = Array.from(planesMap.values())
         .sort((a, b) => a.nombre.localeCompare(b.nombre));
     });
   }
@@ -318,11 +318,11 @@ export class ReporteContabilizacionesComponent implements OnInit {
   }
 
   agruparPorColaborador(detalle: DetalleCruce[]): ColaboradorAgrupadoEnContabilizacion[] {
-    const grupos: { [key: string]: ColaboradorAgrupadoEnContabilizacion } = {};
+    const planes: { [key: string]: ColaboradorAgrupadoEnContabilizacion } = {};
     
     detalle.forEach(cruce => {
-      if (!grupos[cruce.id_colaborador]) {
-        grupos[cruce.id_colaborador] = {
+      if (!planes[cruce.id_colaborador]) {
+        planes[cruce.id_colaborador] = {
           nombre: cruce.colaborador,
           id_colaborador: cruce.id_colaborador,
           total_minutos: 0,
@@ -331,15 +331,15 @@ export class ReporteContabilizacionesComponent implements OnInit {
         };
       }
       
-      grupos[cruce.id_colaborador].cruces.push(cruce);
-      grupos[cruce.id_colaborador].total_minutos += cruce.minutos_cruzados;
+      planes[cruce.id_colaborador].cruces.push(cruce);
+      planes[cruce.id_colaborador].total_minutos += cruce.minutos_cruzados;
     });
     
-    return Object.values(grupos);
+    return Object.values(planes);
   }
 
-  toggleColaborador(grupo: ColaboradorAgrupadoEnContabilizacion | ColaboradorAgrupado) {
-    grupo.expandido = !grupo.expandido;
+  toggleColaborador(plan: ColaboradorAgrupadoEnContabilizacion | ColaboradorAgrupado) {
+    plan.expandido = !plan.expandido;
   }
 
   toggleContabilizacionEnColaborador(contabilizacion: ContabilizacionDeColaborador) {

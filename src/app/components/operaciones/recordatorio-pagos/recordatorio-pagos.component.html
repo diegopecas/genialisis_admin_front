@@ -11,10 +11,10 @@
     </div>
 
     <div class="col-md-3">
-      <label for="grupoSelector" class="form-label">Grupo:</label>
-      <select id="grupoSelector" class="form-select" [(ngModel)]="grupoSeleccionado" (change)="aplicarFiltros()">
-        <option value="">Todos los grupos</option>
-        <option *ngFor="let grupo of grupos" [value]="grupo.id">{{ grupo.nombre }}</option>
+      <label for="planSelector" class="form-label">Plan:</label>
+      <select id="planSelector" class="form-select" [(ngModel)]="planSeleccionado" (change)="aplicarFiltros()">
+        <option value="">Todos los planes</option>
+        <option *ngFor="let plan of planes" [value]="plan.id">{{ plan.nombre }}</option>
       </select>
     </div>
 
@@ -44,8 +44,8 @@
     <div class="col-md-6">
       <div class="input-group">
         <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Buscar estudiante por nombre..."
-          [(ngModel)]="busquedaEstudiante" (keyup)="buscarEstudiante()">
+        <input type="text" class="form-control" placeholder="Buscar cliente por nombre..."
+          [(ngModel)]="busquedaCliente" (keyup)="buscarCliente()">
       </div>
     </div>
   </div>
@@ -66,9 +66,9 @@
     <!-- Resumen -->
     <div class="row mb-4">
       <div class="col-md-3 col-sm-6 mb-3">
-        <div class="resumen-card estudiantes-bg">
-          <span class="resumen-valor">{{ getEstudiantesConSaldo() }}</span>
-          <span class="resumen-label">Estudiantes con saldo</span>
+        <div class="resumen-card clientes-bg">
+          <span class="resumen-valor">{{ getClientesConSaldo() }}</span>
+          <span class="resumen-label">Clientes con saldo</span>
         </div>
       </div>
       <div class="col-md-3 col-sm-6 mb-3">
@@ -85,7 +85,7 @@
       </div>
       <div class="col-md-3 col-sm-6 mb-3">
         <div class="resumen-card alerta-bg">
-          <span class="resumen-valor">{{ getEstudiantesSinTelefono() }}</span>
+          <span class="resumen-valor">{{ getClientesSinTelefono() }}</span>
           <span class="resumen-label">Sin teléfono registrado</span>
         </div>
       </div>
@@ -98,20 +98,20 @@
           <table class="table table-hover table-bordered table-sm">
             <thead class="table-light sticky-top">
               <tr>
-                <th class="columna-fija sortable" (click)="ordenarPor('nombre_estudiante')">
-                  Estudiante
+                <th class="columna-fija sortable" (click)="ordenarPor('nombre_cliente')">
+                  Cliente
                   <i class="fas fa-sort float-end" [ngClass]="{
-                    'fa-sort': columnaOrdenamiento !== 'nombre_estudiante',
-                    'fa-sort-up': columnaOrdenamiento === 'nombre_estudiante' && ordenAscendente,
-                    'fa-sort-down': columnaOrdenamiento === 'nombre_estudiante' && !ordenAscendente
+                    'fa-sort': columnaOrdenamiento !== 'nombre_cliente',
+                    'fa-sort-up': columnaOrdenamiento === 'nombre_cliente' && ordenAscendente,
+                    'fa-sort-down': columnaOrdenamiento === 'nombre_cliente' && !ordenAscendente
                   }"></i>
                 </th>
-                <th class="columna-grupo sortable" (click)="ordenarPor('grupo_estudiante')">
-                  Grupo
+                <th class="columna-plan sortable" (click)="ordenarPor('plan_cliente')">
+                  Plan
                   <i class="fas fa-sort float-end" [ngClass]="{
-                    'fa-sort': columnaOrdenamiento !== 'grupo_estudiante',
-                    'fa-sort-up': columnaOrdenamiento === 'grupo_estudiante' && ordenAscendente,
-                    'fa-sort-down': columnaOrdenamiento === 'grupo_estudiante' && !ordenAscendente
+                    'fa-sort': columnaOrdenamiento !== 'plan_cliente',
+                    'fa-sort-up': columnaOrdenamiento === 'plan_cliente' && ordenAscendente,
+                    'fa-sort-down': columnaOrdenamiento === 'plan_cliente' && !ordenAscendente
                   }"></i>
                 </th>
                 <th class="text-center columna-mes" *ngFor="let mes of mesesDisponibles">
@@ -130,47 +130,47 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let estudiante of estudiantesFiltrados"
-                [ngClass]="{'table-warning': (estudiante.totalSaldoPendiente || 0) > 0}">
-                <td class="columna-fija">{{ estudiante.nombre_estudiante }}</td>
-                <td class="columna-grupo">{{ estudiante.grupo_estudiante }}</td>
+              <tr *ngFor="let cliente of clientesFiltrados"
+                [ngClass]="{'table-warning': (cliente.totalSaldoPendiente || 0) > 0}">
+                <td class="columna-fija">{{ cliente.nombre_cliente }}</td>
+                <td class="columna-plan">{{ cliente.plan_cliente }}</td>
                 <td class="text-end columna-mes" *ngFor="let mes of mesesDisponibles" [ngClass]="{
-                  'text-danger': getSaldoPendienteMes(estudiante, mes.valor) > 0,
-                  'table-danger': getSaldoPendienteMes(estudiante, mes.valor) > 100000
+                  'text-danger': getSaldoPendienteMes(cliente, mes.valor) > 0,
+                  'table-danger': getSaldoPendienteMes(cliente, mes.valor) > 100000
                 }">
-                  <span *ngIf="getSaldoPendienteMes(estudiante, mes.valor) > 0">
-                    {{ getSaldoPendienteMes(estudiante, mes.valor) | currency:'':'symbol':'1.0-0' }}
+                  <span *ngIf="getSaldoPendienteMes(cliente, mes.valor) > 0">
+                    {{ getSaldoPendienteMes(cliente, mes.valor) | currency:'':'symbol':'1.0-0' }}
                   </span>
-                  <span *ngIf="getSaldoPendienteMes(estudiante, mes.valor) === 0" class="text-muted">-</span>
+                  <span *ngIf="getSaldoPendienteMes(cliente, mes.valor) === 0" class="text-muted">-</span>
                 </td>
                 <td class="text-end columna-total fw-bold"
-                  [ngClass]="{'text-danger': (estudiante.totalSaldoPendiente || 0) > 0}">
-                  {{ estudiante.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
+                  [ngClass]="{'text-danger': (cliente.totalSaldoPendiente || 0) > 0}">
+                  {{ cliente.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
                 </td>
                 <td class="text-center">
-                  <small *ngIf="estudiante.ultimo_recordatorio" class="text-muted">
-                    {{ estudiante.ultimo_recordatorio | date:'dd/MM/yy HH:mm' }}
+                  <small *ngIf="cliente.ultimo_recordatorio" class="text-muted">
+                    {{ cliente.ultimo_recordatorio | date:'dd/MM/yy HH:mm' }}
                   </small>
-                  <small *ngIf="!estudiante.ultimo_recordatorio" class="text-muted">-</small>
+                  <small *ngIf="!cliente.ultimo_recordatorio" class="text-muted">-</small>
                 </td>
                 <td class="text-center">
-                  <button class="btn btn-sm btn-success me-1" (click)="verDetalle(estudiante)"
+                  <button class="btn btn-sm btn-success me-1" (click)="verDetalle(cliente)"
                     title="Enviar recordatorio">
                     <i class="fab fa-whatsapp"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-secondary" (click)="verHistorialPago(estudiante)"
+                  <button class="btn btn-sm btn-outline-secondary" (click)="verHistorialPago(cliente)"
                     title="Ver historial">
                     <i class="fas fa-history"></i>
                   </button>
                 </td>
               </tr>
-              <tr *ngIf="estudiantesFiltrados.length === 0">
+              <tr *ngIf="clientesFiltrados.length === 0">
                 <td colspan="16" class="text-center text-muted py-4">
-                  No se encontraron estudiantes con los filtros aplicados
+                  No se encontraron clientes con los filtros aplicados
                 </td>
               </tr>
             </tbody>
-            <tfoot class="table-light" *ngIf="estudiantesFiltrados.length > 0">
+            <tfoot class="table-light" *ngIf="clientesFiltrados.length > 0">
               <tr class="fw-bold">
                 <td colspan="2">TOTALES</td>
                 <td class="text-end" *ngFor="let mes of mesesDisponibles">
@@ -194,8 +194,8 @@
               </h6>
               <div class="row">
                 <div class="col-md-4">
-                  <strong>Estudiantes con saldo:</strong>
-                  {{ getEstudiantesConSaldo() }} de {{ estudiantesFiltrados.length }}
+                  <strong>Clientes con saldo:</strong>
+                  {{ getClientesConSaldo() }} de {{ clientesFiltrados.length }}
                 </div>
                 <div class="col-md-4">
                   <strong>Total pendiente:</strong>
@@ -203,7 +203,7 @@
                 </div>
                 <div class="col-md-4">
                   <strong>Sin teléfono:</strong>
-                  {{ getEstudiantesSinTelefono() }} estudiantes
+                  {{ getClientesSinTelefono() }} clientes
                 </div>
               </div>
             </div>
@@ -221,34 +221,34 @@
   </div>
 </div>
 
-<!-- Modal detalle con acudientes -->
+<!-- Modal detalle con representantes -->
 <div class="modal fade" id="modalRecordatorio" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="fab fa-whatsapp me-2 text-success"></i>
-          Enviar Recordatorio - {{ estudianteSeleccionado?.nombre_estudiante }}
+          Enviar Recordatorio - {{ clienteSeleccionado?.nombre_cliente }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" *ngIf="estudianteSeleccionado">
+      <div class="modal-body" *ngIf="clienteSeleccionado">
 
-        <!-- Info del estudiante -->
+        <!-- Info del cliente -->
         <div class="row mb-3">
           <div class="col-md-4">
-            <strong>Grupo:</strong> {{ estudianteSeleccionado.grupo_estudiante }}
+            <strong>Plan:</strong> {{ clienteSeleccionado.plan_cliente }}
           </div>
           <div class="col-md-4 text-center">
             <strong>Total Pendiente:</strong>
             <span class="text-danger fw-bold">
-              {{ estudianteSeleccionado.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
+              {{ clienteSeleccionado.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
             </span>
           </div>
           <div class="col-md-4 text-end">
             <strong>Saldo Vencido:</strong>
             <span class="text-danger fw-bold">
-              {{ estudianteSeleccionado.saldoVencido | currency:'':'symbol':'1.0-0' }}
+              {{ clienteSeleccionado.saldoVencido | currency:'':'symbol':'1.0-0' }}
             </span>
           </div>
         </div>
@@ -285,7 +285,7 @@
         <div *ngIf="tipoMensajeSeleccionado === 'vencido'" class="alert alert-danger mb-4">
           <div class="d-flex justify-content-between align-items-center">
             <span><i class="fas fa-exclamation-triangle me-2"></i> Saldo vencido a la fecha</span>
-            <strong class="fs-5">{{ estudianteSeleccionado.saldoVencido | currency:'':'symbol':'1.0-0' }}</strong>
+            <strong class="fs-5">{{ clienteSeleccionado.saldoVencido | currency:'':'symbol':'1.0-0' }}</strong>
           </div>
           <small class="text-muted d-block mt-1">El mensaje solo informará el monto vencido sin desglose de meses.</small>
         </div>
@@ -307,7 +307,7 @@
               </thead>
               <tbody>
                 <ng-container *ngFor="let mes of mesesDisponibles">
-                  <tr *ngIf="getSaldoPendienteMes(estudianteSeleccionado, mes.valor) > 0">
+                  <tr *ngIf="getSaldoPendienteMes(clienteSeleccionado, mes.valor) > 0">
                     <td class="text-center">
                       <input type="checkbox" class="form-check-input"
                         [checked]="mesesSeleccionados[mes.valor]"
@@ -315,7 +315,7 @@
                     </td>
                     <td>{{ mes.nombre }}</td>
                     <td class="text-end text-danger">
-                      {{ getSaldoPendienteMes(estudianteSeleccionado, mes.valor) | currency:'':'symbol':'1.0-0' }}
+                      {{ getSaldoPendienteMes(clienteSeleccionado, mes.valor) | currency:'':'symbol':'1.0-0' }}
                     </td>
                   </tr>
                 </ng-container>
@@ -337,7 +337,7 @@
         <div *ngIf="tipoMensajeSeleccionado === 'todos'" class="mb-4">
           <div class="alert alert-info d-flex justify-content-between align-items-center mb-2">
             <span><i class="fas fa-info-circle me-2"></i> Se incluirán todos los meses con saldo pendiente en el mensaje</span>
-            <strong>{{ estudianteSeleccionado.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}</strong>
+            <strong>{{ clienteSeleccionado.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}</strong>
           </div>
           <div class="text-center">
             <button class="btn btn-sm btn-outline-secondary" (click)="mostrarDetalleMeses = !mostrarDetalleMeses">
@@ -356,10 +356,10 @@
                 </thead>
                 <tbody>
                   <ng-container *ngFor="let mes of mesesDisponibles">
-                    <tr *ngIf="getSaldoPendienteMes(estudianteSeleccionado, mes.valor) > 0">
+                    <tr *ngIf="getSaldoPendienteMes(clienteSeleccionado, mes.valor) > 0">
                       <td>{{ mes.nombre }}</td>
                       <td class="text-end text-danger">
-                        {{ getSaldoPendienteMes(estudianteSeleccionado, mes.valor) | currency:'':'symbol':'1.0-0' }}
+                        {{ getSaldoPendienteMes(clienteSeleccionado, mes.valor) | currency:'':'symbol':'1.0-0' }}
                       </td>
                     </tr>
                   </ng-container>
@@ -368,7 +368,7 @@
                   <tr class="fw-bold">
                     <td>Total</td>
                     <td class="text-end text-danger">
-                      {{ estudianteSeleccionado.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
+                      {{ clienteSeleccionado.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
                     </td>
                   </tr>
                 </tfoot>
@@ -417,25 +417,25 @@
           style="font-size: 0.9rem; line-height: 1.5; resize: vertical;"></textarea>
         <small class="text-muted mt-1 d-block">
           <i class="fas fa-info-circle me-1"></i>
-          El texto {{ '{' }}NOMBRE_DESTINATARIO{{ '}' }} se reemplazará con el nombre del acudiente al enviar.
+          El texto {{ '{' }}NOMBRE_DESTINATARIO{{ '}' }} se reemplazará con el nombre del representante al enviar.
         </small>
 
         <hr />
 
-        <!-- Acudientes responsables de pago -->
-        <h6 class="mb-3">Acudientes responsables de pago</h6>
-        <div *ngIf="estudianteSeleccionado.acudientes.length === 0" class="alert alert-warning">
-          <i class="fas fa-exclamation-triangle"></i> No hay acudientes responsables de pago registrados.
+        <!-- Representantes responsables de pago -->
+        <h6 class="mb-3">Representantes responsables de pago</h6>
+        <div *ngIf="clienteSeleccionado.representantes.length === 0" class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i> No hay representantes responsables de pago registrados.
         </div>
 
-        <div *ngFor="let acudiente of estudianteSeleccionado.acudientes; let i = index" class="acudiente-card mb-3">
+        <div *ngFor="let representante of clienteSeleccionado.representantes; let i = index" class="representante-card mb-3">
           <div class="row align-items-center">
             <div class="col-md-4">
-              <div class="fw-bold">{{ acudiente.nombre_acudiente }}</div>
-              <small class="text-muted">{{ acudiente.nombre_tipo_acudiente }}</small>
-              <div *ngIf="acudiente.correo_electronico" class="mt-1">
+              <div class="fw-bold">{{ representante.nombre_representante }}</div>
+              <small class="text-muted">{{ representante.nombre_tipo_representante }}</small>
+              <div *ngIf="representante.correo_electronico" class="mt-1">
                 <i class="fas fa-envelope me-1"></i>
-                <small>{{ acudiente.correo_electronico }}</small>
+                <small>{{ representante.correo_electronico }}</small>
               </div>
             </div>
             <div class="col-md-3">
@@ -446,12 +446,12 @@
             </div>
             <div class="col-md-5 text-end mt-2 mt-md-0">
               <div class="btn-group">
-                <button class="btn btn-success btn-sm" (click)="enviarWhatsApp(estudianteSeleccionado!, acudiente, i)"
+                <button class="btn btn-success btn-sm" (click)="enviarWhatsApp(clienteSeleccionado!, representante, i)"
                   [disabled]="!telefonosEditables[i]" title="Enviar por WhatsApp">
                   <i class="fab fa-whatsapp me-1"></i> WA
                 </button>
-                <button class="btn btn-primary btn-sm" (click)="enviarCorreo(estudianteSeleccionado!, acudiente)"
-                  [disabled]="!acudiente.correo_electronico" title="Enviar por correo">
+                <button class="btn btn-primary btn-sm" (click)="enviarCorreo(clienteSeleccionado!, representante)"
+                  [disabled]="!representante.correo_electronico" title="Enviar por correo">
                   <i class="fas fa-envelope me-1"></i> Email
                 </button>
               </div>
@@ -460,7 +460,7 @@
         </div>
 
         <!-- Enviar a contacto adicional -->
-        <div class="acudiente-card mb-3 border-dashed">
+        <div class="representante-card mb-3 border-dashed">
           <div class="row align-items-center">
             <div class="col-md-3">
               <label class="form-label mb-1"><i class="fas fa-user me-1"></i> Nombre</label>
@@ -483,11 +483,11 @@
             <div class="col-md-3 text-end mt-2 mt-md-0">
               <label class="form-label mb-1 d-none d-md-block">&nbsp;</label>
               <div class="btn-group">
-                <button class="btn btn-outline-success btn-sm" (click)="enviarWhatsAppTelefonoAdicional(estudianteSeleccionado!)"
+                <button class="btn btn-outline-success btn-sm" (click)="enviarWhatsAppTelefonoAdicional(clienteSeleccionado!)"
                   [disabled]="!telefonoAdicional" title="Enviar por WhatsApp">
                   <i class="fab fa-whatsapp me-1"></i> WA
                 </button>
-                <button class="btn btn-outline-primary btn-sm" (click)="enviarCorreoAdicional(estudianteSeleccionado!)"
+                <button class="btn btn-outline-primary btn-sm" (click)="enviarCorreoAdicional(clienteSeleccionado!)"
                   [disabled]="!correoAdicional" title="Enviar por correo">
                   <i class="fas fa-envelope me-1"></i> Email
                 </button>
@@ -499,7 +499,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger me-auto" 
-          (click)="descargarEstadoCuenta(estudianteSeleccionado!)"
+          (click)="descargarEstadoCuenta(clienteSeleccionado!)"
           [disabled]="descargandoPDF || (tipoMensajeSeleccionado === 'seleccion' && getTotalMesesSeleccionados() === 0)">
           <i class="fas fa-file-pdf me-1"></i>
           <span *ngIf="!descargandoPDF">
@@ -520,10 +520,10 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fas fa-history me-2"></i> Historial de Recordatorios - {{ estudianteHistorial?.nombre_estudiante }}</h5>
+        <h5 class="modal-title"><i class="fas fa-history me-2"></i> Historial de Recordatorios - {{ clienteHistorial?.nombre_cliente }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" *ngIf="estudianteHistorial">
+      <div class="modal-body" *ngIf="clienteHistorial">
 
         <div *ngIf="cargandoHistorial" class="text-center py-4">
           <div class="spinner-border text-primary" role="status"></div>
@@ -532,7 +532,7 @@
 
         <div *ngIf="!cargandoHistorial && historialPago.length === 0" class="text-center py-4">
           <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-          <p class="text-muted">Aún no se han enviado recordatorios para este estudiante.</p>
+          <p class="text-muted">Aún no se han enviado recordatorios para este cliente.</p>
         </div>
 
         <div *ngIf="!cargandoHistorial && historialPago.length > 0" class="table-responsive">

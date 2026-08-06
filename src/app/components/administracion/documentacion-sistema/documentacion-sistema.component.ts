@@ -392,7 +392,7 @@ export class DocumentacionSistemaComponent implements OnInit, OnDestroy {
   }
 
   onImageError(event: any): void {
-    event.target.src = 'assets/images/no-image.png';
+    event.target.src = 'mdi mdi-image-off';
   }
 
   getRutaImagen(img: string): string {

@@ -40,6 +40,7 @@
               }
             ],
             "styles": [
+              "src/assets/fonts/materialize/materialdesignicons.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/leaflet-draw/dist/leaflet.draw.css",
@@ -165,6 +166,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/assets/fonts/materialize/materialdesignicons.css",
               "src/styles.scss"
             ],
             "scripts": []

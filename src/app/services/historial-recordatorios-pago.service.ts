@@ -32,9 +32,9 @@ export class HistorialRecordatoriosPagoService {
       );
   }
 
-  obtenerPorEstudiante(idEstudiante: string) {
+  obtenerPorCliente(idCliente: string) {
     return this.http
-      .get<HttpResponse<Object>>(this.servicio + `/estudiante/${idEstudiante}`, { observe: 'response' })
+      .get<HttpResponse<Object>>(this.servicio + `/cliente/${idCliente}`, { observe: 'response' })
       .pipe(
         tap((response: HttpResponse<Object>) => {
           let respuesta: any = response.body;

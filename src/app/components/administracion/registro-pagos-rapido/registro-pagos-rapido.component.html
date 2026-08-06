@@ -5,7 +5,7 @@
   <div class="container-fluid mt-4 px-4">
     <div *ngIf="cargando" class="text-center py-5">
       <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
-      <p class="mt-2 text-muted">Cargando estudiantes y cuentas pendientes...</p>
+      <p class="mt-2 text-muted">Cargando clientes y cuentas pendientes...</p>
     </div>
 
     <div *ngIf="!cargando">
@@ -27,14 +27,14 @@
           <div class="col-md-3">
             <div class="input-group">
               <span class="input-group-text"><i class="fas fa-search"></i></span>
-              <input type="text" class="form-control" placeholder="Buscar estudiante..."
+              <input type="text" class="form-control" placeholder="Buscar cliente..."
                 [(ngModel)]="busqueda" (input)="filtrarFilas()" />
             </div>
           </div>
           <div class="col-md-2">
-            <select class="form-select" [(ngModel)]="filtroGrupo" (change)="filtrarFilas()">
-              <option value="">Todos los grupos</option>
-              <option *ngFor="let g of grupos" [value]="g">{{ g }}</option>
+            <select class="form-select" [(ngModel)]="filtroPlan" (change)="filtrarFilas()">
+              <option value="">Todos los planes</option>
+              <option *ngFor="let g of planes" [value]="g">{{ g }}</option>
             </select>
           </div>
           <div class="col-md-2">
@@ -54,7 +54,7 @@
             </div>
           </div>
           <div class="col-md-3 text-end">
-            <span class="badge bg-info fs-6">{{ filasFiltradas.length }} estudiantes</span>
+            <span class="badge bg-info fs-6">{{ filasFiltradas.length }} clientes</span>
           </div>
         </div>
       </div>
@@ -70,10 +70,10 @@
                 <th class="text-center col-check">
                   <input type="checkbox" class="form-check-input" (change)="seleccionarTodos($event)" />
                 </th>
-                <th class="col-estudiante">Estudiante</th>
-                <th class="col-grupo">Grupo</th>
+                <th class="col-cliente">Cliente</th>
+                <th class="col-plan">Plan</th>
                 <th class="col-saldo text-end">Saldo</th>
-                <th class="col-acudiente">Acudiente</th>
+                <th class="col-representante">Representante</th>
                 <th class="col-tipo-pago">Tipo Pago</th>
                 <th class="col-documento text-center">Doc.</th>
                 <th class="col-fecha">Fecha</th>
@@ -85,9 +85,9 @@
             </thead>
             <tbody>
               <tr *ngIf="filasFiltradas.length === 0">
-                <td colspan="12" class="text-center text-muted py-4">No se encontraron estudiantes con los filtros actuales.</td>
+                <td colspan="12" class="text-center text-muted py-4">No se encontraron clientes con los filtros actuales.</td>
               </tr>
-              <tr *ngFor="let fila of filasFiltradas; trackBy: trackByEstudiante"
+              <tr *ngFor="let fila of filasFiltradas; trackBy: trackByCliente"
                 [class.fila-seleccionada]="fila.seleccionado" [class.fila-sin-saldo]="fila.saldoTotal === 0"
                 [class.fila-lista]="filaListaParaRegistrar(fila)">
 
@@ -95,17 +95,17 @@
                   <input type="checkbox" class="form-check-input" [(ngModel)]="fila.seleccionado" />
                 </td>
                 <td class="align-middle">
-                  <span class="nombre-estudiante">{{ fila.estudiante.nombre_estudiante }}</span>
+                  <span class="nombre-cliente">{{ fila.cliente.nombre_cliente }}</span>
                   <small *ngIf="fila.cuentasPendientes.length > 0" class="d-block text-muted">{{ fila.cuentasPendientes.length }} cta(s)</small>
                 </td>
-                <td class="align-middle"><span class="badge-grupo">{{ fila.estudiante.grupo_estudiante }}</span></td>
+                <td class="align-middle"><span class="badge-plan">{{ fila.cliente.plan_cliente }}</span></td>
                 <td class="text-end align-middle">
                   <span class="saldo" [class.saldo-positivo]="fila.saldoTotal > 0" [class.saldo-cero]="fila.saldoTotal === 0">${{ formatearMoneda(fila.saldoTotal) }}</span>
                 </td>
                 <td class="align-middle">
-                  <select class="form-select form-select-sm" [(ngModel)]="fila.id_acudiente" [disabled]="!fila.seleccionado">
-                    <option [ngValue]="null">Sin acudiente</option>
-                    <option *ngFor="let a of fila.acudientes" [ngValue]="a.id_acudiente">{{ a.nombre_acudiente }} ({{ a.tipo_acudiente }})</option>
+                  <select class="form-select form-select-sm" [(ngModel)]="fila.id_representante" [disabled]="!fila.seleccionado">
+                    <option [ngValue]="null">Sin representante</option>
+                    <option *ngFor="let a of fila.representantes" [ngValue]="a.id_representante">{{ a.nombre_representante }} ({{ a.tipo_representante }})</option>
                   </select>
                 </td>
                 <td class="align-middle">
@@ -117,10 +117,10 @@
                 </td>
                 <td class="text-center align-middle celda-documento">
                   <div *ngIf="requiereDocumento(fila) && fila.seleccionado">
-                    <label *ngIf="!fila.archivo && !fila.analizandoIA" class="btn-adjuntar" [for]="'archivo_' + fila.estudiante.id_estudiante">
+                    <label *ngIf="!fila.archivo && !fila.analizandoIA" class="btn-adjuntar" [for]="'archivo_' + fila.cliente.id_cliente">
                       <i class="fas fa-paperclip"></i>
                     </label>
-                    <input [id]="'archivo_' + fila.estudiante.id_estudiante" type="file" accept=".pdf,.jpg,.jpeg,.png" class="d-none"
+                    <input [id]="'archivo_' + fila.cliente.id_cliente" type="file" accept=".pdf,.jpg,.jpeg,.png" class="d-none"
                       (change)="onArchivoSeleccionado(fila, $event)" />
                     <div *ngIf="fila.analizandoIA" class="ia-loading">
                       <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
@@ -202,15 +202,15 @@
       <div *ngIf="mostrarRegistrados">
         <div class="alert alert-success mb-3">
           <i class="fas fa-check-circle me-2"></i>
-          <strong>{{ filasRegistradas.length }}</strong> pago(s) registrado(s). Envíe confirmaciones a los acudientes.
+          <strong>{{ filasRegistradas.length }}</strong> pago(s) registrado(s). Envíe confirmaciones a los representantes.
         </div>
 
         <div class="table-responsive tabla-pagos-container">
           <table class="table table-bordered tabla-pagos">
             <thead class="table-light">
               <tr>
-                <th>Estudiante</th>
-                <th>Grupo</th>
+                <th>Cliente</th>
+                <th>Plan</th>
                 <th class="text-end">Valor</th>
                 <th>Referencia</th>
                 <th class="text-center">Acciones</th>
@@ -218,8 +218,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let fila of filasFiltradas">
-                <td class="align-middle"><strong>{{ fila.estudiante.nombre_estudiante }}</strong></td>
-                <td class="align-middle"><span class="badge-grupo">{{ fila.estudiante.grupo_estudiante }}</span></td>
+                <td class="align-middle"><strong>{{ fila.cliente.nombre_cliente }}</strong></td>
+                <td class="align-middle"><span class="badge-plan">{{ fila.cliente.plan_cliente }}</span></td>
                 <td class="text-end align-middle fw-bold text-success">${{ formatearMoneda(fila.valor_recibido) }}</td>
                 <td class="align-middle">{{ fila.referencia_bancaria || '—' }}</td>
                 <td class="text-center align-middle">
@@ -256,7 +256,7 @@
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="fas fa-hand-pointer me-2 text-primary"></i>
-          Distribución Manual - {{ modalFila?.estudiante?.nombre_estudiante }}
+          Distribución Manual - {{ modalFila?.cliente?.nombre_cliente }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -334,7 +334,7 @@
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="fab fa-whatsapp me-2 text-success"></i>
-          Enviar Confirmación - {{ envioFila?.estudiante?.nombre_estudiante }}
+          Enviar Confirmación - {{ envioFila?.cliente?.nombre_cliente }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -355,20 +355,20 @@
 
         <hr />
 
-        <!-- Acudientes responsables de pago -->
-        <h6 class="mb-3">Acudientes responsables de pago</h6>
-        <div *ngIf="envioFila.acudientes.length === 0" class="alert alert-warning">
-          <i class="fas fa-exclamation-triangle"></i> No hay acudientes responsables de pago registrados.
+        <!-- Representantes responsables de pago -->
+        <h6 class="mb-3">Representantes responsables de pago</h6>
+        <div *ngIf="envioFila.representantes.length === 0" class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i> No hay representantes responsables de pago registrados.
         </div>
 
-        <div *ngFor="let acudiente of envioFila.acudientes; let i = index" class="acudiente-card mb-3">
+        <div *ngFor="let representante of envioFila.representantes; let i = index" class="representante-card mb-3">
           <div class="row align-items-center">
             <div class="col-md-4">
-              <div class="fw-bold">{{ acudiente.nombre_acudiente }}</div>
-              <small class="text-muted">{{ acudiente.tipo_acudiente }}</small>
-              <div *ngIf="acudiente.correo_electronico" class="mt-1">
+              <div class="fw-bold">{{ representante.nombre_representante }}</div>
+              <small class="text-muted">{{ representante.tipo_representante }}</small>
+              <div *ngIf="representante.correo_electronico" class="mt-1">
                 <i class="fas fa-envelope me-1 text-muted"></i>
-                <small>{{ acudiente.correo_electronico }}</small>
+                <small>{{ representante.correo_electronico }}</small>
               </div>
             </div>
             <div class="col-md-3">
@@ -377,12 +377,12 @@
             </div>
             <div class="col-md-5 text-end mt-2 mt-md-0">
               <div class="btn-group">
-                <button class="btn btn-wa btn-sm" (click)="enviarWhatsAppAcudiente(envioFila!, acudiente, i)"
+                <button class="btn btn-wa btn-sm" (click)="enviarWhatsAppRepresentante(envioFila!, representante, i)"
                   [disabled]="!telefonosEditables[i]" title="Enviar por WhatsApp">
                   <i class="fab fa-whatsapp me-1"></i> WA
                 </button>
-                <button class="btn btn-primary btn-sm" (click)="enviarCorreoAcudiente(envioFila!, acudiente)"
-                  [disabled]="!acudiente.correo_electronico" title="Enviar por correo">
+                <button class="btn btn-primary btn-sm" (click)="enviarCorreoRepresentante(envioFila!, representante)"
+                  [disabled]="!representante.correo_electronico" title="Enviar por correo">
                   <i class="fas fa-envelope me-1"></i> Email
                 </button>
               </div>
@@ -391,7 +391,7 @@
         </div>
 
         <!-- Contacto adicional -->
-        <div class="acudiente-card mb-3 border-dashed">
+        <div class="representante-card mb-3 border-dashed">
           <div class="row align-items-center">
             <div class="col-md-3">
               <label class="form-label mb-1"><i class="fas fa-user me-1"></i> Nombre</label>

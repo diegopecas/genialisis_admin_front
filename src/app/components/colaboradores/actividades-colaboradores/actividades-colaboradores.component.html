@@ -4,7 +4,7 @@
     [mostrarCrear]="false"
     [raiz]="'/colaboradores/gestion'"
     [regresar]="'/colaboradores/gestion'"
-    [iconoTitulo]="'/assets/images/actividades_colaboradores.png'"
+    [iconoTitulo]="'mdi mdi-clipboard-text'"
   >
   </app-header>
 
@@ -18,10 +18,7 @@
         <div class="card-opcion" (click)="seleccionarOpcion('aprobar')">
           <div class="card-opcion-content">
             <div class="icono-container aprobar">
-              <img
-                [src]="'/assets/images/aprobar_actividades.png'"
-                alt="Aprobar Actividades"
-              />
+              <i class="mdi mdi-check-all icono-img"></i>
             </div>
             <h3 class="card-titulo">Aprobar Actividades</h3>
             <p class="card-descripcion">
@@ -42,10 +39,7 @@
         <div class="card-opcion" (click)="seleccionarOpcion('contabilizar')">
           <div class="card-opcion-content">
             <div class="icono-container contabilizar">
-              <img
-                [src]="'/assets/images/contabilizar_actividades.png'"
-                alt="Contabilizar Actividades"
-              />
+              <i class="mdi mdi-timer-cog icono-img"></i>
             </div>
             <h3 class="card-titulo">Contabilizar Actividades</h3>
             <p class="card-descripcion">
@@ -66,10 +60,7 @@
         <div class="card-opcion" (click)="seleccionarOpcion('calendario')">
           <div class="card-opcion-content">
             <div class="icono-container calendario">
-              <img
-                [src]="'/assets/images/calendario_actividades.png'"
-                alt="Calendario"
-              />
+              <i class="mdi mdi-calendar-month icono-img"></i>
             </div>
             <h3 class="card-titulo">Calendario de Actividades</h3>
             <p class="card-descripcion">

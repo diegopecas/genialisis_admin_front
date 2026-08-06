@@ -12,7 +12,7 @@ import { TiposIdentificacionService } from '../../../services/tipos-identificaci
 import { GenerosService } from '../../../services/generos.service';
 import { CiudadesService } from '../../../services/ciudades.service';
 import { NivelesEscolaridadService } from '../../../services/niveles-escolaridad.service';
-import { GruposService } from '../../../services/grupos.service';
+import { PlanesService } from '../../../services/planes.service';
 import { UsuariosService } from '../../../services/usuarios.service';
 import { HorariosColaboradoresService } from '../../../services/horarios-colaboradores.service';
 import Swal from 'sweetalert2';
@@ -46,7 +46,7 @@ export class CrearColaboradoresComponent implements OnInit {
 
   public listas = {
     tiposIdentificacion: [] as any[], generos: [] as any[], roles: [] as any[], nivelesEscolaridad: [] as any[],
-    colaboradoresJefes: [] as any[], ciudades: [] as any[], grupos: [] as any[],
+    colaboradoresJefes: [] as any[], ciudades: [] as any[], planes: [] as any[],
     cargos: [] as any[], motivosRetiro: [] as any[], tiposContrato: [] as any[],
   };
 
@@ -94,7 +94,7 @@ export class CrearColaboradoresComponent implements OnInit {
     private personasService: PersonasService,
     private tiposIdentificacionService: TiposIdentificacionService, private generosService: GenerosService,
     private ciudadesService: CiudadesService, private nivelesEscolaridadService: NivelesEscolaridadService,
-    private gruposService: GruposService,
+    private planesService: PlanesService,
     private cargosService: CargosService, private motivosRetiroService: MotivosRetiroService,
     private tiposContratoService: TiposContratoService, private usuariosService: UsuariosService,
     private horariosService: HorariosColaboradoresService
@@ -184,7 +184,7 @@ export class CrearColaboradoresComponent implements OnInit {
     this.rolesService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.roles = r.body || []), error: (e: any) => console.error('Error', e) });
     this.nivelesEscolaridadService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.nivelesEscolaridad = r.body || []), error: (e: any) => console.error('Error', e) });
     this.ciudadesService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.ciudades = r.body || []), error: (e: any) => console.error('Error', e) });
-    this.gruposService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.grupos = r.body || []), error: (e: any) => console.error('Error', e) });
+    this.planesService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.planes = r.body || []), error: (e: any) => console.error('Error', e) });
     this.cargosService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.cargos = r.body || []), error: (e: any) => console.error('Error', e) });
     this.motivosRetiroService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.motivosRetiro = r.body || []), error: (e: any) => console.error('Error', e) });
     this.tiposContratoService.obtenerTodos().subscribe({ next: (r: any) => (this.listas.tiposContrato = r.body || []), error: (e: any) => console.error('Error', e) });
@@ -259,7 +259,7 @@ export class CrearColaboradoresComponent implements OnInit {
     });
   }
 
-  // ========== GRUPOS ==========
+  // ========== PLANES ==========
 
   // ========== ÁREAS ==========
 

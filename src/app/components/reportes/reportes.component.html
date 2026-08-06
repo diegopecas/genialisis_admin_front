@@ -9,7 +9,7 @@
   <div class="container-fluid mt-5">
     <div class="row justify-content-center">
       <!-- Académicos -->
-      <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['reportes.calificaciones_estudiante', 'reportes.calificaciones_sprint', 'reportes.cobertura_curricular', 'reportes.ejecucion_tareas', 'reportes.malla_curricular'])">
+      <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['reportes.calificaciones_cliente', 'reportes.calificaciones_sprint', 'reportes.cobertura_curricular', 'reportes.ejecucion_tareas', 'reportes.malla_curricular'])">
         <div
           class="card-maestro menu-principal"
           [class.active]="menuActivo === 'academicos'"
@@ -17,7 +17,7 @@
         >
           <div class="card-maestro-content">
             <div class="icono-container academicos">
-              <img src="assets/images/academico.png" alt="Académicos" />
+              <i class="mdi mdi-school icono-img"></i>
             </div>
             <h3 class="card-titulo">Académicos</h3>
             <p class="card-descripcion">
@@ -34,7 +34,7 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.calificaciones_sprint')">
               </div>
-              <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.calificaciones_estudiante')">
+              <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.calificaciones_cliente')">
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.malla_curricular')">
               </div>
@@ -47,18 +47,18 @@
         </div>
       </div>
 
-      <!-- Estudiantes -->
-      <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['reportes.asistencia', 'reportes.estudiantes_general', 'reportes.tamizajes'])">
+      <!-- Clientes -->
+      <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['reportes.asistencia', 'reportes.clientes_general', 'reportes.tamizajes'])">
         <div
           class="card-maestro menu-principal"
-          [class.active]="menuActivo === 'estudiantes'"
-          (click)="toggleMenu('estudiantes', $event)"
+          [class.active]="menuActivo === 'clientes'"
+          (click)="toggleMenu('clientes', $event)"
         >
           <div class="card-maestro-content">
-            <div class="icono-container estudiantes">
-              <img src="assets/images/estudiantes.png" alt="Estudiantes" />
+            <div class="icono-container clientes">
+              <i class="mdi mdi-account-tie icono-img"></i>
             </div>
-            <h3 class="card-titulo">Estudiantes</h3>
+            <h3 class="card-titulo">Clientes</h3>
             <p class="card-descripcion">
               Información general, asistencia y tamizajes
             </p>
@@ -71,15 +71,12 @@
 
           <div class="submenu-container">
             <div class="row g-2">
-              <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.estudiantes_general')">
+              <div class="col-6" *ngIf="permisosService.tienePermiso('reportes.clientes_general')">
                 <div
                   class="submenu-item"
-                  (click)="seleccionarOpcion('estudiantes-general', $event)"
+                  (click)="seleccionarOpcion('clientes-general', $event)"
                 >
-                  <img
-                    src="assets/images/reporte-estudiantes.png"
-                    alt="Reporte General"
-                  />
+                  <i class="mdi mdi-account-details icono-img"></i>
                   <span>Reporte General</span>
                 </div>
               </div>
@@ -101,7 +98,7 @@
         >
           <div class="card-maestro-content">
             <div class="icono-container financiero">
-              <img src="assets/images/finanzas.png" alt="Financiero" />
+              <i class="mdi mdi-finance icono-img"></i>
             </div>
             <h3 class="card-titulo">Financiero</h3>
             <p class="card-descripcion">
@@ -121,7 +118,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('cartera', $event)"
                 >
-                  <img src="assets/images/cartera.png" alt="Cartera" />
+                  <i class="mdi mdi-wallet icono-img"></i>
                   <span>Cartera</span>
                 </div>
               </div>
@@ -130,10 +127,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('cobros-realizados', $event)"
                 >
-                  <img
-                    src="assets/images/cobros-realizados.png"
-                    alt="Cobros Realizados"
-                  />
+                  <i class="mdi mdi-cash-check icono-img"></i>
                   <span>Cobros Realizados</span>
                 </div>
               </div>
@@ -142,7 +136,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('pagos-recibidos', $event)"
                 >
-                  <img src="assets/images/pagos.png" alt="Pagos Recibidos" />
+                  <i class="mdi mdi-cash-multiple icono-img"></i>
                   <span>Pagos Recibidos</span>
                 </div>
               </div>
@@ -151,10 +145,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('reportes-pago', $event)"
                 >
-                  <img
-                    src="assets/images/reportar-pago.png"
-                    alt="Reportes de Pago"
-                  />
+                  <i class="mdi mdi-cash-check icono-img"></i>
                   <span>Reportes de Pago</span>
                 </div>
               </div>
@@ -163,10 +154,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('movimientos-financieros', $event)"
                 >
-                  <img
-                    src="assets/images/finanzas.png"
-                    alt="Ingresos y Egresos"
-                  />
+                  <i class="mdi mdi-finance icono-img"></i>
                   <span>Ingresos y Egresos</span>
                 </div>
               </div>
@@ -184,7 +172,7 @@
         >
           <div class="card-maestro-content">
             <div class="icono-container colaboradores">
-              <img src="assets/images/colaboradores.png" alt="Colaboradores" />
+              <i class="mdi mdi-account-group icono-img"></i>
             </div>
             <h3 class="card-titulo">Colaboradores</h3>
             <p class="card-descripcion">
@@ -206,10 +194,7 @@
                     seleccionarOpcion('reporte-contabilizaciones', $event)
                   "
                 >
-                  <img
-                    src="assets/images/reportes_actividades_colaboradores.png"
-                    alt="Reportes Contabilización"
-                  />
+                  <i class="mdi mdi-chart-box icono-img"></i>
                   <span>Reportes de Contabilización</span>
                 </div>
               </div>
@@ -218,10 +203,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('historial-actividades', $event)"
                 >
-                  <img
-                    src="assets/images/historial_actividades.png"
-                    alt="Historial Actividades"
-                  />
+                  <i class="mdi mdi-history icono-img"></i>
                   <span>Historial de Actividades</span>
                 </div>
               </div>
@@ -241,10 +223,7 @@
         >
           <div class="card-maestro-content">
             <div class="icono-container administracion">
-              <img
-                src="assets/images/administracion.png"
-                alt="Administración"
-              />
+              <i class="mdi mdi-cog-outline icono-img"></i>
             </div>
             <h3 class="card-titulo">Administración</h3>
             <p class="card-descripcion">Reportes administrativos generales</p>
@@ -262,10 +241,7 @@
                   class="submenu-item"
                   (click)="seleccionarOpcion('dashboard-gerencial', $event)"
                 >
-                  <img
-                    src="assets/images/dashboard-gerencial.png"
-                    alt="Dashboard Gerencial"
-                  />
+                  <i class="mdi mdi-view-dashboard icono-img"></i>
                   <span>Dashboard Gerencial</span>
                 </div>
               </div>
@@ -283,7 +259,7 @@
         >
           <div class="card-maestro-content">
             <div class="icono-container apoyo">
-              <img src="assets/images/apoyo.png" alt="Apoyo" />
+              <i class="mdi mdi-lifebuoy icono-img"></i>
             </div>
             <h3 class="card-titulo">Apoyo</h3>
             <p class="card-descripcion">Control de alimentación y servicios</p>

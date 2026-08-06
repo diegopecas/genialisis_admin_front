@@ -13,18 +13,18 @@ import { PagosRecibidosService } from '../../../services/pagos-recibidos.service
 import { PlantillasService } from '../../../services/plantillas.service';
 
 
-interface EstudianteRapido {
-  id_estudiante: string;
+interface ClienteRapido {
+  id_cliente: string;
   id_persona: string;
-  nombre_estudiante: string;
+  nombre_cliente: string;
   numero_identificacion: string;
-  grupo_estudiante: string;
+  plan_cliente: string;
 }
 
 interface CuentaPorCobrar {
   id: string;
   id_persona: string;
-  id_estudiante: string;
+  id_cliente: string;
   fecha: string;
   valor: number;
   detalle: string;
@@ -33,12 +33,12 @@ interface CuentaPorCobrar {
   saldo: number;
 }
 
-interface AcudienteResponsable {
-  id_acudiente: string;
-  id_estudiante: string;
-  id_persona_acudiente: string;
-  nombre_acudiente: string;
-  tipo_acudiente: string;
+interface RepresentanteResponsable {
+  id_representante: string;
+  id_cliente: string;
+  id_persona_representante: string;
+  nombre_representante: string;
+  tipo_representante: string;
   telefono: string | null;
   correo_electronico: string | null;
 }
@@ -70,11 +70,11 @@ interface CuentaModalItem {
 
 interface FilaPago {
   seleccionado: boolean;
-  estudiante: EstudianteRapido;
+  cliente: ClienteRapido;
   saldoTotal: number;
   cuentasPendientes: CuentaPorCobrar[];
-  acudientes: AcudienteResponsable[];
-  id_acudiente: string | null;
+  representantes: RepresentanteResponsable[];
+  id_representante: string | null;
   id_tipo_pago: string | null;
   archivo: File | null;
   analizandoIA: boolean;
@@ -115,8 +115,8 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
   public busqueda = '';
   public mostrarSoloConSaldo = true;
   public mostrarSoloListos = false;
-  public filtroGrupo = '';
-  public grupos: string[] = [];
+  public filtroPlan = '';
+  public planes: string[] = [];
 
   public cargando = false;
   public registrando = false;
@@ -136,20 +136,20 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
   public correoAdicional = '';
   public descargandoPDF = false;
 
-  /* El nombre sale de la configuracion del jardin, no se quema aqui:
+  /* El nombre sale de la configuracion del organizacion, no se quema aqui:
      el mismo codigo corre para todos los tenants. */
   private get nombreColegio(): string {
     return this.institucionConfigService.getNombreInstitucion() || 'La institución';
   }
 
-  /* Cuerpos del mensaje de confirmacion. Son el respaldo: si el jardin tiene
+  /* Cuerpos del mensaje de confirmacion. Son el respaldo: si el organizacion tiene
      la plantilla sembrada en base, estos valores se reemplazan al iniciar. */
   public plantillaConfirmacion: any = {
-    cuerpo_whatsapp: 'Estimad@ *{nombre_destinatario}*,\n\nDe parte de *{nombre_colegio}*, confirmamos la recepción de su pago:\n\n👤 *Estudiante:* {nombre_estudiante}\n💰 *Valor:* {valor}\n📅 *Fecha:* {fecha}\n{linea_referencia}\n\n¡Gracias por su puntualidad y confianza! 🙏',
+    cuerpo_whatsapp: 'Estimad@ *{nombre_destinatario}*,\n\nDe parte de *{nombre_colegio}*, confirmamos la recepción de su pago:\n\n👤 *Cliente:* {nombre_cliente}\n💰 *Valor:* {valor}\n📅 *Fecha:* {fecha}\n{linea_referencia}\n\n¡Gracias por su puntualidad y confianza! 🙏',
     linea_referencia_whatsapp: '🔢 *Referencia:* {referencia}',
-    cuerpo_correo: 'Estimad@ {nombre_destinatario},\n\nDe parte de {nombre_colegio}, confirmamos la recepción de su pago:\n\nEstudiante: {nombre_estudiante}\nValor: {valor}\nFecha: {fecha}\n{linea_referencia}\n\nGracias por su puntualidad y confianza.',
+    cuerpo_correo: 'Estimad@ {nombre_destinatario},\n\nDe parte de {nombre_colegio}, confirmamos la recepción de su pago:\n\nCliente: {nombre_cliente}\nValor: {valor}\nFecha: {fecha}\n{linea_referencia}\n\nGracias por su puntualidad y confianza.',
     linea_referencia_correo: 'Referencia: {referencia}',
-    asunto_correo: 'Confirmación de pago - {nombre_estudiante} - {nombre_colegio}'
+    asunto_correo: 'Confirmación de pago - {nombre_cliente} - {nombre_colegio}'
   };
 
   constructor(
@@ -212,7 +212,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
     let mensaje = cuerpo || '';
     mensaje = mensaje.replace(/\{nombre_destinatario\}/g, nombreDestinatario);
     mensaje = mensaje.replace(/\{nombre_colegio\}/g, this.nombreColegio);
-    mensaje = mensaje.replace(/\{nombre_estudiante\}/g, fila.estudiante.nombre_estudiante);
+    mensaje = mensaje.replace(/\{nombre_cliente\}/g, fila.cliente.nombre_cliente);
     mensaje = mensaje.replace(/\{valor\}/g, '$' + this.formatearMoneda(fila.valor_recibido));
     mensaje = mensaje.replace(/\{fecha\}/g, this.formatearFecha(fila.fecha));
 
@@ -227,7 +227,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
 
   private armarAsuntoConfirmacion(fila: FilaPago): string {
     let asunto = this.plantillaConfirmacion.asunto_correo || '';
-    asunto = asunto.replace(/\{nombre_estudiante\}/g, fila.estudiante.nombre_estudiante);
+    asunto = asunto.replace(/\{nombre_cliente\}/g, fila.cliente.nombre_cliente);
     asunto = asunto.replace(/\{nombre_colegio\}/g, this.nombreColegio);
     return asunto;
   }
@@ -248,21 +248,21 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
         if (data) {
           this.tiposPago = data.tipos_pagos || [];
 
-          const acudientesPorEstudiante = new Map<string, AcudienteResponsable[]>();
-          (data.acudientes || []).forEach((a: AcudienteResponsable) => {
-            if (!acudientesPorEstudiante.has(a.id_estudiante)) {
-              acudientesPorEstudiante.set(a.id_estudiante, []);
+          const representantesPorCliente = new Map<string, RepresentanteResponsable[]>();
+          (data.representantes || []).forEach((a: RepresentanteResponsable) => {
+            if (!representantesPorCliente.has(a.id_cliente)) {
+              representantesPorCliente.set(a.id_cliente, []);
             }
-            acudientesPorEstudiante.get(a.id_estudiante)!.push(a);
+            representantesPorCliente.get(a.id_cliente)!.push(a);
           });
 
-          const cuentasPorEstudiante = new Map<string, CuentaPorCobrar[]>();
+          const cuentasPorCliente = new Map<string, CuentaPorCobrar[]>();
           (data.cuentas_por_cobrar || []).forEach((c: any) => {
-            const idEst = c.id_estudiante;
-            if (!cuentasPorEstudiante.has(idEst)) {
-              cuentasPorEstudiante.set(idEst, []);
+            const idEst = c.id_cliente;
+            if (!cuentasPorCliente.has(idEst)) {
+              cuentasPorCliente.set(idEst, []);
             }
-            cuentasPorEstudiante.get(idEst)!.push({
+            cuentasPorCliente.get(idEst)!.push({
               ...c,
               saldo: parseFloat(String(c.saldo)),
               valor: parseFloat(String(c.valor)),
@@ -272,15 +272,15 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
 
           const hoy = new Date().toISOString().split('T')[0];
 
-          this.filas = (data.estudiantes || []).map((est: EstudianteRapido) => {
-            const cuentas = cuentasPorEstudiante.get(est.id_estudiante) || [];
-            const acudientes = acudientesPorEstudiante.get(est.id_estudiante) || [];
+          this.filas = (data.clientes || []).map((est: ClienteRapido) => {
+            const cuentas = cuentasPorCliente.get(est.id_cliente) || [];
+            const representantes = representantesPorCliente.get(est.id_cliente) || [];
             const saldoTotal = cuentas.reduce((sum: number, c: CuentaPorCobrar) => sum + c.saldo, 0);
-            const primerAcudiente = acudientes.length > 0 ? acudientes[0].id_acudiente : null;
+            const primerRepresentante = representantes.length > 0 ? representantes[0].id_representante : null;
 
             return {
-              seleccionado: false, estudiante: est, saldoTotal, cuentasPendientes: cuentas, acudientes,
-              id_acudiente: primerAcudiente, id_tipo_pago: null, archivo: null, analizandoIA: false,
+              seleccionado: false, cliente: est, saldoTotal, cuentasPendientes: cuentas, representantes,
+              id_representante: primerRepresentante, id_tipo_pago: null, archivo: null, analizandoIA: false,
               datosIA: null, fecha: hoy, referencia_bancaria: '', referenciaVerificada: null, totalReferenciaBD: 0, valor_recibido: 0,
               valor_recibido_formateado: '', valor_comprobante: null, observaciones: '',
               id_documento_persona: null, modoDistribucion: 'auto' as const,
@@ -289,9 +289,9 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
             } as FilaPago;
           });
 
-          const gruposSet = new Set<string>();
-          this.filas.forEach((f: FilaPago) => gruposSet.add(f.estudiante.grupo_estudiante || 'Sin grupo'));
-          this.grupos = Array.from(gruposSet).sort();
+          const planesSet = new Set<string>();
+          this.filas.forEach((f: FilaPago) => planesSet.add(f.cliente.plan_cliente || 'Sin plan'));
+          this.planes = Array.from(planesSet).sort();
           this.filtrarFilas();
         }
         this.cargando = false;
@@ -320,11 +320,11 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
       if (this.busqueda) {
         const termino = this.busqueda.toLowerCase();
         resultado = resultado.filter((f: FilaPago) =>
-          f.estudiante.nombre_estudiante.toLowerCase().includes(termino) ||
-          (f.estudiante.grupo_estudiante || '').toLowerCase().includes(termino)
+          f.cliente.nombre_cliente.toLowerCase().includes(termino) ||
+          (f.cliente.plan_cliente || '').toLowerCase().includes(termino)
         );
       }
-      if (this.filtroGrupo) resultado = resultado.filter((f: FilaPago) => (f.estudiante.grupo_estudiante || 'Sin grupo') === this.filtroGrupo);
+      if (this.filtroPlan) resultado = resultado.filter((f: FilaPago) => (f.cliente.plan_cliente || 'Sin plan') === this.filtroPlan);
     }
     this.filasFiltradas = resultado;
   }
@@ -407,7 +407,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
 
   // Compara el banco detectado por la IA en el comprobante contra el nombre del
   // tipo de pago elegido en esa fila. Solo advierte (no bloquea) si no coinciden.
-  // El mensaje nombra al estudiante porque el listado maneja muchas filas.
+  // El mensaje nombra al cliente porque el listado maneja muchas filas.
   private validarBancoContraTipoPago(fila: FilaPago): void {
     const bancoDetectado = fila.datosIA?.banco;
     if (!bancoDetectado || !fila.id_tipo_pago) return;
@@ -428,7 +428,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
       Swal.fire({
         title: 'Verifique el tipo de pago',
         html: `<div style="text-align:left;">`
-          + `Estudiante: <strong>${fila.estudiante.nombre_estudiante}</strong><br><br>`
+          + `Cliente: <strong>${fila.cliente.nombre_cliente}</strong><br><br>`
           + `El comprobante parece ser de <strong>${bancoDetectado}</strong>, `
           + `pero el tipo de pago seleccionado es <strong>${tipo.nombre}</strong>.<br><br>`
           + `Verifique que el tipo de pago sea el correcto.`
@@ -445,7 +445,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
 
   // Verifica una referencia al salir del campo o tras el analisis con IA.
   // La referencia repetida NO es un error: un mismo comprobante puede repartirse
-  // entre varios estudiantes (hermanos). Lo que se controla es que la suma de lo
+  // entre varios clientes (hermanos). Lo que se controla es que la suma de lo
   // ya registrado en BD mas lo asignado en este listado no supere el valor del
   // comprobante. Solo advierte; nunca bloquea el registro.
   verificarReferencia(fila: FilaPago): void {
@@ -498,14 +498,14 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
         // Sin valor de comprobante solo se informa que la referencia ya se uso.
         if (pagosPrevios.length > 0) {
           const nombres = pagosPrevios
-            .map((p: any) => `${p.nombre_estudiante || 'N/A'} ($${this.formatearMoneda(Number(p.valor_recibido || 0))})`)
+            .map((p: any) => `${p.nombre_cliente || 'N/A'} ($${this.formatearMoneda(Number(p.valor_recibido || 0))})`)
             .join('<br>');
           Swal.fire({
             title: 'Referencia ya utilizada',
             html: `<div style="text-align:left;">`
               + `La referencia <strong>${referencia}</strong> ya tiene pagos registrados por `
               + `<strong>$${this.formatearMoneda(totalRegistrado)}</strong>:<br><br>${nombres}<br><br>`
-              + `Si el comprobante cubre a varios estudiantes puede continuar.`
+              + `Si el comprobante cubre a varios clientes puede continuar.`
               + `</div>`,
             icon: 'info',
             confirmButtonText: 'Entendido'
@@ -521,7 +521,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
 
   eliminarArchivo(fila: FilaPago): void {
     fila.archivo = null; fila.datosIA = null; fila.valor_comprobante = null;
-    const inputFile = document.getElementById('archivo_' + fila.estudiante.id_estudiante) as HTMLInputElement;
+    const inputFile = document.getElementById('archivo_' + fila.cliente.id_cliente) as HTMLInputElement;
     if (inputFile) inputFile.value = '';
   }
 
@@ -691,10 +691,10 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
   validarFilasSeleccionadas(): { valido: boolean; errores: string[] } {
     const errores: string[] = [];
     const filasParaValidar = this.filasSeleccionadas;
-    if (filasParaValidar.length === 0) { errores.push('Debe seleccionar al menos un estudiante'); return { valido: false, errores }; }
+    if (filasParaValidar.length === 0) { errores.push('Debe seleccionar al menos un cliente'); return { valido: false, errores }; }
 
     filasParaValidar.forEach((fila: FilaPago) => {
-      const nombre = fila.estudiante.nombre_estudiante;
+      const nombre = fila.cliente.nombre_cliente;
       if (!fila.id_tipo_pago) errores.push(`${nombre}: Debe seleccionar un tipo de pago`);
       if (!fila.fecha) errores.push(`${nombre}: Debe ingresar una fecha`);
       if (!fila.valor_recibido || fila.valor_recibido <= 0) errores.push(`${nombre}: El valor debe ser mayor a cero`);
@@ -714,7 +714,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
         // El total en BD es el mismo para toda la referencia: se toma el mayor
         // conocido entre las filas (algunas pueden no haberse verificado aun).
         datos.totalBD = Math.max(datos.totalBD, Number(fila.totalReferenciaBD || 0));
-        datos.nombres.push(fila.estudiante.nombre_estudiante);
+        datos.nombres.push(fila.cliente.nombre_cliente);
       }
     });
     porReferencia.forEach((datos: any, ref: string) => {
@@ -751,7 +751,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
       const saldoAFavor = fila.valor_recibido - totalDistribuido;
       totalSaldoAFavor += saldoAFavor;
       const modoTag = fila.modoDistribucion === 'manual' ? ' <small class="text-info">(manual)</small>' : '';
-      resumenHtml += `<p><strong>${fila.estudiante.nombre_estudiante}</strong>: $${this.formatearMoneda(fila.valor_recibido)} → ${distribucion.length} cuenta(s)${modoTag}`;
+      resumenHtml += `<p><strong>${fila.cliente.nombre_cliente}</strong>: $${this.formatearMoneda(fila.valor_recibido)} → ${distribucion.length} cuenta(s)${modoTag}`;
       if (saldoAFavor > 0) resumenHtml += ` | Saldo a favor: $${this.formatearMoneda(saldoAFavor)}`;
       resumenHtml += `</p>`;
     });
@@ -771,14 +771,14 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
       for (const fila of this.filasSeleccionadas.filter((f: FilaPago) => f.archivo)) {
         try { fila.id_documento_persona = await this.subirDocumento(fila); }
         catch (error: any) {
-          Swal.fire('Error', `No se pudo subir el comprobante de ${fila.estudiante.nombre_estudiante}. Proceso cancelado.`, 'error');
+          Swal.fire('Error', `No se pudo subir el comprobante de ${fila.cliente.nombre_cliente}. Proceso cancelado.`, 'error');
           this.registrando = false; return;
         }
       }
 
       const filasARegistrar = [...this.filasSeleccionadas];
       const pagos = filasARegistrar.map((fila: FilaPago) => ({
-        id_estudiante: fila.estudiante.id_estudiante, id_acudiente: fila.id_acudiente,
+        id_cliente: fila.cliente.id_cliente, id_representante: fila.id_representante,
         id_tipo_pago: fila.id_tipo_pago, fecha: fila.fecha,
         referencia_bancaria: fila.referencia_bancaria, valor_recibido: fila.valor_recibido,
         valor_comprobante: fila.valor_comprobante || undefined,
@@ -826,7 +826,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
       if (!fila.archivo) { resolve(''); return; }
       const formData = new FormData();
       formData.append('archivo', fila.archivo);
-      formData.append('id_persona', fila.estudiante.id_persona.toString());
+      formData.append('id_persona', fila.cliente.id_persona.toString());
       formData.append('codigo_tipo_documento', 'comprobante_pago');
       formData.append('observaciones', `Comprobante de pago - Ref: ${fila.referencia_bancaria || 'N/A'}`);
       const idUsuario = this.utilService.obtenerIdUsuarioActual();
@@ -847,55 +847,55 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
     this.telefonoAdicional = '';
     this.nombreAdicional = '';
     this.correoAdicional = '';
-    this.telefonosEditables = fila.acudientes.map((a: AcudienteResponsable) => a.telefono || '');
+    this.telefonosEditables = fila.representantes.map((a: RepresentanteResponsable) => a.telefono || '');
 
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalEnvioWA'));
     modal.show();
   }
 
   generarMensajeWA(fila: FilaPago): void {
-    const acudiente = fila.acudientes.find((a: AcudienteResponsable) => a.id_acudiente === fila.id_acudiente);
-    const nombreDestinatario = acudiente ? acudiente.nombre_acudiente : 'Señor(a) acudiente';
+    const representante = fila.representantes.find((a: RepresentanteResponsable) => a.id_representante === fila.id_representante);
+    const nombreDestinatario = representante ? representante.nombre_representante : 'Señor(a) representante';
 
     fila.mensajeWA = this.armarMensajeConfirmacion(fila, nombreDestinatario, 'whatsapp');
-    fila.telefonoWA = acudiente?.telefono || '';
+    fila.telefonoWA = representante?.telefono || '';
   }
 
   generarMensajeWAParaDestinatario(fila: FilaPago, nombreDestinatario: string): string {
     return this.armarMensajeConfirmacion(fila, nombreDestinatario, 'whatsapp');
   }
 
-  enviarWhatsAppAcudiente(fila: FilaPago, acudiente: AcudienteResponsable, indice: number): void {
+  enviarWhatsAppRepresentante(fila: FilaPago, representante: RepresentanteResponsable, indice: number): void {
     const telefono = this.telefonosEditables[indice];
     if (!telefono) { Swal.fire('Atención', 'Ingrese un número de teléfono.', 'warning'); return; }
-    const mensaje = this.generarMensajeWAParaDestinatario(fila, acudiente.nombre_acudiente);
+    const mensaje = this.generarMensajeWAParaDestinatario(fila, representante.nombre_representante);
     const telefonoLimpio = this.limpiarTelefono(telefono);
     window.open(`https://wa.me/57${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
   enviarWhatsAppAdicional(fila: FilaPago): void {
     if (!this.telefonoAdicional) { Swal.fire('Atención', 'Ingrese un número de teléfono.', 'warning'); return; }
-    const nombre = this.nombreAdicional.trim() || 'Señor(a) acudiente';
+    const nombre = this.nombreAdicional.trim() || 'Señor(a) representante';
     const mensaje = this.generarMensajeWAParaDestinatario(fila, nombre);
     const telefonoLimpio = this.limpiarTelefono(this.telefonoAdicional);
     window.open(`https://wa.me/57${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
-  enviarCorreoAcudiente(fila: FilaPago, acudiente: AcudienteResponsable): void {
-    if (!acudiente.correo_electronico) {
-      Swal.fire('Atención', 'Este acudiente no tiene correo electrónico registrado.', 'warning');
+  enviarCorreoRepresentante(fila: FilaPago, representante: RepresentanteResponsable): void {
+    if (!representante.correo_electronico) {
+      Swal.fire('Atención', 'Este representante no tiene correo electrónico registrado.', 'warning');
       return;
     }
     const asunto = this.armarAsuntoConfirmacion(fila);
-    const cuerpo = this.armarMensajeConfirmacion(fila, acudiente.nombre_acudiente, 'correo');
+    const cuerpo = this.armarMensajeConfirmacion(fila, representante.nombre_representante, 'correo');
 
-    const url = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(acudiente.correo_electronico)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    const url = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(representante.correo_electronico)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
     window.open(url, '_blank');
   }
 
   enviarCorreoAdicional(fila: FilaPago): void {
     if (!this.correoAdicional) { Swal.fire('Atención', 'Ingrese un correo electrónico.', 'warning'); return; }
-    const nombre = this.nombreAdicional.trim() || 'Señor(a) acudiente';
+    const nombre = this.nombreAdicional.trim() || 'Señor(a) representante';
     const asunto = this.armarAsuntoConfirmacion(fila);
     const cuerpo = this.armarMensajeConfirmacion(fila, nombre, 'correo');
 
@@ -927,8 +927,8 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
 
           const datosPDF: DatosComprobantePDF = {
             pago: datos.pago,
-            estudiante: datos.estudiante,
-            acudiente: datos.acudiente,
+            cliente: datos.cliente,
+            representante: datos.representante,
             tipoPago: datos.tipoPago,
             fechaGeneracion: new Date(),
             logoBase64: logoBase64
@@ -982,7 +982,7 @@ export class RegistroPagosRapidoComponent implements OnInit, OnDestroy {
     this.cargarDatos();
   }
 
-  trackByEstudiante(index: number, fila: FilaPago): string {
-    return fila.estudiante.id_estudiante;
+  trackByCliente(index: number, fila: FilaPago): string {
+    return fila.cliente.id_cliente;
   }
 }

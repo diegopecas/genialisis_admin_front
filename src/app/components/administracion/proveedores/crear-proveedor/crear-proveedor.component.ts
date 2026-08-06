@@ -60,7 +60,7 @@ export class CrearProveedorComponent implements OnInit {
         generos: [] as any[],
         tiposProveedor: [] as any[],
         ciudades: [] as any[],
-        gruposRh: [
+        planesRh: [
             { id: 'O+', nombre: 'O+' },
             { id: 'O-', nombre: 'O-' },
             { id: 'A+', nombre: 'A+' },

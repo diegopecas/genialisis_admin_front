@@ -129,14 +129,14 @@
             </div>
           </div>
 
-          <div class="desglose-item desglose-estudiantes">
+          <div class="desglose-item desglose-clientes">
             <div class="desglose-icono">🎒</div>
             <div class="desglose-contenido">
               <div class="desglose-valores">
-                <span class="desglose-num-money">{{ formatoMoneda(cartera.saldo_estudiantes.saldo) }}</span>
+                <span class="desglose-num-money">{{ formatoMoneda(cartera.saldo_clientes.saldo) }}</span>
               </div>
-              <div class="desglose-label">Cartera estudiantes</div>
-              <div class="desglose-sub">{{ cartera.saldo_estudiantes.total_cuentas }} cuenta(s)</div>
+              <div class="desglose-label">Cartera clientes</div>
+              <div class="desglose-sub">{{ cartera.saldo_clientes.total_cuentas }} cuenta(s)</div>
             </div>
           </div>
 
@@ -248,14 +248,14 @@
             </div>
           </div>
 
-          <div class="desglose-item desglose-estudiantes">
+          <div class="desglose-item desglose-clientes">
             <div class="desglose-icono">🎒</div>
             <div class="desglose-contenido">
               <div class="desglose-valores">
-                <span class="desglose-num-money">{{ formatoMoneda(recaudo.mes_estudiantes.total) }}</span>
+                <span class="desglose-num-money">{{ formatoMoneda(recaudo.mes_clientes.total) }}</span>
               </div>
-              <div class="desglose-label">Pagos del mes · estudiantes</div>
-              <div class="desglose-sub">{{ recaudo.mes_estudiantes.cantidad }} pago(s)</div>
+              <div class="desglose-label">Pagos del mes · clientes</div>
+              <div class="desglose-sub">{{ recaudo.mes_clientes.cantidad }} pago(s)</div>
             </div>
           </div>
 
@@ -447,7 +447,7 @@
     </div>
 
     <div class="filtros-bar" *ngIf="!cargandoDetalleCartera && morososOriginal.length > 0">
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <button class="btn btn-sm" [class.btn-warning]="filtroEstado === 'todos'" [class.btn-outline-secondary]="filtroEstado !== 'todos'"
                 (click)="cambiarFiltroEstado('todos')">
           Todos ({{ morososOriginal.length }})
@@ -462,8 +462,8 @@
         </button>
       </div>
 
-      <div class="busqueda-grupo">
-        <input type="text" class="form-control form-control-sm" placeholder="Buscar por nombre, grupo o ID..."
+      <div class="busqueda-plan">
+        <input type="text" class="form-control form-control-sm" placeholder="Buscar por nombre, plan o ID..."
                [(ngModel)]="busquedaCartera" (input)="buscarMorosos()" />
       </div>
     </div>
@@ -486,8 +486,8 @@
             <th class="th-ordenable" (click)="ordenarCartera('nombre_persona')">
               Persona <i class="fas ms-1" [ngClass]="iconoOrdenCartera('nombre_persona')"></i>
             </th>
-            <th class="th-ordenable" (click)="ordenarCartera('grupo_o_cargo')">
-              Grupo/Cargo <i class="fas ms-1" [ngClass]="iconoOrdenCartera('grupo_o_cargo')"></i>
+            <th class="th-ordenable" (click)="ordenarCartera('plan_o_cargo')">
+              Plan/Cargo <i class="fas ms-1" [ngClass]="iconoOrdenCartera('plan_o_cargo')"></i>
             </th>
             <th class="text-center th-ordenable" (click)="ordenarCartera('activo')">
               Estado <i class="fas ms-1" [ngClass]="iconoOrdenCartera('activo')"></i>
@@ -524,13 +524,13 @@
               <div class="persona-nombre">{{ m.nombre_persona }}</div>
               <div class="persona-tipo">
                 <span class="badge-tipo"
-                  [class.badge-estudiante]="m.tipo_persona === 'Estudiante'"
+                  [class.badge-cliente]="m.tipo_persona === 'Cliente'"
                   [class.badge-colaborador]="m.tipo_persona === 'Colaborador'">
                   {{ m.tipo_persona }}
                 </span>
               </div>
             </td>
-            <td>{{ m.grupo_o_cargo }}</td>
+            <td>{{ m.plan_o_cargo }}</td>
             <td class="text-center">
               <span class="badge-estado"
                 [class.badge-activo]="m.activo === 1"
@@ -612,7 +612,7 @@
 
     <!-- Filtros -->
     <div class="filtros-bar" *ngIf="!cargandoDetalleRecaudo">
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <button class="btn btn-sm" [class.btn-warning]="rangoRecaudo === 'hoy'" [class.btn-outline-secondary]="rangoRecaudo !== 'hoy'"
                 (click)="cambiarRangoRecaudo('hoy')">Hoy</button>
         <button class="btn btn-sm" [class.btn-warning]="rangoRecaudo === 'mes'" [class.btn-outline-secondary]="rangoRecaudo !== 'mes'"
@@ -621,25 +621,25 @@
                 (click)="cambiarRangoRecaudo('anio')">Año</button>
       </div>
 
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <button class="btn btn-sm" [class.btn-warning]="filtroTipoPersonaRec === 'todos'" [class.btn-outline-secondary]="filtroTipoPersonaRec !== 'todos'"
                 (click)="cambiarFiltroTipoPersona('todos')">Todos</button>
-        <button class="btn btn-sm" [class.btn-warning]="filtroTipoPersonaRec === 'estudiantes'" [class.btn-outline-secondary]="filtroTipoPersonaRec !== 'estudiantes'"
-                (click)="cambiarFiltroTipoPersona('estudiantes')">Estudiantes</button>
+        <button class="btn btn-sm" [class.btn-warning]="filtroTipoPersonaRec === 'clientes'" [class.btn-outline-secondary]="filtroTipoPersonaRec !== 'clientes'"
+                (click)="cambiarFiltroTipoPersona('clientes')">Clientes</button>
         <button class="btn btn-sm" [class.btn-warning]="filtroTipoPersonaRec === 'colaboradores'" [class.btn-outline-secondary]="filtroTipoPersonaRec !== 'colaboradores'"
                 (click)="cambiarFiltroTipoPersona('colaboradores')">Colaboradores</button>
-        <button class="btn btn-sm" [class.btn-warning]="filtroTipoPersonaRec === 'acudientes'" [class.btn-outline-secondary]="filtroTipoPersonaRec !== 'acudientes'"
-                (click)="cambiarFiltroTipoPersona('acudientes')">Acudientes</button>
+        <button class="btn btn-sm" [class.btn-warning]="filtroTipoPersonaRec === 'representantes'" [class.btn-outline-secondary]="filtroTipoPersonaRec !== 'representantes'"
+                (click)="cambiarFiltroTipoPersona('representantes')">Representantes</button>
       </div>
 
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <select class="form-select form-select-sm" [(ngModel)]="filtroTipoPagoId" (change)="cambiarFiltroTipoPago()">
           <option value="">Todos los tipos de pago</option>
           <option *ngFor="let tp of tiposPago" [value]="tp.id">{{ tp.nombre }}</option>
         </select>
       </div>
 
-      <div class="busqueda-grupo">
+      <div class="busqueda-plan">
         <input type="text" class="form-control form-control-sm" placeholder="Buscar por nombre, referencia..."
                [(ngModel)]="busquedaRecaudo" (input)="buscarPagos()" />
       </div>
@@ -699,9 +699,9 @@
             <td>{{ p.nombre_persona }}</td>
             <td>
               <span class="badge-tipo"
-                [class.badge-estudiante]="p.tipo_persona === 'Estudiante'"
+                [class.badge-cliente]="p.tipo_persona === 'Cliente'"
                 [class.badge-colaborador]="p.tipo_persona === 'Colaborador'"
-                [class.badge-acudiente]="p.tipo_persona === 'Acudiente'">
+                [class.badge-representante]="p.tipo_persona === 'Representante'">
                 {{ p.tipo_persona }}
               </span>
             </td>
@@ -736,7 +736,7 @@
     </div>
 
     <div class="filtros-bar" *ngIf="!cargandoDetalleMovimientos">
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <button class="btn btn-sm" [class.btn-warning]="rangoMovimientos === 'hoy'" [class.btn-outline-secondary]="rangoMovimientos !== 'hoy'"
                 (click)="cambiarRangoMovimientos('hoy')">Hoy</button>
         <button class="btn btn-sm" [class.btn-warning]="rangoMovimientos === 'mes'" [class.btn-outline-secondary]="rangoMovimientos !== 'mes'"
@@ -745,7 +745,7 @@
                 (click)="cambiarRangoMovimientos('anio')">Año</button>
       </div>
 
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <button class="btn btn-sm" [class.btn-warning]="filtroTipoMov === 'todos'" [class.btn-outline-secondary]="filtroTipoMov !== 'todos'"
                 (click)="cambiarFiltroTipoMov('todos')">Todos</button>
         <button class="btn btn-sm" [class.btn-warning]="filtroTipoMov === 'ingresos'" [class.btn-outline-secondary]="filtroTipoMov !== 'ingresos'"
@@ -754,7 +754,7 @@
                 (click)="cambiarFiltroTipoMov('gastos')">Gastos</button>
       </div>
 
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <button class="btn btn-sm" [class.btn-warning]="filtroEstadoMov === 'todos'" [class.btn-outline-secondary]="filtroEstadoMov !== 'todos'"
                 (click)="cambiarFiltroEstadoMov('todos')">Todos</button>
         <button class="btn btn-sm" [class.btn-warning]="filtroEstadoMov === 'aprobados'" [class.btn-outline-secondary]="filtroEstadoMov !== 'aprobados'"
@@ -765,21 +765,21 @@
                 (click)="cambiarFiltroEstadoMov('anulados')">Anulados</button>
       </div>
 
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <select class="form-select form-select-sm" [(ngModel)]="filtroCategoriaMovId" (change)="cambiarFiltroCategoriaMov()">
           <option value="">Todas las categorías</option>
           <option *ngFor="let c of categoriasMov" [value]="c.id">{{ c.nombre }}</option>
         </select>
       </div>
 
-      <div class="filtro-grupo">
+      <div class="filtro-plan">
         <select class="form-select form-select-sm" [(ngModel)]="filtroMedioPagoMovId" (change)="cambiarFiltroMedioPagoMov()">
           <option value="">Todos los medios</option>
           <option *ngFor="let m of mediosPagoMov" [value]="m.id">{{ m.nombre }}</option>
         </select>
       </div>
 
-      <div class="busqueda-grupo">
+      <div class="busqueda-plan">
         <input type="text" class="form-control form-control-sm" placeholder="Buscar concepto, detalle, referencia..."
                [(ngModel)]="busquedaMov" (input)="buscarMovimientos()" />
       </div>

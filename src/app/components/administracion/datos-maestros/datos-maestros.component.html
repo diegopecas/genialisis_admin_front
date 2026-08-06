@@ -15,7 +15,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'catalogos'" (click)="toggleMenu('catalogos', $event)">
           <div class="card-maestro-content">
             <div class="icono-container catalogos">
-              <img src="assets/images/catalogos-productos.png" alt="Catálogos de Productos" />
+              <i class="mdi mdi-format-list-checks icono-img"></i>
             </div>
             <h3 class="card-titulo">Catálogos de Productos</h3>
             <p class="card-descripcion">Gestiona productos, servicios y proveedores</p>
@@ -28,19 +28,19 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.productos')">
                 <div class="submenu-item" (click)="seleccionarOpcion('productos')">
-                  <img src="assets/images/productos.png" alt="Productos" />
+                  <i class="mdi mdi-package-variant icono-img"></i>
                   <span>Productos</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.proveedores')">
                 <div class="submenu-item" (click)="seleccionarOpcion('proveedores')">
-                  <img src="assets/images/proveedores.png" alt="Proveedores" />
+                  <i class="mdi mdi-truck-delivery icono-img"></i>
                   <span>Proveedores</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.productos_servicios')">
                 <div class="submenu-item" (click)="seleccionarOpcion('productos-servicios')">
-                  <img src="assets/images/productos_servicios.png" alt="Productos y Servicios" />
+                  <i class="mdi mdi-room-service icono-img"></i>
                   <span>Productos y Servicios</span>
                 </div>
               </div>
@@ -62,7 +62,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'infraestructura'" (click)="toggleMenu('infraestructura', $event)">
           <div class="card-maestro-content">
             <div class="icono-container infraestructura">
-              <img src="assets/images/infraestructura-espacios.png" alt="Infraestructura y Espacios" />
+              <i class="mdi mdi-home-city icono-img"></i>
             </div>
             <h3 class="card-titulo">Infraestructura y Espacios</h3>
             <p class="card-descripcion">Administra áreas físicas y elementos del colegio</p>
@@ -89,7 +89,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'operaciones'" (click)="toggleMenu('operaciones', $event)">
           <div class="card-maestro-content">
             <div class="icono-container operaciones">
-              <img src="assets/images/operaciones.png" alt="Operaciones" />
+              <i class="mdi mdi-cogs icono-img"></i>
             </div>
             <h3 class="card-titulo">Operaciones</h3>
             <p class="card-descripcion">Gestiona menús y configuraciones operativas</p>
@@ -114,7 +114,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'plantillas'" (click)="toggleMenu('plantillas', $event)">
           <div class="card-maestro-content">
             <div class="icono-container plantillas">
-              <img src="assets/images/plantillas.png" alt="Plantillas" />
+              <i class="mdi mdi-file-document-multiple icono-img"></i>
             </div>
             <h3 class="card-titulo">Plantillas</h3>
             <p class="card-descripcion">Gestiona plantillas institucionales y de WhatsApp</p>
@@ -127,7 +127,7 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.plantillas')">
                 <div class="submenu-item" (click)="seleccionarOpcion('plantillas-institucionales')">
-                  <img src="assets/images/plantillas_institucionales.png" alt="Institucionales" />
+                  <i class="mdi mdi-file-document-outline icono-img"></i>
                   <span>Institucionales</span>
                 </div>
               </div>
@@ -139,11 +139,11 @@
       </div>
 
       <!-- Configuración -->
-      <div class="col-lg-4 col-md-6 mb-4" *ngIf="tieneAlguno(['admin.cargos', 'admin.conectar_whatsapp', 'admin.configuracion_geofence', 'admin.configuracion_global', 'admin.configuracion_google', 'admin.configuracion_ia', 'admin.datos_estudiantes', 'admin.institucion', 'admin.tipos_documentos'])">
+      <div class="col-lg-4 col-md-6 mb-4" *ngIf="tieneAlguno(['admin.cargos', 'admin.conectar_whatsapp', 'admin.configuracion_geofence', 'admin.configuracion_global', 'admin.configuracion_google', 'admin.configuracion_ia', 'admin.datos_clientes', 'admin.institucion', 'admin.tipos_documentos'])">
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'configuracion'" (click)="toggleMenu('configuracion', $event)">
           <div class="card-maestro-content">
             <div class="icono-container configuracion">
-              <img src="assets/images/configuracion.png" alt="Configuración" />
+              <i class="mdi mdi-cog icono-img"></i>
             </div>
             <h3 class="card-titulo">Configuración</h3>
             <p class="card-descripcion">Gestiona parámetros globales del sistema</p>
@@ -156,25 +156,25 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.configuracion_global')">
                 <div class="submenu-item" (click)="seleccionarOpcion('configuracion-global')">
-                  <img src="assets/images/configuracion.png" alt="Configuración Global" />
+                  <i class="mdi mdi-cog icono-img"></i>
                   <span>Configuración Global</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.cargos')">
                 <div class="submenu-item" (click)="seleccionarOpcion('cargos')">
-                  <img src="assets/images/cargos.png" alt="Cargos" />
+                  <i class="mdi mdi-badge-account icono-img"></i>
                   <span>Cargos</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.tipos_documentos')">
                 <div class="submenu-item" (click)="seleccionarOpcion('tipos-documentos')">
-                  <img src="assets/images/tipos-documentos.png" alt="Tipos de Documentos" />
+                  <i class="mdi mdi-file-cog icono-img"></i>
                   <span>Tipos de Documentos</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.configuracion_ia')">
                 <div class="submenu-item" (click)="seleccionarOpcion('configuracion-ia')">
-                  <img src="assets/images/configuracion-ia.png" alt="Configuración IA" />
+                  <i class="mdi mdi-robot icono-img"></i>
                   <span>Configuración IA</span>
                 </div>
               </div>
@@ -182,11 +182,11 @@
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.configuracion_geofence')">
               </div>
-              <div class="col-6" *ngIf="permisosService.tienePermiso('admin.datos_estudiantes')">
+              <div class="col-6" *ngIf="permisosService.tienePermiso('admin.datos_clientes')">
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.institucion')">
                 <div class="submenu-item" (click)="seleccionarOpcion('institucion')">
-                  <img src="assets/images/institucion.png" alt="Institución" />
+                  <i class="mdi mdi-domain icono-img"></i>
                   <span>Institución</span>
                 </div>
               </div>
@@ -202,7 +202,7 @@
         <div class="card-maestro menu-principal" [class.active]="menuActivo === 'seguridad'" (click)="toggleMenu('seguridad', $event)">
           <div class="card-maestro-content">
             <div class="icono-container seguridad">
-              <img src="assets/images/seguridad.png" alt="Seguridad" />
+              <i class="mdi mdi-shield-lock icono-img"></i>
             </div>
             <h3 class="card-titulo">Seguridad</h3>
             <p class="card-descripcion">Gestiona usuarios, roles y permisos</p>
@@ -215,54 +215,54 @@
             <div class="row g-2">
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.usuarios')">
                 <div class="submenu-item" (click)="seleccionarOpcion('usuarios')">
-                  <img src="assets/images/usuarios.png" alt="Usuarios" />
+                  <i class="mdi mdi-account-cog icono-img"></i>
                   <span>Usuarios</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.roles')">
                 <div class="submenu-item" (click)="seleccionarOpcion('roles')">
-                  <img src="assets/images/roles.png" alt="Roles" />
+                  <i class="mdi mdi-account-key icono-img"></i>
                   <span>Roles</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.usuarios_x_rol')">
                 <div class="submenu-item" (click)="seleccionarOpcion('usuarios-x-rol')">
-                  <img src="assets/images/roles.png" alt="Usuarios por Rol" />
+                  <i class="mdi mdi-account-key icono-img"></i>
                   <span>Usuarios por Rol</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.permisos_rol')">
                 <div class="submenu-item" (click)="seleccionarOpcion('permisos')">
-                  <img src="assets/images/permisos.png" alt="Permisos" />
+                  <i class="mdi mdi-key-variant icono-img"></i>
                   <span>Permisos por Rol</span>
                 </div>
               </div>
               <div class="col-6" *ngIf="permisosService.tienePermiso('admin.documentacion')">
                 <div class="submenu-item" (click)="seleccionarOpcion('documentacion-sistema')">
-                  <img src="assets/images/documentacion_configuracion.png" alt="Documentación" />
+                  <i class="mdi mdi-book-open-variant icono-img"></i>
                   <span>Documentación</span>
                 </div>
               </div>
             </div>
           </div>
                         <div class="submenu-item" (click)="seleccionarOpcion('productos-mobiliario')">
-                  <img src="assets/images/productos-mobiliario.png" alt="Mobiliario" />
+                  <i class="mdi mdi-sofa icono-img"></i>
                   <span>Productos Mobiliario</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('productos-limpieza')">
-                  <img src="assets/images/productos-limpieza.png" alt="Limpieza" />
+                  <i class="mdi mdi-spray-bottle icono-img"></i>
                   <span>Productos Limpieza</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('areas-fisicas')">
-                  <img src="assets/images/areas_fisicas.png" alt="Áreas Físicas" />
+                  <i class="mdi mdi-floor-plan icono-img"></i>
                   <span>Áreas Físicas</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('elementos-fisicos')">
-                  <img src="assets/images/elementos-fisicos.png" alt="Elementos Físicos" />
+                  <i class="mdi mdi-lightbulb-on icono-img"></i>
                   <span>Elementos Físicos</span>
                 </div>
                 <div class="submenu-item" (click)="seleccionarOpcion('config-aseo')">
-                  <img src="assets/images/config_aseo.png" alt="Configuración de Aseo" />
+                  <i class="mdi mdi-tune icono-img"></i>
                   <span>Configuración de Aseo</span>
                 </div>
 </div>

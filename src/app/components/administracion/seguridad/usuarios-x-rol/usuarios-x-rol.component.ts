@@ -24,7 +24,7 @@ export class UsuariosXRolComponent implements OnInit {
   usuarios = [] as any[];
   filtroTexto: string = '';
   filtroAsignacion: string = 'todos'; // todos | asignados | sin-asignar
-  filtroTipo: string = 'todos'; // todos | colaborador | acudiente | ninguno
+  filtroTipo: string = 'todos'; // todos | colaborador | representante | ninguno
   filtroEstado: string = 'todos'; // todos | activos | inactivos
   cargando: boolean = false;
   hayCambios: boolean = false;
@@ -65,9 +65,9 @@ export class UsuariosXRolComponent implements OnInit {
         this.usuarios = body.map(u => ({
           ...u,
           asignado: u.asignado == 1,
-          tipo_persona: u.es_colaborador == 1 && u.es_acudiente == 1 ? 'Colaborador y Acudiente'
+          tipo_persona: u.es_colaborador == 1 && u.es_representante == 1 ? 'Colaborador y Representante'
             : u.es_colaborador == 1 ? 'Colaborador'
-            : u.es_acudiente == 1 ? 'Acudiente'
+            : u.es_representante == 1 ? 'Representante'
             : 'Ninguno'
         }));
         this.cargando = false;
@@ -85,8 +85,8 @@ export class UsuariosXRolComponent implements OnInit {
       if (this.filtroAsignacion === 'asignados' && !u.asignado) return false;
       if (this.filtroAsignacion === 'sin-asignar' && u.asignado) return false;
       if (this.filtroTipo === 'colaborador' && u.es_colaborador != 1) return false;
-      if (this.filtroTipo === 'acudiente' && u.es_acudiente != 1) return false;
-      if (this.filtroTipo === 'ninguno' && (u.es_colaborador == 1 || u.es_acudiente == 1)) return false;
+      if (this.filtroTipo === 'representante' && u.es_representante != 1) return false;
+      if (this.filtroTipo === 'ninguno' && (u.es_colaborador == 1 || u.es_representante == 1)) return false;
       if (this.filtroEstado === 'activos' && u.activo != 1) return false;
       if (this.filtroEstado === 'inactivos' && u.activo == 1) return false;
       if (t && !(u.nombre_completo || '').toLowerCase().includes(t)

@@ -462,11 +462,7 @@
                     *ngIf="accionEditarActivo"
                     (click)="seleccionar('editar', dato.id, dato)"
                   >
-                    <img
-                      src="/assets/images/editar.png"
-                      width="20"
-                      class="me-2"
-                    />
+                    <i class="mdi mdi-pencil icono-img me-2"></i>
                     Editar
                   </a>
 
@@ -480,15 +476,7 @@
                       "
                       (click)="seleccionar(accion.id, dato.id, dato)"
                     >
-                      <img
-                        [src]="
-                          accion.icono
-                            ? accion.icono
-                            : '/assets/images/detalle.png'
-                        "
-                        width="20"
-                        class="me-2"
-                      />
+                      <i class="mdi mdi-format-list-bulleted icono-img me-2"></i>
                       {{ accion.label }}
                     </a>
                   </ng-container>
@@ -499,11 +487,7 @@
                     *ngIf="accionVerActivo"
                     (click)="seleccionar('consultar', dato.id, dato)"
                   >
-                    <img
-                      src="/assets/images/detalle.png"
-                      width="20"
-                      class="me-2"
-                    />
+                    <i class="mdi mdi-format-list-bulleted icono-img me-2"></i>
                     Ver detalle
                   </a>
                   <a
@@ -511,11 +495,7 @@
                     *ngIf="accionEliminarActivo"
                     (click)="seleccionar('eliminar', dato.id, dato)"
                   >
-                    <img
-                      src="/assets/images/eliminar.png"
-                      width="20"
-                      class="me-2"
-                    />
+                    <i class="mdi mdi-delete icono-img me-2"></i>
                     Eliminar
                   </a>
                 </div>
@@ -1104,11 +1084,7 @@
         <!-- Acción de editar primero (similar al menú desplegable) -->
         <div class="col" *ngIf="accionEditarActivo">
           <p class="accion">
-            <img
-              src="/assets/images/editar.png"
-              width="50"
-              (click)="seleccionar('editar', dato.id, dato)"
-            />
+            <i class="mdi mdi-pencil icono-img"></i>
           </p>
         </div>
 
@@ -1119,13 +1095,7 @@
             *ngIf="!accion.condicion || dato[accion.condicion] === accion.valor"
           >
             <p class="accion">
-              <img
-                [src]="
-                  accion.icono ? accion.icono : '/assets/images/detalle.png'
-                "
-                width="50"
-                (click)="seleccionar(accion.id, dato.id, dato)"
-              />
+              <i class="mdi mdi-format-list-bulleted icono-img"></i>
             </p>
           </div>
         </ng-container>
@@ -1133,20 +1103,12 @@
         <!-- Otras acciones predefinidas al final -->
         <div class="col" *ngIf="accionVerActivo">
           <p class="accion">
-            <img
-              src="/assets/images/detalle.png"
-              width="50"
-              (click)="seleccionar('consultar', dato.id, dato)"
-            />
+            <i class="mdi mdi-format-list-bulleted icono-img"></i>
           </p>
         </div>
         <div class="col" *ngIf="accionEliminarActivo">
           <p class="accion">
-            <img
-              src="/assets/images/eliminar.png"
-              width="50"
-              (click)="seleccionar('eliminar', dato.id, dato)"
-            />
+            <i class="mdi mdi-delete icono-img"></i>
           </p>
         </div>
       </div>

@@ -11,10 +11,10 @@
     </div>
 
     <div class="col-md-3">
-      <label for="grupoSelector" class="form-label">Grupo:</label>
-      <select id="grupoSelector" class="form-select" [(ngModel)]="grupoSeleccionado" (change)="aplicarFiltros()">
-        <option value="">Todos los grupos</option>
-        <option *ngFor="let grupo of grupos" [value]="grupo.id">{{ grupo.nombre }}</option>
+      <label for="planSelector" class="form-label">Plan:</label>
+      <select id="planSelector" class="form-select" [(ngModel)]="planSeleccionado" (change)="aplicarFiltros()">
+        <option value="">Todos los planes</option>
+        <option *ngFor="let plan of planes" [value]="plan.id">{{ plan.nombre }}</option>
       </select>
     </div>
 
@@ -38,13 +38,13 @@
     </div>
   </div>
 
-  <!-- Búsqueda de estudiante -->
+  <!-- Búsqueda de cliente -->
   <div class="row mb-4">
     <div class="col-md-6">
       <div class="input-group">
         <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Buscar estudiante por nombre..."
-          [(ngModel)]="busquedaEstudiante" (keyup)="buscarEstudiante()">
+        <input type="text" class="form-control" placeholder="Buscar cliente por nombre..."
+          [(ngModel)]="busquedaCliente" (keyup)="buscarCliente()">
       </div>
     </div>
     <div class="col-md-6 text-end">
@@ -80,7 +80,7 @@
                 <span class="estadistica-valor">{{ totalesGenerales.totalCobrado | currency:'':'symbol':'1.0-0'
                   }}</span>
                 <span class="estadistica-label">Total Cobrado</span>
-                <span class="estadistica-extra">{{ totalesGenerales.cantidadEstudiantes }} estudiantes</span>
+                <span class="estadistica-extra">{{ totalesGenerales.cantidadClientes }} clientes</span>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
@@ -104,7 +104,7 @@
                 <span class="estadistica-valor">{{ totalesGenerales.saldoVencido | currency:'':'symbol':'1.0-0'
                   }}</span>
                 <span class="estadistica-label">Saldo Vencido</span>
-                <span class="estadistica-extra">{{ totalesGenerales.cantidadVencidos }} estudiantes</span>
+                <span class="estadistica-extra">{{ totalesGenerales.cantidadVencidos }} clientes</span>
               </div>
             </div>
           </div>
@@ -135,9 +135,9 @@
     <!-- Tabs para diferentes vistas -->
     <ul class="nav nav-tabs mb-3" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes"
-          type="button" role="tab" aria-controls="estudiantes" aria-selected="true">
-          <i class="fas fa-users"></i> Por Estudiante
+        <button class="nav-link active" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes"
+          type="button" role="tab" aria-controls="clientes" aria-selected="true">
+          <i class="fas fa-users"></i> Por Cliente
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -179,7 +179,7 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="saldos-pendientes-tab" data-bs-toggle="tab" data-bs-target="#saldos-pendientes"
           type="button" role="tab" aria-controls="saldos-pendientes" aria-selected="false">
-          <i class="fas fa-calendar-check"></i> Saldos Estudiantes
+          <i class="fas fa-calendar-check"></i> Saldos Clientes
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -192,15 +192,15 @@
 
     <!-- Contenido de los tabs -->
     <div class="tab-content">
-      <!-- Tab: Por Estudiante -->
-      <div class="tab-pane fade show active" id="estudiantes" role="tabpanel" aria-labelledby="estudiantes-tab">
+      <!-- Tab: Por Cliente -->
+      <div class="tab-pane fade show active" id="clientes" role="tabpanel" aria-labelledby="clientes-tab">
         <div class="card">
           <div class="card-body">
             <div class="row mb-3">
               <div class="col-md-6">
                 <label class="form-label me-2">Estado:</label>
                 <select class="form-select form-select-sm d-inline-block w-auto"
-                  [(ngModel)]="filtroActivoEstudiantes" (change)="aplicarFiltros()">
+                  [(ngModel)]="filtroActivoClientes" (change)="aplicarFiltros()">
                   <option value="todos">Todos</option>
                   <option value="activos">Solo activos</option>
                   <option value="inactivos">Solo inactivos</option>
@@ -211,12 +211,12 @@
               <table class="table table-hover table-striped">
                 <thead class="table-light">
                   <tr>
-                    <th class="sortable" (click)="ordenarPor('nombre_estudiante')">
-                      Estudiante
+                    <th class="sortable" (click)="ordenarPor('nombre_cliente')">
+                      Cliente
                       <i class="fas fa-sort float-end" [ngClass]="{
-                          'fa-sort': columnaOrdenamiento !== 'nombre_estudiante',
-                          'fa-sort-up': columnaOrdenamiento === 'nombre_estudiante' && ordenAscendente,
-                          'fa-sort-down': columnaOrdenamiento === 'nombre_estudiante' && !ordenAscendente
+                          'fa-sort': columnaOrdenamiento !== 'nombre_cliente',
+                          'fa-sort-up': columnaOrdenamiento === 'nombre_cliente' && ordenAscendente,
+                          'fa-sort-down': columnaOrdenamiento === 'nombre_cliente' && !ordenAscendente
                         }"></i>
                     </th>
                     <th class="sortable" (click)="ordenarPor('numero_identificacion')">
@@ -227,12 +227,12 @@
                         'fa-sort-down': columnaOrdenamiento === 'numero_identificacion' && !ordenAscendente
                       }"></i>
                     </th>
-                    <th class="sortable" (click)="ordenarPor('grupo_estudiante')">
-                      Grupo
+                    <th class="sortable" (click)="ordenarPor('plan_cliente')">
+                      Plan
                       <i class="fas fa-sort float-end" [ngClass]="{
-               'fa-sort': columnaOrdenamiento !== 'grupo_estudiante',
-               'fa-sort-up': columnaOrdenamiento === 'grupo_estudiante' && ordenAscendente,
-               'fa-sort-down': columnaOrdenamiento === 'grupo_estudiante' && !ordenAscendente
+               'fa-sort': columnaOrdenamiento !== 'plan_cliente',
+               'fa-sort-up': columnaOrdenamiento === 'plan_cliente' && ordenAscendente,
+               'fa-sort-down': columnaOrdenamiento === 'plan_cliente' && !ordenAscendente
              }"></i>
                     </th>
                     <th class="text-end sortable" (click)="ordenarPor('totalCobrado')">
@@ -272,56 +272,56 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Filas de estudiantes existentes -->
-                  <tr *ngFor="let estudiante of getEstudiantesPaginados()">
-                    <td>{{ estudiante.nombre_estudiante }}</td>
-                    <td>{{ estudiante.numero_identificacion }}</td>
-                    <td>{{ estudiante.grupo_estudiante }}</td>
-                    <td class="text-end">{{ estudiante.totalCobrado | currency:'':'symbol':'1.0-0' }}</td>
-                    <td class="text-end">{{ estudiante.totalPagado | currency:'':'symbol':'1.0-0' }}</td>
-                    <td class="text-end" [ngClass]="{'text-danger': estudiante.saldoTotal > 0}">
-                      {{ estudiante.saldoTotal | currency:'':'symbol':'1.0-0' }}
+                  <!-- Filas de clientes existentes -->
+                  <tr *ngFor="let cliente of getClientesPaginados()">
+                    <td>{{ cliente.nombre_cliente }}</td>
+                    <td>{{ cliente.numero_identificacion }}</td>
+                    <td>{{ cliente.plan_cliente }}</td>
+                    <td class="text-end">{{ cliente.totalCobrado | currency:'':'symbol':'1.0-0' }}</td>
+                    <td class="text-end">{{ cliente.totalPagado | currency:'':'symbol':'1.0-0' }}</td>
+                    <td class="text-end" [ngClass]="{'text-danger': cliente.saldoTotal > 0}">
+                      {{ cliente.saldoTotal | currency:'':'symbol':'1.0-0' }}
                     </td>
-                    <td class="text-end" [ngClass]="{'text-danger': estudiante.saldoVencido > 0}">
-                      {{ estudiante.saldoVencido | currency:'':'symbol':'1.0-0' }}
+                    <td class="text-end" [ngClass]="{'text-danger': cliente.saldoVencido > 0}">
+                      {{ cliente.saldoVencido | currency:'':'symbol':'1.0-0' }}
                     </td>
                     <td class="text-center">
-                      <span class="badge" [ngClass]="getEstadoBadgeClass(estudiante)">
-                        {{ getEstadoTexto(estudiante) }}
+                      <span class="badge" [ngClass]="getEstadoBadgeClass(cliente)">
+                        {{ getEstadoTexto(cliente) }}
                       </span>
                     </td>
                     <td class="text-center">
-                      <button class="btn btn-sm btn-info" (click)="verDetalleEstudiante(estudiante)"
+                      <button class="btn btn-sm btn-info" (click)="verDetalleCliente(cliente)"
                         title="Ver detalle">
                         <i class="fas fa-eye"></i>
                       </button>
                     </td>
                   </tr>
-                  <tr *ngIf="estudiantesFiltrados.length === 0">
+                  <tr *ngIf="clientesFiltrados.length === 0">
                     <td colspan="9" class="text-center text-muted py-4">
-                      No se encontraron estudiantes con los filtros aplicados
+                      No se encontraron clientes con los filtros aplicados
                     </td>
                   </tr>
                 </tbody>
 
                 <!-- AGREGAR ESTA SECCIÓN DE TFOOT -->
-                <tfoot class="table-light" *ngIf="estudiantesFiltrados.length > 0">
+                <tfoot class="table-light" *ngIf="clientesFiltrados.length > 0">
                   <tr class="fw-bold">
                     <td colspan="3">
                       TOTALES
-                      <span class="badge bg-secondary ms-2">{{ estudiantesFiltrados.length }} estudiantes</span>
+                      <span class="badge bg-secondary ms-2">{{ clientesFiltrados.length }} clientes</span>
                     </td>
-                    <td class="text-end">{{ getTotalEstudiantes('totalCobrado') | currency:'':'symbol':'1.0-0' }}</td>
-                    <td class="text-end">{{ getTotalEstudiantes('totalPagado') | currency:'':'symbol':'1.0-0' }}</td>
-                    <td class="text-end" [ngClass]="{'text-danger': getTotalEstudiantes('saldoTotal') > 0}">
-                      {{ getTotalEstudiantes('saldoTotal') | currency:'':'symbol':'1.0-0' }}
+                    <td class="text-end">{{ getTotalClientes('totalCobrado') | currency:'':'symbol':'1.0-0' }}</td>
+                    <td class="text-end">{{ getTotalClientes('totalPagado') | currency:'':'symbol':'1.0-0' }}</td>
+                    <td class="text-end" [ngClass]="{'text-danger': getTotalClientes('saldoTotal') > 0}">
+                      {{ getTotalClientes('saldoTotal') | currency:'':'symbol':'1.0-0' }}
                     </td>
-                    <td class="text-end" [ngClass]="{'text-danger': getTotalEstudiantes('saldoVencido') > 0}">
-                      {{ getTotalEstudiantes('saldoVencido') | currency:'':'symbol':'1.0-0' }}
+                    <td class="text-end" [ngClass]="{'text-danger': getTotalClientes('saldoVencido') > 0}">
+                      {{ getTotalClientes('saldoVencido') | currency:'':'symbol':'1.0-0' }}
                     </td>
                     <td class="text-center">
                       <span class="badge bg-info">
-                        {{ getPorcentajeRecaudoEstudiantes() }}% recaudado
+                        {{ getPorcentajeRecaudoClientes() }}% recaudado
                       </span>
                     </td>
                     <td></td>
@@ -331,7 +331,7 @@
             </div>
 
             <!-- Paginación -->
-            <nav aria-label="Paginación estudiantes" *ngIf="estudiantesFiltrados.length > 0">
+            <nav aria-label="Paginación clientes" *ngIf="clientesFiltrados.length > 0">
               <ul class="pagination justify-content-center">
                 <li class="page-item" [class.disabled]="paginaActual === 1">
                   <a class="page-link" (click)="cambiarPagina(paginaActual - 1)" href="javascript:void(0)">
@@ -371,12 +371,12 @@
               <table class="table table-hover table-striped">
                 <thead class="table-light">
                   <tr>
-                    <th class="sortable" (click)="ordenarPorColaboradores('nombre_estudiante')">
+                    <th class="sortable" (click)="ordenarPorColaboradores('nombre_cliente')">
                       Colaborador
                       <i class="fas fa-sort float-end" [ngClass]="{
-                          'fa-sort': columnaOrdenamientoColaboradores !== 'nombre_estudiante',
-                          'fa-sort-up': columnaOrdenamientoColaboradores === 'nombre_estudiante' && ordenAscendenteColaboradores,
-                          'fa-sort-down': columnaOrdenamientoColaboradores === 'nombre_estudiante' && !ordenAscendenteColaboradores
+                          'fa-sort': columnaOrdenamientoColaboradores !== 'nombre_cliente',
+                          'fa-sort-up': columnaOrdenamientoColaboradores === 'nombre_cliente' && ordenAscendenteColaboradores,
+                          'fa-sort-down': columnaOrdenamientoColaboradores === 'nombre_cliente' && !ordenAscendenteColaboradores
                         }"></i>
                     </th>
                     <th class="sortable" (click)="ordenarPorColaboradores('numero_identificacion')">
@@ -387,12 +387,12 @@
                         'fa-sort-down': columnaOrdenamientoColaboradores === 'numero_identificacion' && !ordenAscendenteColaboradores
                       }"></i>
                     </th>
-                    <th class="sortable" (click)="ordenarPorColaboradores('grupo_estudiante')">
+                    <th class="sortable" (click)="ordenarPorColaboradores('plan_cliente')">
                       Cargo
                       <i class="fas fa-sort float-end" [ngClass]="{
-                        'fa-sort': columnaOrdenamientoColaboradores !== 'grupo_estudiante',
-                        'fa-sort-up': columnaOrdenamientoColaboradores === 'grupo_estudiante' && ordenAscendenteColaboradores,
-                        'fa-sort-down': columnaOrdenamientoColaboradores === 'grupo_estudiante' && !ordenAscendenteColaboradores
+                        'fa-sort': columnaOrdenamientoColaboradores !== 'plan_cliente',
+                        'fa-sort-up': columnaOrdenamientoColaboradores === 'plan_cliente' && ordenAscendenteColaboradores,
+                        'fa-sort-down': columnaOrdenamientoColaboradores === 'plan_cliente' && !ordenAscendenteColaboradores
                       }"></i>
                     </th>
                     <th class="text-end sortable" (click)="ordenarPorColaboradores('totalCobrado')">
@@ -433,9 +433,9 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let colaborador of getColaboradoresPaginados()">
-                    <td>{{ colaborador.nombre_estudiante }}</td>
+                    <td>{{ colaborador.nombre_cliente }}</td>
                     <td>{{ colaborador.numero_identificacion }}</td>
-                    <td>{{ colaborador.grupo_estudiante }}</td>
+                    <td>{{ colaborador.plan_cliente }}</td>
                     <td class="text-end">{{ colaborador.totalCobrado | currency:'':'symbol':'1.0-0' }}</td>
                     <td class="text-end">{{ colaborador.totalPagado | currency:'':'symbol':'1.0-0' }}</td>
                     <td class="text-end" [ngClass]="{'text-danger': colaborador.saldoTotal > 0}">
@@ -653,7 +653,7 @@
                     <th class="text-end">Saldo Total</th>
                     <th class="text-end">Saldo Vencido</th>
                     <th class="text-end">% Recaudo</th>
-                    <th class="text-center">Estudiantes</th>
+                    <th class="text-center">Clientes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -694,7 +694,7 @@
                         </span>
                       </td>
                       <td class="text-center">
-                        <span class="badge bg-secondary">{{ producto.cantidad_estudiantes }}</span>
+                        <span class="badge bg-secondary">{{ producto.cantidad_clientes }}</span>
                       </td>
                     </tr>
 
@@ -732,7 +732,7 @@
                       </td>
                       <td class="text-center">
                         <span class="badge bg-primary">
-                          {{ getSubtotalClasificacionProductos(clasificacion.key, 'cantidad_estudiantes') }}
+                          {{ getSubtotalClasificacionProductos(clasificacion.key, 'cantidad_clientes') }}
                         </span>
                       </td>
                     </tr>
@@ -774,7 +774,7 @@
                     </th>
                     <th class="text-center">
                       <span class="badge bg-dark">
-                        {{ getTotalProductos('cantidad_estudiantes') }}
+                        {{ getTotalProductos('cantidad_clientes') }}
                       </span>
                     </th>
                   </tr>
@@ -938,7 +938,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th class="text-end">Monto</th>
                                 <th class="text-end">Cantidad</th>
                               </tr>
@@ -947,7 +947,7 @@
                               <tr *ngFor="let movimiento of getCobrosPaginados()">
                                 <td>{{ formatearFecha(movimiento.fecha) }}</td>
                                 <td>
-                                  <small>{{ movimiento.nombre_estudiante || '-' }}</small>
+                                  <small>{{ movimiento.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td class="text-end">
                                   {{ movimiento.total_cobrado | currency:'':'symbol':'1.0-0' }}
@@ -1088,7 +1088,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Recibido</th>
                                 <th class="text-end">Aplicado</th>
@@ -1100,7 +1100,7 @@
                                 [ngClass]="{'table-warning': tieneDiferenciaRecibidoAplicado(movimiento)}">
                                 <td>{{ formatearFecha(movimiento.fecha) }}</td>
                                 <td>
-                                  <small>{{ movimiento.nombre_estudiante || '-' }}</small>
+                                  <small>{{ movimiento.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <span class="badge bg-success">
@@ -1237,7 +1237,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Recibido</th>
                                 <th class="text-end">Aplicado</th>
@@ -1249,7 +1249,7 @@
                                 [ngClass]="{'table-warning': tieneDiferenciaRecibidoAplicado(movimiento)}">
                                 <td>{{ formatearFecha(movimiento.fecha) }}</td>
                                 <td>
-                                  <small>{{ movimiento.nombre_estudiante || '-' }}</small>
+                                  <small>{{ movimiento.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <span class="badge bg-warning text-dark">
@@ -1384,7 +1384,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Recibido</th>
                                 <th class="text-end">Aplicado</th>
@@ -1396,7 +1396,7 @@
                                 [ngClass]="{'table-warning': tieneDiferenciaRecibidoAplicado(movimiento)}">
                                 <td>{{ formatearFecha(movimiento.fecha) }}</td>
                                 <td>
-                                  <small>{{ movimiento.nombre_estudiante || '-' }}</small>
+                                  <small>{{ movimiento.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <span class="badge bg-info">
@@ -1654,7 +1654,7 @@
                               <tr>
                                 <th>Fecha Anulación</th>
                                 <th>Fecha Original</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Producto</th>
                                 <th>Clasificación</th>
                                 <th class="text-end">Valor Anulado</th>
@@ -1670,7 +1670,7 @@
                                   <small class="text-muted">{{ formatearFecha(anulado.fecha_original) }}</small>
                                 </td>
                                 <td>
-                                  <small>{{ anulado.nombre_estudiante || '-' }}</small>
+                                  <small>{{ anulado.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <small>{{ anulado.nombre_producto || '-' }}</small>
@@ -1796,7 +1796,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha Anul.</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Valor</th>
                               </tr>
@@ -1807,7 +1807,7 @@
                                   <small>{{ formatearFecha(anulado.fecha_anulacion) }}</small>
                                 </td>
                                 <td>
-                                  <small>{{ anulado.nombre_estudiante || '-' }}</small>
+                                  <small>{{ anulado.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <span class="badge bg-danger">
@@ -1899,7 +1899,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha Anul.</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Valor</th>
                               </tr>
@@ -1910,7 +1910,7 @@
                                   <small>{{ formatearFecha(anulado.fecha_anulacion) }}</small>
                                 </td>
                                 <td>
-                                  <small>{{ anulado.nombre_estudiante || '-' }}</small>
+                                  <small>{{ anulado.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <span class="badge bg-danger">
@@ -2002,7 +2002,7 @@
                             <thead class="table-light">
                               <tr>
                                 <th>Fecha Anul.</th>
-                                <th>Estudiante</th>
+                                <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Valor</th>
                               </tr>
@@ -2013,7 +2013,7 @@
                                   <small>{{ formatearFecha(anulado.fecha_anulacion) }}</small>
                                 </td>
                                 <td>
-                                  <small>{{ anulado.nombre_estudiante || '-' }}</small>
+                                  <small>{{ anulado.nombre_cliente || '-' }}</small>
                                 </td>
                                 <td>
                                   <span class="badge bg-danger">
@@ -2172,7 +2172,7 @@
               <div class="col-md-4">
                 <label class="form-label me-2">Estado:</label>
                 <select class="form-select form-select-sm d-inline-block w-auto"
-                  [(ngModel)]="filtroActivoSaldosEstudiantes" (change)="aplicarFiltrosSaldosPendientes()">
+                  [(ngModel)]="filtroActivoSaldosClientes" (change)="aplicarFiltrosSaldosPendientes()">
                   <option value="todos">Todos</option>
                   <option value="activos">Solo activos</option>
                   <option value="inactivos">Solo inactivos</option>
@@ -2190,20 +2190,20 @@
               <table class="table table-hover table-bordered table-sm">
                 <thead class="table-light sticky-top">
                   <tr>
-                    <th class="columna-fija sortable" (click)="ordenarPorSaldosPendientes('nombre_estudiante')">
-                      Estudiante
+                    <th class="columna-fija sortable" (click)="ordenarPorSaldosPendientes('nombre_cliente')">
+                      Cliente
                       <i class="fas fa-sort float-end" [ngClass]="{
-                  'fa-sort': columnaOrdenamientoSaldos !== 'nombre_estudiante',
-                  'fa-sort-up': columnaOrdenamientoSaldos === 'nombre_estudiante' && ordenAscendenteSaldos,
-                  'fa-sort-down': columnaOrdenamientoSaldos === 'nombre_estudiante' && !ordenAscendenteSaldos
+                  'fa-sort': columnaOrdenamientoSaldos !== 'nombre_cliente',
+                  'fa-sort-up': columnaOrdenamientoSaldos === 'nombre_cliente' && ordenAscendenteSaldos,
+                  'fa-sort-down': columnaOrdenamientoSaldos === 'nombre_cliente' && !ordenAscendenteSaldos
                 }"></i>
                     </th>
-                    <th class="columna-grupo sortable" (click)="ordenarPorSaldosPendientes('grupo_estudiante')">
-                      Grupo
+                    <th class="columna-plan sortable" (click)="ordenarPorSaldosPendientes('plan_cliente')">
+                      Plan
                       <i class="fas fa-sort float-end" [ngClass]="{
-                  'fa-sort': columnaOrdenamientoSaldos !== 'grupo_estudiante',
-                  'fa-sort-up': columnaOrdenamientoSaldos === 'grupo_estudiante' && ordenAscendenteSaldos,
-                  'fa-sort-down': columnaOrdenamientoSaldos === 'grupo_estudiante' && !ordenAscendenteSaldos
+                  'fa-sort': columnaOrdenamientoSaldos !== 'plan_cliente',
+                  'fa-sort-up': columnaOrdenamientoSaldos === 'plan_cliente' && ordenAscendenteSaldos,
+                  'fa-sort-down': columnaOrdenamientoSaldos === 'plan_cliente' && !ordenAscendenteSaldos
                 }"></i>
                     </th>
                     <th class="text-center columna-mes" *ngFor="let mes of mesesDisponibles">
@@ -2221,31 +2221,31 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let estudiante of estudiantesSaldosPendientesFiltrados"
-                    [ngClass]="{'table-warning': (estudiante.totalSaldoPendiente || 0) > 0}">
-                    <td class="columna-fija">{{ estudiante.nombre_estudiante }}</td>
-                    <td class="columna-grupo">{{ estudiante.grupo_estudiante }}</td>
+                  <tr *ngFor="let cliente of clientesSaldosPendientesFiltrados"
+                    [ngClass]="{'table-warning': (cliente.totalSaldoPendiente || 0) > 0}">
+                    <td class="columna-fija">{{ cliente.nombre_cliente }}</td>
+                    <td class="columna-plan">{{ cliente.plan_cliente }}</td>
                     <td class="text-end columna-mes" *ngFor="let mes of mesesDisponibles" [ngClass]="{
-                    'text-danger': getSaldoPendienteMes(estudiante, mes.valor) > 0,
-                    'table-danger': getSaldoPendienteMes(estudiante, mes.valor) > 100000
+                    'text-danger': getSaldoPendienteMes(cliente, mes.valor) > 0,
+                    'table-danger': getSaldoPendienteMes(cliente, mes.valor) > 100000
                   }">
-                      <span *ngIf="getSaldoPendienteMes(estudiante, mes.valor) > 0">
-                        {{ getSaldoPendienteMes(estudiante, mes.valor) | currency:'':'symbol':'1.0-0' }}
+                      <span *ngIf="getSaldoPendienteMes(cliente, mes.valor) > 0">
+                        {{ getSaldoPendienteMes(cliente, mes.valor) | currency:'':'symbol':'1.0-0' }}
                       </span>
-                      <span *ngIf="getSaldoPendienteMes(estudiante, mes.valor) === 0" class="text-muted">
+                      <span *ngIf="getSaldoPendienteMes(cliente, mes.valor) === 0" class="text-muted">
                         -
                       </span>
                     </td>
                     <td class="text-end columna-total fw-bold"
-                      [ngClass]="{'text-danger': (estudiante.totalSaldoPendiente || 0) > 0}">
-                      {{ estudiante.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
+                      [ngClass]="{'text-danger': (cliente.totalSaldoPendiente || 0) > 0}">
+                      {{ cliente.totalSaldoPendiente | currency:'':'symbol':'1.0-0' }}
                     </td>
                   </tr>
-                  <tr *ngIf="estudiantesSaldosPendientesFiltrados.length === 0">
+                  <tr *ngIf="clientesSaldosPendientesFiltrados.length === 0">
                     <td colspan="15" class="text-center text-muted py-4">
                       {{ mostrarSoloConSaldoPendiente ?
-                      'No se encontraron estudiantes con saldos pendientes' :
-                      'No se encontraron estudiantes con los filtros aplicados' }}
+                      'No se encontraron clientes con saldos pendientes' :
+                      'No se encontraron clientes con los filtros aplicados' }}
                     </td>
                   </tr>
                 </tbody>
@@ -2272,15 +2272,15 @@
                   </h6>
                   <div class="row">
                     <div class="col-md-4">
-                      <strong>Total estudiantes con saldo:</strong>
-                      {{ getEstudiantesConSaldoPendiente() }} de {{ estudiantesSaldosPendientesFiltrados.length }}
+                      <strong>Total clientes con saldo:</strong>
+                      {{ getClientesConSaldoPendiente() }} de {{ clientesSaldosPendientesFiltrados.length }}
                     </div>
                     <div class="col-md-4">
                       <strong>Mes con mayor saldo pendiente:</strong>
                       {{ getMesConMayorSaldoPendiente() }}
                     </div>
                     <div class="col-md-4">
-                      <strong>Promedio saldo por estudiante:</strong>
+                      <strong>Promedio saldo por cliente:</strong>
                       {{ getPromedioSaldoPendiente() | currency:'':'symbol':'1.0-0' }}
                     </div>
                   </div>
@@ -2327,20 +2327,20 @@
               <table class="table table-hover table-bordered table-sm">
                 <thead class="table-light sticky-top">
                   <tr>
-                    <th class="columna-fija sortable" (click)="ordenarPorSaldosPendientesColaboradores('nombre_estudiante')">
+                    <th class="columna-fija sortable" (click)="ordenarPorSaldosPendientesColaboradores('nombre_cliente')">
                       Colaborador
                       <i class="fas fa-sort float-end" [ngClass]="{
-                        'fa-sort': columnaOrdenamientoSaldosColaboradores !== 'nombre_estudiante',
-                        'fa-sort-up': columnaOrdenamientoSaldosColaboradores === 'nombre_estudiante' && ordenAscendenteSaldosColaboradores,
-                        'fa-sort-down': columnaOrdenamientoSaldosColaboradores === 'nombre_estudiante' && !ordenAscendenteSaldosColaboradores
+                        'fa-sort': columnaOrdenamientoSaldosColaboradores !== 'nombre_cliente',
+                        'fa-sort-up': columnaOrdenamientoSaldosColaboradores === 'nombre_cliente' && ordenAscendenteSaldosColaboradores,
+                        'fa-sort-down': columnaOrdenamientoSaldosColaboradores === 'nombre_cliente' && !ordenAscendenteSaldosColaboradores
                       }"></i>
                     </th>
-                    <th class="columna-grupo sortable" (click)="ordenarPorSaldosPendientesColaboradores('grupo_estudiante')">
+                    <th class="columna-plan sortable" (click)="ordenarPorSaldosPendientesColaboradores('plan_cliente')">
                       Cargo
                       <i class="fas fa-sort float-end" [ngClass]="{
-                        'fa-sort': columnaOrdenamientoSaldosColaboradores !== 'grupo_estudiante',
-                        'fa-sort-up': columnaOrdenamientoSaldosColaboradores === 'grupo_estudiante' && ordenAscendenteSaldosColaboradores,
-                        'fa-sort-down': columnaOrdenamientoSaldosColaboradores === 'grupo_estudiante' && !ordenAscendenteSaldosColaboradores
+                        'fa-sort': columnaOrdenamientoSaldosColaboradores !== 'plan_cliente',
+                        'fa-sort-up': columnaOrdenamientoSaldosColaboradores === 'plan_cliente' && ordenAscendenteSaldosColaboradores,
+                        'fa-sort-down': columnaOrdenamientoSaldosColaboradores === 'plan_cliente' && !ordenAscendenteSaldosColaboradores
                       }"></i>
                     </th>
                     <th class="text-center columna-mes" *ngFor="let mes of mesesDisponibles">
@@ -2360,8 +2360,8 @@
                 <tbody>
                   <tr *ngFor="let colaborador of colaboradoresSaldosPendientesFiltrados"
                     [ngClass]="{'table-warning': (colaborador.totalSaldoPendiente || 0) > 0}">
-                    <td class="columna-fija">{{ colaborador.nombre_estudiante }}</td>
-                    <td class="columna-grupo">{{ colaborador.grupo_estudiante }}</td>
+                    <td class="columna-fija">{{ colaborador.nombre_cliente }}</td>
+                    <td class="columna-plan">{{ colaborador.plan_cliente }}</td>
                     <td class="text-end columna-mes" *ngFor="let mes of mesesDisponibles" [ngClass]="{
                       'text-danger': getSaldoPendienteMes(colaborador, mes.valor) > 0,
                       'table-danger': getSaldoPendienteMes(colaborador, mes.valor) > 100000
@@ -2436,36 +2436,36 @@
   </div>
 </div>
 
-<!-- Modal para detalle de estudiante -->
-<div class="modal fade" id="modalDetalleEstudiante" tabindex="-1" aria-hidden="true">
+<!-- Modal para detalle de cliente -->
+<div class="modal fade" id="modalDetalleCliente" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="fas fa-user-graduate me-2"></i>
-          Detalle de Cartera - {{ estudianteSeleccionado?.nombre_estudiante }}
+          Detalle de Cartera - {{ clienteSeleccionado?.nombre_cliente }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row mb-3">
           <div class="col-md-6">
-            <strong>Identificación:</strong> {{ estudianteSeleccionado?.numero_identificacion }}<br>
-            <strong>Grupo:</strong> {{ estudianteSeleccionado?.grupo_estudiante }}
+            <strong>Identificación:</strong> {{ clienteSeleccionado?.numero_identificacion }}<br>
+            <strong>Plan:</strong> {{ clienteSeleccionado?.plan_cliente }}
           </div>
           <div class="col-md-6 text-end">
-            <strong>Total Cobrado:</strong> {{ estudianteSeleccionado?.totalCobrado | currency:'':'symbol':'1.0-0'
+            <strong>Total Cobrado:</strong> {{ clienteSeleccionado?.totalCobrado | currency:'':'symbol':'1.0-0'
             }}<br>
-            <strong>Total Pagado:</strong> {{ estudianteSeleccionado?.totalPagado | currency:'':'symbol':'1.0-0'
+            <strong>Total Pagado:</strong> {{ clienteSeleccionado?.totalPagado | currency:'':'symbol':'1.0-0'
             }}<br>
             <strong>Saldo:</strong> <span
-              [ngClass]="{'text-danger': estudianteSeleccionado && estudianteSeleccionado.saldoTotal > 0}">
-              {{ estudianteSeleccionado?.saldoTotal | currency:'':'symbol':'1.0-0' }}
+              [ngClass]="{'text-danger': clienteSeleccionado && clienteSeleccionado.saldoTotal > 0}">
+              {{ clienteSeleccionado?.saldoTotal | currency:'':'symbol':'1.0-0' }}
             </span>
           </div>
         </div>
 
-        <!-- Detalle mensual del estudiante -->
+        <!-- Detalle mensual del cliente -->
         <h6 class="mb-3">Detalle por Mes</h6>
         <div class="table-responsive">
           <table class="table table-sm table-hover">
@@ -2478,7 +2478,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let detalle of detalleEstudianteMensual">
+              <tr *ngFor="let detalle of detalleClienteMensual">
                 <td>{{ detalle.mes }}</td>
                 <td class="text-end">{{ detalle.cobrado | currency:'':'symbol':'1.0-0' }}</td>
                 <td class="text-end">{{ detalle.pagado | currency:'':'symbol':'1.0-0' }}</td>
@@ -2493,7 +2493,7 @@
         <!-- Tipos de pago utilizados -->
         <h6 class="mb-3 mt-4">Formas de Pago Utilizadas</h6>
         <div class="row">
-          <div class="col-md-6" *ngFor="let tipoPago of detalleEstudianteTiposPago">
+          <div class="col-md-6" *ngFor="let tipoPago of detalleClienteTiposPago">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <span>{{ tipoPago.nombre }}:</span>
               <strong>{{ tipoPago.valor | currency:'':'symbol':'1.0-0' }}</strong>
@@ -2503,7 +2503,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" (click)="exportarDetalleEstudiante()">
+        <button type="button" class="btn btn-primary" (click)="exportarDetalleCliente()">
           <i class="fas fa-download"></i> Exportar Detalle
         </button>
       </div>

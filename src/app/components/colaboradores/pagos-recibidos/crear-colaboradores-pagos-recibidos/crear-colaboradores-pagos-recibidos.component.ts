@@ -16,7 +16,7 @@ interface PagoModel {
   id: string;
   fecha: string;
   id_colaborador: string;
-  id_acudiente: string | null;
+  id_representante: string | null;
   id_tipo_pago: string;
   valor_recibido: number;
   saldo: number;
@@ -93,7 +93,7 @@ export class CrearColaboradoresPagosRecibidosComponent implements OnInit {
     id: '',
     fecha: "",
     id_colaborador: "",
-    id_acudiente: null,
+    id_representante: null,
     id_tipo_pago: "",
     valor_recibido: 0,
     saldo: 0,
@@ -660,7 +660,7 @@ export class CrearColaboradoresPagosRecibidosComponent implements OnInit {
       id: this.model.id,
       fecha: this.model.fecha,
       id_colaborador: this.model.id_colaborador,
-      id_acudiente: null,
+      id_representante: null,
       id_tipo_pago: this.model.id_tipo_pago,
       valor_recibido: this.model.valor_recibido,
       saldo: this.model.saldo,
@@ -813,7 +813,7 @@ export class CrearColaboradoresPagosRecibidosComponent implements OnInit {
       id: '',
       fecha: "",
       id_colaborador: "",
-      id_acudiente: null,
+      id_representante: null,
       id_tipo_pago: "",
       valor_recibido: 0,
       saldo: 0,

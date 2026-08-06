@@ -27,9 +27,9 @@ export class ReportesComponent {
   seleccionarOpcion(opcion: string, event: Event) {
     event.stopPropagation();
     switch (opcion) {
-      // Estudiantes
-      case 'estudiantes-general':
-        this.router.navigate(['/reportes/estudiantes-general']);
+      // Clientes
+      case 'clientes-general':
+        this.router.navigate(['/reportes/clientes-general']);
         break;
       // Financiero
       case 'cartera':

@@ -30,7 +30,7 @@ export interface TipoDocumentoCrud {
   requiere_firma: number;
   dias_alerta_vencimiento?: number;
   permite_multiples: number;
-  modificable_acudientes: number;
+  modificable_representantes: number;
   activo: number;
 }
 

@@ -4,8 +4,8 @@ import { InstitucionConfigService } from './institucion-config.service';
 
 export interface DatosComprobantePDF {
   pago: any;
-  estudiante: any;
-  acudiente: any;
+  cliente: any;
+  representante: any;
   tipoPago: any;
   fechaGeneracion: Date;
   logoBase64?: string;
@@ -41,7 +41,7 @@ export class ExportarPdfComprobanteService {
       doc.line(15, yPos, pageWidth - 15, yPos);
       yPos += 15;
 
-      // 2. INFORMACIÓN DEL ESTUDIANTE Y ACUDIENTE
+      // 2. INFORMACIÓN DEL CLIENTE Y REPRESENTANTE
       this.dibujarInformacionPersonas(doc, datos, yPos, pageWidth, primaryColor, grayColor);
       yPos += 45;
 
@@ -132,11 +132,11 @@ export class ExportarPdfComprobanteService {
 
   private dibujarInformacionPersonas(doc: jsPDF, datos: DatosComprobantePDF, yPos: number,
     pageWidth: number, primaryColor: string, grayColor: string): void {
-    // Cajas para estudiante y acudiente con márgenes más pequeños
+    // Cajas para cliente y representante con márgenes más pequeños
     const marginX = 15;  // Margen reducido
     const boxWidth = (pageWidth - (marginX * 2) - 10) / 2;
 
-    // Caja del estudiante
+    // Caja del cliente
     doc.setDrawColor(200);
     doc.setLineWidth(0.5);
     doc.setFillColor(248, 249, 250);
@@ -145,19 +145,19 @@ export class ExportarPdfComprobanteService {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
-    doc.text('Datos del Estudiante', marginX + 5, yPos + 8);
+    doc.text('Datos del Cliente', marginX + 5, yPos + 8);
 
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
 
-    const datosEstudiante = [
-      { label: 'Nombre:', valor: datos.estudiante.nombre },
-      { label: 'Documento:', valor: datos.estudiante.documento },
-      { label: 'Grado:', valor: datos.estudiante.grado }
+    const datosCliente = [
+      { label: 'Nombre:', valor: datos.cliente.nombre },
+      { label: 'Documento:', valor: datos.cliente.documento },
+      { label: 'Grado:', valor: datos.cliente.grado }
     ];
 
     let yOffset = yPos + 16;
-    datosEstudiante.forEach(item => {
+    datosCliente.forEach(item => {
       doc.setTextColor(grayColor);
       doc.text(item.label, marginX + 5, yOffset);
       doc.setTextColor(0);
@@ -165,32 +165,32 @@ export class ExportarPdfComprobanteService {
       yOffset += 6;
     });
 
-    // Caja del acudiente
-    const xPosAcudiente = marginX + boxWidth + 10;
+    // Caja del representante
+    const xPosRepresentante = marginX + boxWidth + 10;
     doc.setFillColor(248, 249, 250);
-    doc.roundedRect(xPosAcudiente, yPos, boxWidth, 38, 3, 3, 'FD');
+    doc.roundedRect(xPosRepresentante, yPos, boxWidth, 38, 3, 3, 'FD');
 
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
-    doc.text('Datos del Acudiente', xPosAcudiente + 5, yPos + 8);
+    doc.text('Datos del Representante', xPosRepresentante + 5, yPos + 8);
 
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
 
-    const datosAcudiente = [
-      { label: 'Nombre:', valor: datos.acudiente.nombre },
-      { label: 'Documento:', valor: datos.acudiente.documento },
+    const datosRepresentante = [
+      { label: 'Nombre:', valor: datos.representante.nombre },
+      { label: 'Documento:', valor: datos.representante.documento },
       { label: 'Tipo de Pago:', valor: datos.tipoPago.nombre || 'No especificado' }
     ];
 
     yOffset = yPos + 16;
-    datosAcudiente.forEach(item => {
+    datosRepresentante.forEach(item => {
       doc.setTextColor(grayColor);
-      doc.text(item.label, xPosAcudiente + 5, yOffset);
+      doc.text(item.label, xPosRepresentante + 5, yOffset);
       doc.setTextColor(0);
       const maxWidth = boxWidth - 40;
       const lines = doc.splitTextToSize(item.valor, maxWidth);
-      doc.text(lines[0], xPosAcudiente + 35, yOffset);
+      doc.text(lines[0], xPosRepresentante + 35, yOffset);
       yOffset += 6;
     });
   }

@@ -5,7 +5,7 @@
         [accion]="accion" 
         [raiz]="'/administracion/datos-maestros/plantillas'"
         [regresar]="regresar" 
-        [iconoTitulo]="'/assets/images/plantillas.png'">
+        [iconoTitulo]="'mdi mdi-file-document-multiple'">
     </app-header>
 
     <div class="container mt-5">
@@ -130,7 +130,7 @@
             <!-- Vista Dual -->
             <div class="row mt-3" *ngIf="modoVista === 'dual' && tieneSingularPlural">
                 <div class="col-md-6">
-                    <h6 class="text-center header-plural text-white p-2 rounded">VERSIÓN PLURAL (Dos acudientes)</h6>
+                    <h6 class="text-center header-plural text-white p-2 rounded">VERSIÓN PLURAL (Dos representantes)</h6>
                     <div class="editor-container">
                         <div *ngFor="let campo of camposEditables" class="mb-3">
                             <label class="form-label fw-bold">{{ campo.label }}</label>
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h6 class="text-center header-singular text-white p-2 rounded">VERSIÓN SINGULAR (Un acudiente)</h6>
+                    <h6 class="text-center header-singular text-white p-2 rounded">VERSIÓN SINGULAR (Un representante)</h6>
                     <div class="editor-container">
                         <div *ngFor="let campo of camposSingulares" class="mb-3">
                             <label class="form-label fw-bold">{{ campo.label }}</label>

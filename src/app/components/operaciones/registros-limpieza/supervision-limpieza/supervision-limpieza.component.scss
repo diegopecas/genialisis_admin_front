@@ -160,13 +160,13 @@ label.form-label {
 }
 
 // Jornadas (fecha + proceso)
-.grupos {
+.planes {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
 }
 
-.grupo {
+.plan {
   border: 1px solid $borde-vidrio;
   border-radius: 14px;
   overflow: hidden;
@@ -176,14 +176,14 @@ label.form-label {
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 
   // El borde dorado a la izquierda marca la jornada con áreas seleccionadas
-  &.grupo-activo {
+  &.plan-activo {
     background: $vidrio-activo;
     border-color: rgba(255, 193, 7, 0.55);
     box-shadow: inset 3px 0 0 $dorado, $sombra-suave;
   }
 }
 
-.grupo-header {
+.plan-header {
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -196,7 +196,7 @@ label.form-label {
     background: rgba(255, 255, 255, 0.35);
   }
 
-  .grupo-check {
+  .plan-check {
     font-size: 1.4rem;
     color: rgba(150, 130, 90, 0.4);
     line-height: 1;
@@ -209,7 +209,7 @@ label.form-label {
     }
   }
 
-  .grupo-info {
+  .plan-info {
     flex: 1;
     display: flex;
     align-items: baseline;
@@ -218,14 +218,14 @@ label.form-label {
     min-width: 0;
   }
 
-  .grupo-fecha {
+  .plan-fecha {
     font-weight: 700;
     color: $tinta;
     font-size: 1.02rem;
     letter-spacing: -0.01em;
   }
 
-  .grupo-proceso {
+  .plan-proceso {
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -237,19 +237,19 @@ label.form-label {
     border-radius: 20px;
   }
 
-  .grupo-conteo {
+  .plan-conteo {
     font-size: 0.8rem;
     color: $tinta-suave;
   }
 
-  .grupo-chevron {
+  .plan-chevron {
     color: rgba(150, 130, 90, 0.55);
     font-size: 0.82rem;
     transition: transform 0.2s ease;
   }
 }
 
-.grupo-detalle {
+.plan-detalle {
   border-top: 1px solid $borde-sutil;
   background: rgba(255, 255, 255, 0.25);
   padding: 0.4rem 1rem 0.7rem;

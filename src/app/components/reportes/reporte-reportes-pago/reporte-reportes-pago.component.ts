@@ -22,7 +22,7 @@ export class ReporteReportesPagoComponent implements OnInit {
   public datos = [] as any[];
   public columnasFiltro = [
     { columna: 'Fecha Pago', tipoFiltro: 'fecha' as 'fecha' | 'normal' },
-    'Estudiante',
+    'Cliente',
     'Reportado por',
     'Recibió',
     'Medio de Pago',
@@ -51,7 +51,7 @@ export class ReporteReportesPagoComponent implements OnInit {
     this.titulos = [
       { clave: 'id', alias: 'ID', alinear: 'centrado' },
       { clave: 'fecha_pago', alias: 'Fecha Pago', alinear: 'centrado', tipo: 'date', formato: { pattern: 'dd/MM/yyyy' } },
-      { clave: 'nombre_estudiante', alias: 'Estudiante', alinear: 'izquierda' },
+      { clave: 'nombre_cliente', alias: 'Cliente', alinear: 'izquierda' },
       { clave: 'nombre_persona_reporta', alias: 'Reportado por', alinear: 'izquierda' },
       { clave: 'nombre_colaborador_recibio', alias: 'Recibió', alinear: 'izquierda' },
       { clave: 'nombre_tipo_pago', alias: 'Medio de Pago', alinear: 'izquierda' },

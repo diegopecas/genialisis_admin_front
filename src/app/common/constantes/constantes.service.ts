@@ -18,7 +18,7 @@ export class ConstantesService {
     tiposIdentificacion: environment.api + 'tipos-identificacion', // ok
     tiposDias: environment.api + 'tipos-dias', // ok
     diasSemana: environment.api + 'dias-semana', // ok
-    grupos: environment.api + 'grupos', // ok
+    planes: environment.api + 'planes', // ok
     areasAcademicas: environment.api + 'areas-academicas', // ok
     competenciasCognitivas: environment.api + 'competencias-cognitivas', // ok
     cortesAcademicos: environment.api + 'cortes-academicos', // ok
@@ -43,7 +43,7 @@ export class ConstantesService {
     "tiposIdentificacion",
     "tiposDias",
     "diasSemana",
-    "grupos",
+    "planes",
     "areasAcademicas",
     "competenciasCognitivas",
     "cortesAcademicos",
@@ -68,7 +68,7 @@ export class ConstantesService {
     tiposIdentificacion: [],
     tiposDias: [],
     diasSemana: [],
-    grupos: [],
+    planes: [],
     areasAcademicas: [],
     competenciasCognitivas: [],
     cortesAcademicos: [],

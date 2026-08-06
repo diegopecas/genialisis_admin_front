@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
   providedIn: 'root',
 })
 export class InstitucionConfigService {
-  private jardinCodigo: string = '';
+  private organizacionCodigo: string = '';
   private institucionNombre: string = '';
   private institucionDireccion: string = '';
   private institucionNit: string = '';
@@ -37,7 +37,7 @@ export class InstitucionConfigService {
       
       if (savedInstitucion) {
         console.log('🔑 Institución recuperada de sessionStorage:', savedInstitucion);
-        this.jardinCodigo = savedInstitucion;
+        this.organizacionCodigo = savedInstitucion;
       } else {
         console.log('ℹ️ No hay institución en sessionStorage, esperando login');
         return;
@@ -61,7 +61,7 @@ export class InstitucionConfigService {
   }
 
   async cargarConfiguracionTenant(): Promise<void> {
-    if (!this.jardinCodigo) {
+    if (!this.organizacionCodigo) {
       throw new Error('No hay tenant configurado');
     }
 
@@ -104,7 +104,7 @@ export class InstitucionConfigService {
       }
 
       this.configuracionCargada = true;
-      console.log('✅ Configuración cargada para:', this.jardinCodigo);
+      console.log('✅ Configuración cargada para:', this.organizacionCodigo);
 
     } catch (error) {
       console.error('Error cargando configuración del tenant:', error);
@@ -131,7 +131,7 @@ export class InstitucionConfigService {
   }
 
   setTenantManual(codigo: string, nombre: string): void {
-    this.jardinCodigo = codigo;
+    this.organizacionCodigo = codigo;
     this.institucionNombre = nombre;
     sessionStorage.setItem('institucion_actual', codigo);
     localStorage.setItem(this.ULTIMO_TENANT_KEY, codigo);
@@ -140,27 +140,27 @@ export class InstitucionConfigService {
   }
 
   getLogoUrl(): string {
-    if (!this.jardinCodigo) {
+    if (!this.organizacionCodigo) {
       console.warn('⚠️ Intento de obtener logo sin institución configurada');
       return '';
     }
-    return `/assets/images/instituciones/${this.jardinCodigo}/logo.png`;
+    return `/assets/images/instituciones/${this.organizacionCodigo}/logo.png`;
   }
 
   getLogoBasicoUrl(): string {
-    if (!this.jardinCodigo) {
+    if (!this.organizacionCodigo) {
       console.warn('⚠️ Intento de obtener logo básico sin institución configurada');
       return '';
     }
-    return `/assets/images/instituciones/${this.jardinCodigo}/logo_basico.png`;
+    return `/assets/images/instituciones/${this.organizacionCodigo}/logo_basico.png`;
   }
 
   getFondoUrl(): string {
-    if (!this.jardinCodigo) {
+    if (!this.organizacionCodigo) {
       console.warn('⚠️ Intento de obtener fondo sin institución configurada');
       return this.FONDO_FALLBACK;
     }
-    return `/assets/images/instituciones/${this.jardinCodigo}/fondo.png`;
+    return `/assets/images/instituciones/${this.organizacionCodigo}/fondo.png`;
   }
 
   getFondoFallbackUrl(): string {
@@ -182,8 +182,8 @@ export class InstitucionConfigService {
     return this.institucionNombre;
   }
 
-  getJardinCodigo(): string {
-    return this.jardinCodigo;
+  getOrganizacionCodigo(): string {
+    return this.organizacionCodigo;
   }
 
   getDireccionInstitucion(): string {
@@ -215,10 +215,10 @@ export class InstitucionConfigService {
   }
 
   getTenantHeader(): string {
-    if (!this.jardinCodigo) {
+    if (!this.organizacionCodigo) {
       console.error('❌ Intento de obtener tenant header sin institución configurada');
       throw new Error('Institución no configurada');
     }
-    return this.jardinCodigo;
+    return this.organizacionCodigo;
   }
 }

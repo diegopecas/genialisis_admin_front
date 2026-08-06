@@ -164,8 +164,8 @@ label.form-label {
   }
 }
 
-// Fila-título de grupo dentro de la tabla
-.tabla-reporte .fila-grupo {
+// Fila-título de plan dentro de la tabla
+.tabla-reporte .fila-plan {
   cursor: pointer;
   background: rgba(255, 193, 7, 0.1) !important;
 
@@ -177,12 +177,12 @@ label.form-label {
     padding-bottom: 0.5rem;
   }
 
-  .grupo-titulo {
+  .plan-titulo {
     font-weight: 700;
     color: $tinta;
   }
 
-  .grupo-conteo {
+  .plan-conteo {
     font-size: 0.75rem;
     color: $tinta-suave;
     margin-left: 0.6rem;

@@ -37,9 +37,9 @@ export class AuditoriaService {
         catchError(this.handleError)
       );
   }
-  obtenerDetalleMedidas(idGrupo: string, fechaInicio: string, fechaFin: string): Observable<HttpResponse<Object>> {
+  obtenerDetalleMedidas(idPlan: string, fechaInicio: string, fechaFin: string): Observable<HttpResponse<Object>> {
     const params = new HttpParams()
-      .set('id_grupo', idGrupo.toString())
+      .set('id_plan', idPlan.toString())
       .set('fecha_inicio', fechaInicio)
       .set('fecha_fin', fechaFin);
 
@@ -60,9 +60,9 @@ export class AuditoriaService {
       );
   }
 
-  obtenerDetalleAsistencia(idGrupo: string, fechaInicio: string, fechaFin: string): Observable<HttpResponse<Object>> {
+  obtenerDetalleAsistencia(idPlan: string, fechaInicio: string, fechaFin: string): Observable<HttpResponse<Object>> {
     const params = new HttpParams()
-      .set('id_grupo', idGrupo.toString())
+      .set('id_plan', idPlan.toString())
       .set('fecha_inicio', fechaInicio)
       .set('fecha_fin', fechaFin);
 
@@ -83,9 +83,9 @@ export class AuditoriaService {
       );
   }
 
-  obtenerDetalleClases(idGrupo: string, idSprint?: string): Observable<HttpResponse<Object>> {
+  obtenerDetalleClases(idPlan: string, idSprint?: string): Observable<HttpResponse<Object>> {
     let params = new HttpParams()
-      .set('id_grupo', idGrupo.toString());
+      .set('id_plan', idPlan.toString());
 
     if (idSprint) {
       params = params.set('id_sprint', idSprint.toString());

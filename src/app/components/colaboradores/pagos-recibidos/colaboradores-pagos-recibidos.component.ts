@@ -48,8 +48,8 @@ export class ColaboradoresPagosRecibidosComponent implements OnInit {
   private registrosSeleccionados = new Set<any>();
 
   public acciones = [
-    { id: 'contabilizar', label: 'Contabilizar', icono: '/assets/images/contabilizar.png' },
-    { id: 'imprimir', label: 'Imprimir', icono: '/assets/images/comprobante_pago.png' }
+    { id: 'contabilizar', label: 'Contabilizar', icono: 'mdi mdi-calculator-variant' },
+    { id: 'imprimir', label: 'Imprimir', icono: 'mdi mdi-receipt-text' }
   ] as any[];
 
   constructor(

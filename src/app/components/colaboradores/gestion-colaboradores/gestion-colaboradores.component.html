@@ -1,5 +1,5 @@
 <div class="modulo">
-    <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [raiz]="'/'" [regresar]="'/menu'" [iconoTitulo]="'/assets/images/colaboradores.png'"></app-header>
+    <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [raiz]="'/'" [regresar]="'/menu'" [iconoTitulo]="'mdi mdi-account-group'"></app-header>
 
     <div class="container-fluid mt-5">
 
@@ -10,7 +10,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'colaboradores'" (click)="toggleMenu('colaboradores', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container colaboradores">
-                            <img src="assets/images/colaboradores.png" alt="Colaboradores" />
+                            <i class="mdi mdi-account-group icono-img"></i>
                         </div>
                         <h3 class="card-titulo">Colaboradores</h3>
                         <p class="card-descripcion">Administra colaboradores, casas asignadas y actividades del equipo</p>
@@ -23,14 +23,14 @@
                         <div class="row g-2">
                             <div class="col-4" *ngIf="permisosService.tienePermiso('colaboradores.listado')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('colaboradores', $event)">
-                                    <img src="assets/images/colaboradores.png" alt="Gestión" />
+                                    <i class="mdi mdi-account-group icono-img"></i>
                                     <span>Gestión</span>
                                 </div>
                             </div>
                             
                             <div class="col-4" *ngIf="permisosService.tienePermiso('colaboradores.actividades')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('actividades-colaboradores', $event)">
-                                    <img src="assets/images/actividades_colaboradores.png" alt="Actividades" />
+                                    <i class="mdi mdi-clipboard-text icono-img"></i>
                                     <span>Actividades</span>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'nomina'" (click)="toggleMenu('nomina', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container nomina">
-                            <img src="assets/images/nomina.png" alt="Nómina" />
+                            <i class="mdi mdi-cash-register icono-img"></i>
                         </div>
                         <h3 class="card-titulo">Nómina</h3>
                         <p class="card-descripcion">Gestiona las nóminas de colaboradores, crea periodos, procesa pagos y genera reportes</p>
@@ -84,7 +84,7 @@
                         <div class="row g-2">
                             <div class="col-12" *ngIf="permisosService.tienePermiso('colaboradores.nominas')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('nominas', $event)">
-                                    <img src="assets/images/nomina.png" alt="Nóminas" />
+                                    <i class="mdi mdi-cash-register icono-img"></i>
                                     <span>Gestionar Nóminas</span>
                                 </div>
                             </div>

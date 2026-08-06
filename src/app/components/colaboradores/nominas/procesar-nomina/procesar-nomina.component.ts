@@ -24,7 +24,7 @@ interface ColaboradorNomina {
   total_auxilio_transporte: number;
   total_devengado: number;
   total_salud: number;
-  total_pension: number;
+  total_suscripcion: number;
   total_deducciones_legales: number;
   total_productos: number;
   total_prestamos: number;
@@ -134,7 +134,7 @@ export class ProcesarNominaComponent implements OnInit, OnChanges {
             total_auxilio_transporte: 0,
             total_devengado: 0,
             total_salud: 0,
-            total_pension: 0,
+            total_suscripcion: 0,
             total_deducciones_legales: 0,
             total_productos: 0,
             total_prestamos: 0,
@@ -317,7 +317,7 @@ export class ProcesarNominaComponent implements OnInit, OnChanges {
 
     // Deducciones legales - Buscar por palabras clave
     colaborador.total_salud = this.obtenerValorPorNombre(conceptosDeducciones, ['SALUD', 'EPS']);
-    colaborador.total_pension = this.obtenerValorPorNombre(conceptosDeducciones, ['PENSION', 'PENSIÓN', 'AFP']);
+    colaborador.total_suscripcion = this.obtenerValorPorNombre(conceptosDeducciones, ['PENSION', 'PENSIÓN', 'AFP']);
     colaborador.total_deducciones_legales = datos.totales.deducciones_legales;
 
     // Otras deducciones
@@ -336,7 +336,7 @@ export class ProcesarNominaComponent implements OnInit, OnChanges {
       auxilio: colaborador.total_auxilio_transporte,
       devengado: colaborador.total_devengado,
       salud: colaborador.total_salud,
-      pension: colaborador.total_pension,
+      suscripcion: colaborador.total_suscripcion,
       deducciones: colaborador.total_deducciones_legales,
       neto: colaborador.neto_pagar
     });
@@ -516,7 +516,7 @@ export class ProcesarNominaComponent implements OnInit, OnChanges {
       total_auxilio: colaboradoresCalculados.reduce((sum, c) => sum + c.total_auxilio_transporte, 0),
       total_devengado: colaboradoresCalculados.reduce((sum, c) => sum + c.total_devengado, 0),
       total_salud: colaboradoresCalculados.reduce((sum, c) => sum + c.total_salud, 0),
-      total_pension: colaboradoresCalculados.reduce((sum, c) => sum + c.total_pension, 0),
+      total_suscripcion: colaboradoresCalculados.reduce((sum, c) => sum + c.total_suscripcion, 0),
       total_deducciones_legales: colaboradoresCalculados.reduce((sum, c) => sum + c.total_deducciones_legales, 0),
       total_productos: colaboradoresCalculados.reduce((sum, c) => sum + c.total_productos, 0),
       total_prestamos: colaboradoresCalculados.reduce((sum, c) => sum + c.total_prestamos, 0),

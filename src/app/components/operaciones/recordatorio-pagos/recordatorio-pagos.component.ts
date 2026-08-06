@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { HeaderComponent } from '../../../common/header/header.component';
 import { CuentasPorCobrarService } from '../../../services/cuentas-por-cobrar.service';
-import { GruposService } from '../../../services/grupos.service';
+import { PlanesService } from '../../../services/planes.service';
 import { ExportarPdfCuentasService, DatosCuentasPDF } from '../../../services/exportar-pdf-cuentas.service';
 import { InstitucionConfigService } from '../../../services/institucion-config.service';
 import { PlantillasService } from '../../../services/plantillas.service';
@@ -13,12 +13,12 @@ import { HistorialRecordatoriosPagoService } from '../../../services/historial-r
 import { TareasColaboradoresService } from '../../../services/tareas-colaboradores.service';
 import { UtilService } from '../../../common/constantes/util.service';
 
-interface EstudianteCartera {
+interface ClienteCartera {
   id_persona: string;
-  id_estudiante: string;
-  nombre_estudiante: string;
+  id_cliente: string;
+  nombre_cliente: string;
   numero_identificacion: string;
-  grupo_estudiante: string;
+  plan_cliente: string;
   activo: number;
   totalCobrado: number;
   totalPagado: number;
@@ -27,19 +27,19 @@ interface EstudianteCartera {
   saldoPendiente: number;
   valoresMensuales: { [key: string]: any };
   totalSaldoPendiente: number;
-  acudientes: AcudientePago[];
+  representantes: RepresentantePago[];
   ultimo_recordatorio: string | null;
 }
 
-interface AcudientePago {
+interface RepresentantePago {
   id_persona: string;
-  id_estudiante: string;
-  nombre_estudiante: string;
-  id_acudiente: string;
-  id_tipo_acudiente: number;
-  nombre_tipo_acudiente: string;
-  id_persona_acudiente: string;
-  nombre_acudiente: string;
+  id_cliente: string;
+  nombre_cliente: string;
+  id_representante: string;
+  id_tipo_representante: number;
+  nombre_tipo_representante: string;
+  id_persona_representante: string;
+  nombre_representante: string;
   telefono: string;
   correo_electronico: string;
 }
@@ -61,15 +61,15 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   // Filtros
   public anioSeleccionado: number = new Date().getFullYear();
   public aniosDisponibles: number[] = [];
-  public grupoSeleccionado: string = '';
-  public busquedaEstudiante: string = '';
+  public planSeleccionado: string = '';
+  public busquedaCliente: string = '';
   public mostrarSoloConSaldo: boolean = true;
 
   // Datos
-  public grupos: any[] = [];
-  public estudiantes: EstudianteCartera[] = [];
-  public estudiantesFiltrados: EstudianteCartera[] = [];
-  public acudientesPago: AcudientePago[] = [];
+  public planes: any[] = [];
+  public clientes: ClienteCartera[] = [];
+  public clientesFiltrados: ClienteCartera[] = [];
+  public representantesPago: RepresentantePago[] = [];
 
   // Ordenamiento
   public columnaOrdenamiento: string = 'totalSaldoPendiente';
@@ -92,7 +92,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   ];
 
   // Modal detalle
-  public estudianteSeleccionado: EstudianteCartera | null = null;
+  public clienteSeleccionado: ClienteCartera | null = null;
 
   // Tipo de mensaje: 'vencido' | 'seleccion' | 'todos'
   public tipoMensajeSeleccionado: string = 'vencido';
@@ -117,15 +117,15 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     return this.institucionConfigService.getNombreInstitucion() || 'La institución';
   }
 
-  /* Bloques del mensaje. Son el respaldo: si el jardin tiene la plantilla
+  /* Bloques del mensaje. Son el respaldo: si el organizacion tiene la plantilla
      sembrada en base, estos valores se reemplazan al iniciar. El detalle de
      meses y los totales los sigue armando el codigo, porque dependen de lo
      que se marque en pantalla. */
   public bloquesMensaje: any = {
     saludo_tu: 'Hola {NOMBRE_DESTINATARIO},',
     saludo_usted: 'Cordial saludo {NOMBRE_DESTINATARIO},',
-    encabezado_tu: 'Te escribimos desde *{nombre_colegio}* con relación al estado de cuenta del estudiante *{nombre_estudiante}*.',
-    encabezado_usted: 'Le escribimos desde *{nombre_colegio}* con relación al estado de cuenta del estudiante *{nombre_estudiante}*.',
+    encabezado_tu: 'Te escribimos desde *{nombre_colegio}* con relación al estado de cuenta del cliente *{nombre_cliente}*.',
+    encabezado_usted: 'Le escribimos desde *{nombre_colegio}* con relación al estado de cuenta del cliente *{nombre_cliente}*.',
     titulo_detalle: '*Detalle de saldos pendientes:*',
     linea_total: '*Total pendiente: {total}*',
     linea_vencido: '*Saldo vencido: {vencido}*',
@@ -142,7 +142,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     cierre_tu: 'Quedamos atentos. Gracias por tu confianza.',
     cierre_usted: 'Quedamos atentos. Gracias por su confianza.',
     firma: '{nombre_colegio}',
-    asunto_correo: 'Recordatorio de pago - {nombre_estudiante} - {nombre_colegio}'
+    asunto_correo: 'Recordatorio de pago - {nombre_cliente} - {nombre_colegio}'
   };
 
   /**
@@ -169,7 +169,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
 
   /**
    * Reemplaza las variables del bloque. {NOMBRE_DESTINATARIO} no se toca aqui:
-   * se resuelve al enviar, cuando ya se sabe a que acudiente va el mensaje.
+   * se resuelve al enviar, cuando ya se sabe a que representante va el mensaje.
    */
   private resolverBloque(clave: string, valores: { [k: string]: string } = {}): string {
     let texto = this.bloquesMensaje[clave] || '';
@@ -184,13 +184,13 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   public descargandoPDF: boolean = false;
 
   // Modal historial con compromisos
-  public estudianteHistorial: EstudianteCartera | null = null;
+  public clienteHistorial: ClienteCartera | null = null;
   public historialPago: any[] = [];
   public cargandoHistorial: boolean = false;
 
   constructor(
     private cuentasPorCobrarService: CuentasPorCobrarService,
-    private gruposService: GruposService,
+    private planesService: PlanesService,
     private exportarPdfCuentasService: ExportarPdfCuentasService,
     private institucionConfigService: InstitucionConfigService,
     private historialRecordatoriosService: HistorialRecordatoriosPagoService,
@@ -202,7 +202,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.inicializarAnios();
     this.cargarPlantilla();
-    this.cargarGrupos();
+    this.cargarPlanes();
     this.cargarDatos();
   }
 
@@ -220,13 +220,13 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     this.anioSeleccionado = anioActual;
   }
 
-  cargarGrupos(): void {
-    const sub = this.gruposService.obtenerTodos().subscribe({
+  cargarPlanes(): void {
+    const sub = this.planesService.obtenerTodos().subscribe({
       next: (response: any) => {
-        this.grupos = response.body || [];
+        this.planes = response.body || [];
       },
       error: (error) => {
-        console.error('Error al cargar grupos:', error);
+        console.error('Error al cargar planes:', error);
       }
     });
     this.subscriptions.push(sub);
@@ -236,10 +236,10 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     this.cargando = true;
     this.datosDisponibles = false;
 
-    const sub = this.cuentasPorCobrarService.obtenerReporteCarteraEstudiantes(this.anioSeleccionado).subscribe({
+    const sub = this.cuentasPorCobrarService.obtenerReporteCarteraClientes(this.anioSeleccionado).subscribe({
       next: (response: any) => {
         const data = response.body;
-        if (data && data.reporte_estudiantes && data.reporte_valores) {
+        if (data && data.reporte_clientes && data.reporte_valores) {
           this.procesarDatos(data);
           this.datosDisponibles = true;
         }
@@ -255,16 +255,16 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   }
 
   procesarDatos(data: any): void {
-    const estudiantesMap = new Map<string, EstudianteCartera>();
+    const clientesMap = new Map<string, ClienteCartera>();
 
-    // Inicializar estudiantes
-    data.reporte_estudiantes.forEach((est: any) => {
-      estudiantesMap.set(est.id_persona, {
+    // Inicializar clientes
+    data.reporte_clientes.forEach((est: any) => {
+      clientesMap.set(est.id_persona, {
         id_persona: est.id_persona,
-        id_estudiante: est.id_estudiante,
-        nombre_estudiante: est.nombre_estudiante,
+        id_cliente: est.id_cliente,
+        nombre_cliente: est.nombre_cliente,
         numero_identificacion: est.numero_identificacion,
-        grupo_estudiante: est.grupo_estudiante || 'Sin grupo',
+        plan_cliente: est.plan_cliente || 'Sin plan',
         activo: est.activo ?? 1,
         totalCobrado: 0,
         totalPagado: 0,
@@ -273,74 +273,74 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
         saldoPendiente: 0,
         valoresMensuales: {},
         totalSaldoPendiente: 0,
-        acudientes: [],
+        representantes: [],
         ultimo_recordatorio: est.ultimo_recordatorio || null
       });
     });
 
     // Procesar valores
     data.reporte_valores.forEach((valor: any) => {
-      const estudiante = estudiantesMap.get(valor.id_persona);
-      if (!estudiante) return;
+      const cliente = clientesMap.get(valor.id_persona);
+      if (!cliente) return;
 
       switch (valor.tipo_valor) {
         case 'Total Cobrado':
-          estudiante.totalCobrado = parseFloat(valor.valor) || 0;
+          cliente.totalCobrado = parseFloat(valor.valor) || 0;
           break;
         case 'Total Pagado':
-          estudiante.totalPagado = parseFloat(valor.valor) || 0;
+          cliente.totalPagado = parseFloat(valor.valor) || 0;
           break;
         case 'Saldo Total':
-          estudiante.saldoTotal = parseFloat(valor.valor) || 0;
+          cliente.saldoTotal = parseFloat(valor.valor) || 0;
           break;
         case 'Saldo Vencido':
-          estudiante.saldoVencido = parseFloat(valor.valor) || 0;
+          cliente.saldoVencido = parseFloat(valor.valor) || 0;
           break;
         case 'Saldo Pendiente':
-          estudiante.saldoPendiente = parseFloat(valor.valor) || 0;
+          cliente.saldoPendiente = parseFloat(valor.valor) || 0;
           break;
         default:
           // Valores mensuales
           if (valor.mes !== null) {
-            if (!estudiante.valoresMensuales[valor.mes]) {
-              estudiante.valoresMensuales[valor.mes] = {};
+            if (!cliente.valoresMensuales[valor.mes]) {
+              cliente.valoresMensuales[valor.mes] = {};
             }
-            estudiante.valoresMensuales[valor.mes][valor.tipo_valor] = parseFloat(valor.valor) || 0;
+            cliente.valoresMensuales[valor.mes][valor.tipo_valor] = parseFloat(valor.valor) || 0;
           }
           break;
       }
     });
 
-    // Calcular totalSaldoPendiente por estudiante
-    estudiantesMap.forEach(est => {
+    // Calcular totalSaldoPendiente por cliente
+    clientesMap.forEach(est => {
       est.totalSaldoPendiente = this.calcularTotalSaldoPendiente(est);
     });
 
-    // Procesar acudientes
-    this.acudientesPago = data.acudientes_pago || [];
+    // Procesar representantes
+    this.representantesPago = data.representantes_pago || [];
 
-    // Asignar acudientes a estudiantes
-    this.acudientesPago.forEach(acu => {
-      const estudiante = estudiantesMap.get(acu.id_persona);
-      if (estudiante) {
-        estudiante.acudientes.push(acu);
+    // Asignar representantes a clientes
+    this.representantesPago.forEach(acu => {
+      const cliente = clientesMap.get(acu.id_persona);
+      if (cliente) {
+        cliente.representantes.push(acu);
       }
     });
 
-    this.estudiantes = Array.from(estudiantesMap.values());
+    this.clientes = Array.from(clientesMap.values());
     this.aplicarFiltros();
   }
 
-  calcularTotalSaldoPendiente(estudiante: EstudianteCartera): number {
+  calcularTotalSaldoPendiente(cliente: ClienteCartera): number {
     let total = 0;
     for (let mes = 1; mes <= 12; mes++) {
-      total += this.getSaldoPendienteMes(estudiante, mes);
+      total += this.getSaldoPendienteMes(cliente, mes);
     }
     return total;
   }
 
-  getSaldoPendienteMes(estudiante: EstudianteCartera, mes: number): number {
-    const valoresMes = estudiante.valoresMensuales[mes];
+  getSaldoPendienteMes(cliente: ClienteCartera, mes: number): number {
+    const valoresMes = cliente.valoresMensuales[mes];
     if (!valoresMes) return 0;
     const nombreMes = this.mesesDisponibles[mes - 1].nombre;
     const saldo = valoresMes[`Saldo ${nombreMes}`] || 0;
@@ -348,24 +348,24 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   }
 
   aplicarFiltros(): void {
-    let filtrados = [...this.estudiantes];
+    let filtrados = [...this.clientes];
 
     // Solo activos
     filtrados = filtrados.filter(est => est.activo === 1);
 
-    // Filtrar por grupo
-    if (this.grupoSeleccionado) {
-      const grupoSel = this.grupos.find(g => g.id.toString() === this.grupoSeleccionado);
-      if (grupoSel) {
-        filtrados = filtrados.filter(est => est.grupo_estudiante === grupoSel.nombre);
+    // Filtrar por plan
+    if (this.planSeleccionado) {
+      const planSel = this.planes.find(g => g.id.toString() === this.planSeleccionado);
+      if (planSel) {
+        filtrados = filtrados.filter(est => est.plan_cliente === planSel.nombre);
       }
     }
 
     // Filtrar por búsqueda
-    if (this.busquedaEstudiante) {
-      const busqueda = this.busquedaEstudiante.toLowerCase();
+    if (this.busquedaCliente) {
+      const busqueda = this.busquedaCliente.toLowerCase();
       filtrados = filtrados.filter(est =>
-        est.nombre_estudiante.toLowerCase().includes(busqueda)
+        est.nombre_cliente.toLowerCase().includes(busqueda)
       );
     }
 
@@ -374,13 +374,13 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
       filtrados = filtrados.filter(est => est.totalSaldoPendiente > 0);
     }
 
-    this.estudiantesFiltrados = filtrados;
+    this.clientesFiltrados = filtrados;
     this.aplicarOrdenamiento();
   }
 
   aplicarOrdenamiento(): void {
     const multiplicador = this.ordenAscendente ? 1 : -1;
-    this.estudiantesFiltrados.sort((a, b) => {
+    this.clientesFiltrados.sort((a, b) => {
       let valorA: any;
       let valorB: any;
 
@@ -388,8 +388,8 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
         valorA = a.totalSaldoPendiente || 0;
         valorB = b.totalSaldoPendiente || 0;
       } else {
-        valorA = a[this.columnaOrdenamiento as keyof EstudianteCartera];
-        valorB = b[this.columnaOrdenamiento as keyof EstudianteCartera];
+        valorA = a[this.columnaOrdenamiento as keyof ClienteCartera];
+        valorB = b[this.columnaOrdenamiento as keyof ClienteCartera];
       }
 
       if (typeof valorA === 'string') {
@@ -408,7 +408,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
       this.ordenAscendente = !this.ordenAscendente;
     } else {
       this.columnaOrdenamiento = columna;
-      this.ordenAscendente = columna === 'nombre_estudiante' || columna === 'grupo_estudiante';
+      this.ordenAscendente = columna === 'nombre_cliente' || columna === 'plan_cliente';
     }
     this.aplicarOrdenamiento();
   }
@@ -417,20 +417,20 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     this.cargarDatos();
   }
 
-  buscarEstudiante(): void {
+  buscarCliente(): void {
     this.aplicarFiltros();
   }
 
   resetearFiltros(): void {
-    this.grupoSeleccionado = '';
-    this.busquedaEstudiante = '';
+    this.planSeleccionado = '';
+    this.busquedaCliente = '';
     this.mostrarSoloConSaldo = true;
     this.aplicarFiltros();
   }
 
-  // Abrir modal de detalle con acudientes
-  verDetalle(estudiante: EstudianteCartera): void {
-    this.estudianteSeleccionado = estudiante;
+  // Abrir modal de detalle con representantes
+  verDetalle(cliente: ClienteCartera): void {
+    this.clienteSeleccionado = cliente;
     this.tipoMensajeSeleccionado = 'vencido';
     this.telefonoAdicional = '';
     this.nombreAdicional = '';
@@ -441,11 +441,11 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     this.solicitarReunionVirtual = false;
     this.solicitarFechaCompromiso = false;
 
-    this.telefonosEditables = estudiante.acudientes.map(a => a.telefono || '');
+    this.telefonosEditables = cliente.representantes.map(a => a.telefono || '');
 
     this.mesesSeleccionados = {};
     this.mesesDisponibles.forEach(mes => {
-      if (this.getSaldoPendienteMes(estudiante, mes.valor) > 0) {
+      if (this.getSaldoPendienteMes(cliente, mes.valor) > 0) {
         this.mesesSeleccionados[mes.valor] = true;
       }
     });
@@ -460,7 +460,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   onTipoMensajeCambio(): void {
     if (this.tipoMensajeSeleccionado === 'todos' || this.tipoMensajeSeleccionado === 'seleccion') {
       this.mesesDisponibles.forEach(mes => {
-        if (this.estudianteSeleccionado && this.getSaldoPendienteMes(this.estudianteSeleccionado, mes.valor) > 0) {
+        if (this.clienteSeleccionado && this.getSaldoPendienteMes(this.clienteSeleccionado, mes.valor) > 0) {
           this.mesesSeleccionados[mes.valor] = true;
         }
       });
@@ -477,9 +477,9 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   // Toggle todos los meses
   toggleTodosLosMeses(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    if (!this.estudianteSeleccionado) return;
+    if (!this.clienteSeleccionado) return;
     this.mesesDisponibles.forEach(mes => {
-      if (this.getSaldoPendienteMes(this.estudianteSeleccionado!, mes.valor) > 0) {
+      if (this.getSaldoPendienteMes(this.clienteSeleccionado!, mes.valor) > 0) {
         this.mesesSeleccionados[mes.valor] = checked;
       }
     });
@@ -488,19 +488,19 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
 
   // Verificar si todos los meses están seleccionados
   todosLosMesesSeleccionados(): boolean {
-    if (!this.estudianteSeleccionado) return false;
+    if (!this.clienteSeleccionado) return false;
     return this.mesesDisponibles
-      .filter(mes => this.getSaldoPendienteMes(this.estudianteSeleccionado!, mes.valor) > 0)
+      .filter(mes => this.getSaldoPendienteMes(this.clienteSeleccionado!, mes.valor) > 0)
       .every(mes => this.mesesSeleccionados[mes.valor]);
   }
 
   // Total de meses seleccionados
   getTotalMesesSeleccionados(): number {
-    if (!this.estudianteSeleccionado) return 0;
+    if (!this.clienteSeleccionado) return 0;
     let total = 0;
     this.mesesDisponibles.forEach(mes => {
       if (this.mesesSeleccionados[mes.valor]) {
-        total += this.getSaldoPendienteMes(this.estudianteSeleccionado!, mes.valor);
+        total += this.getSaldoPendienteMes(this.clienteSeleccionado!, mes.valor);
       }
     });
     return total;
@@ -509,14 +509,14 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   // ==================== CONSTRUCCIÓN DE MENSAJE ====================
 
   regenerarMensajePago(): void {
-    if (!this.estudianteSeleccionado) return;
-    this.mensajeEditable = this.construirMensajePago(this.estudianteSeleccionado);
+    if (!this.clienteSeleccionado) return;
+    this.mensajeEditable = this.construirMensajePago(this.clienteSeleccionado);
   }
 
-  private construirMensajePago(estudiante: EstudianteCartera): string {
+  private construirMensajePago(cliente: ClienteCartera): string {
     const tu = this.tratoCercano;
     const sufijo = tu ? '_tu' : '_usted';
-    const datos = { nombre_estudiante: estudiante.nombre_estudiante };
+    const datos = { nombre_cliente: cliente.nombre_cliente };
     let msg = '';
 
     msg += this.resolverBloque('saludo' + sufijo, datos) + `\n\n`;
@@ -524,19 +524,19 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     msg += this.resolverBloque('encabezado' + sufijo, datos) + `\n\n`;
 
     if (this.tipoMensajeSeleccionado === 'vencido') {
-      msg += this.resolverBloque('linea_vencido', { vencido: this.formatearMoneda(estudiante.saldoVencido) }) + `\n\n`;
+      msg += this.resolverBloque('linea_vencido', { vencido: this.formatearMoneda(cliente.saldoVencido) }) + `\n\n`;
     } else {
       let mesesIncluir: number[] = [];
 
       if (this.tipoMensajeSeleccionado === 'todos') {
         this.mesesDisponibles.forEach(mes => {
-          if (this.getSaldoPendienteMes(estudiante, mes.valor) > 0) {
+          if (this.getSaldoPendienteMes(cliente, mes.valor) > 0) {
             mesesIncluir.push(mes.valor);
           }
         });
       } else {
         this.mesesDisponibles.forEach(mes => {
-          if (this.mesesSeleccionados[mes.valor] && this.getSaldoPendienteMes(estudiante, mes.valor) > 0) {
+          if (this.mesesSeleccionados[mes.valor] && this.getSaldoPendienteMes(cliente, mes.valor) > 0) {
             mesesIncluir.push(mes.valor);
           }
         });
@@ -548,7 +548,7 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
         mesesIncluir.forEach(mesValor => {
           const mes = this.mesesDisponibles.find(m => m.valor === mesValor);
           if (mes) {
-            const saldo = this.getSaldoPendienteMes(estudiante, mesValor);
+            const saldo = this.getSaldoPendienteMes(cliente, mesValor);
             msg += `- ${mes.nombre}: ${this.formatearMoneda(saldo)}\n`;
             totalIncluido += saldo;
           }
@@ -556,8 +556,8 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
         msg += `\n` + this.resolverBloque('linea_total', { total: this.formatearMoneda(totalIncluido) }) + `\n`;
       }
 
-      if (estudiante.saldoVencido > 0) {
-        msg += this.resolverBloque('linea_vencido', { vencido: this.formatearMoneda(estudiante.saldoVencido) }) + `\n`;
+      if (cliente.saldoVencido > 0) {
+        msg += this.resolverBloque('linea_vencido', { vencido: this.formatearMoneda(cliente.saldoVencido) }) + `\n`;
       }
       msg += '\n';
     }
@@ -591,71 +591,71 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
   private getMensajeCorreo(nombreDestinatario: string): string {
     return this.getMensajeParaEnvio(nombreDestinatario).replace(/\*/g, '');
   }
-  // Abrir WhatsApp con mensaje (acudiente registrado)
-  enviarWhatsApp(estudiante: EstudianteCartera, acudiente: AcudientePago, indice: number): void {
+  // Abrir WhatsApp con mensaje (representante registrado)
+  enviarWhatsApp(cliente: ClienteCartera, representante: RepresentantePago, indice: number): void {
     const telefono = this.telefonosEditables[indice];
     if (!telefono) { alert('Ingrese un número de teléfono para enviar el recordatorio.'); return; }
 
-    const mensaje = this.getMensajeParaEnvio(acudiente.nombre_acudiente);
+    const mensaje = this.getMensajeParaEnvio(representante.nombre_representante);
     const telefonoLimpio = this.limpiarTelefono(telefono);
-    const monto = this.calcularMontoNotificado(estudiante);
+    const monto = this.calcularMontoNotificado(cliente);
 
-    this.guardarHistorialSilencioso(estudiante, acudiente.id_persona_acudiente, telefonoLimpio, acudiente.nombre_acudiente, monto);
+    this.guardarHistorialSilencioso(cliente, representante.id_persona_representante, telefonoLimpio, representante.nombre_representante, monto);
     window.open(`https://wa.me/57${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
   // Enviar a teléfono adicional
-  enviarWhatsAppTelefonoAdicional(estudiante: EstudianteCartera): void {
+  enviarWhatsAppTelefonoAdicional(cliente: ClienteCartera): void {
     if (!this.telefonoAdicional) { alert('Ingrese un número de teléfono.'); return; }
 
-    const nombre = this.nombreAdicional.trim() || 'Señor(a) acudiente';
+    const nombre = this.nombreAdicional.trim() || 'Señor(a) representante';
     const mensaje = this.getMensajeParaEnvio(nombre);
     const telefonoLimpio = this.limpiarTelefono(this.telefonoAdicional);
-    const monto = this.calcularMontoNotificado(estudiante);
+    const monto = this.calcularMontoNotificado(cliente);
 
-    this.guardarHistorialSilencioso(estudiante, null, telefonoLimpio, nombre, monto);
+    this.guardarHistorialSilencioso(cliente, null, telefonoLimpio, nombre, monto);
     window.open(`https://wa.me/57${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
-  // Enviar correo a acudiente registrado
-  enviarCorreo(estudiante: EstudianteCartera, acudiente: AcudientePago): void {
-    if (!acudiente.correo_electronico) { alert('El acudiente no tiene correo electrónico registrado.'); return; }
+  // Enviar correo a representante registrado
+  enviarCorreo(cliente: ClienteCartera, representante: RepresentantePago): void {
+    if (!representante.correo_electronico) { alert('El representante no tiene correo electrónico registrado.'); return; }
 
-    const asunto = this.resolverBloque('asunto_correo', { nombre_estudiante: estudiante.nombre_estudiante });
-    const cuerpo = this.getMensajeCorreo(acudiente.nombre_acudiente);
-    const monto = this.calcularMontoNotificado(estudiante);
+    const asunto = this.resolverBloque('asunto_correo', { nombre_cliente: cliente.nombre_cliente });
+    const cuerpo = this.getMensajeCorreo(representante.nombre_representante);
+    const monto = this.calcularMontoNotificado(cliente);
 
-    this.guardarHistorialSilencioso(estudiante, acudiente.id_persona_acudiente, acudiente.correo_electronico, acudiente.nombre_acudiente, monto);
-    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(acudiente.correo_electronico)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
+    this.guardarHistorialSilencioso(cliente, representante.id_persona_representante, representante.correo_electronico, representante.nombre_representante, monto);
+    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(representante.correo_electronico)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
   }
 
   // Enviar correo a contacto adicional
-  enviarCorreoAdicional(estudiante: EstudianteCartera): void {
+  enviarCorreoAdicional(cliente: ClienteCartera): void {
     if (!this.correoAdicional) { alert('Ingrese un correo electrónico.'); return; }
 
-    const nombre = this.nombreAdicional.trim() || 'Señor(a) acudiente';
-    const asunto = this.resolverBloque('asunto_correo', { nombre_estudiante: estudiante.nombre_estudiante });
+    const nombre = this.nombreAdicional.trim() || 'Señor(a) representante';
+    const asunto = this.resolverBloque('asunto_correo', { nombre_cliente: cliente.nombre_cliente });
     const cuerpo = this.getMensajeCorreo(nombre);
-    const monto = this.calcularMontoNotificado(estudiante);
+    const monto = this.calcularMontoNotificado(cliente);
 
-    this.guardarHistorialSilencioso(estudiante, null, this.correoAdicional, nombre, monto);
+    this.guardarHistorialSilencioso(cliente, null, this.correoAdicional, nombre, monto);
     window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(this.correoAdicional)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
   }
 
   // Calcular monto notificado según tipo de mensaje
-  private calcularMontoNotificado(estudiante: EstudianteCartera): number {
+  private calcularMontoNotificado(cliente: ClienteCartera): number {
     if (this.tipoMensajeSeleccionado === 'vencido') {
-      return estudiante.saldoVencido;
+      return cliente.saldoVencido;
     } else if (this.tipoMensajeSeleccionado === 'seleccion') {
       return this.getTotalMesesSeleccionados();
     }
-    return estudiante.totalSaldoPendiente;
+    return cliente.totalSaldoPendiente;
   }
 
   // Guardar historial de forma silenciosa (sin spinner)
   private guardarHistorialSilencioso(
-    estudiante: EstudianteCartera,
-    idPersonaAcudiente: string | null,
+    cliente: ClienteCartera,
+    idPersonaRepresentante: string | null,
     telefono: string,
     nombreDestinatario: string,
     monto: number
@@ -664,8 +664,8 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
     const idColaborador = this.utilService.obtenerIdColaboradorActual();
 
     const registro = {
-      id_estudiante: estudiante.id_estudiante,
-      id_persona_acudiente: idPersonaAcudiente,
+      id_cliente: cliente.id_cliente,
+      id_persona_representante: idPersonaRepresentante,
       telefono_usado: telefono,
       nombre_destinatario: nombreDestinatario,
       tipo_recordatorio: this.tipoMensajeSeleccionado,
@@ -675,14 +675,14 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
 
     this.historialRecordatoriosService.crear(registro).subscribe({
       next: (response: any) => {
-        estudiante.ultimo_recordatorio = new Date().toISOString();
+        cliente.ultimo_recordatorio = new Date().toISOString();
 
         // Crear tarea automáticamente
         if (idColaborador) {
-          const descripcion = `Seguimiento cobro (${this.tipoMensajeSeleccionado}) - ${estudiante.nombre_estudiante} - ${this.formatearMoneda(monto)} - Enviado a: ${nombreDestinatario}`;
+          const descripcion = `Seguimiento cobro (${this.tipoMensajeSeleccionado}) - ${cliente.nombre_cliente} - ${this.formatearMoneda(monto)} - Enviado a: ${nombreDestinatario}`;
           const tarea: any = {
             id_colaborador: idColaborador,
-            id_estudiante: estudiante.id_estudiante,
+            id_cliente: cliente.id_cliente,
             descripcion: descripcion,
             origen: 'recordatorio_pago',
             id_historial_origen: response.id || null,
@@ -701,12 +701,12 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
 
   // ==================== MODAL HISTORIAL CON COMPROMISOS ====================
 
-  verHistorialPago(estudiante: EstudianteCartera): void {
-    this.estudianteHistorial = estudiante;
+  verHistorialPago(cliente: ClienteCartera): void {
+    this.clienteHistorial = cliente;
     this.historialPago = [];
     this.cargandoHistorial = true;
 
-    const sub = this.historialRecordatoriosService.obtenerPorEstudiante(estudiante.id_estudiante).subscribe({
+    const sub = this.historialRecordatoriosService.obtenerPorCliente(cliente.id_cliente).subscribe({
       next: (response: any) => {
         this.historialPago = (response.body || []).map((h: any) => ({
           ...h,
@@ -777,57 +777,57 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
 
   // Totales para el resumen
   getTotalSaldoPendiente(): number {
-    return this.estudiantesFiltrados.reduce((total, est) => total + (est.totalSaldoPendiente || 0), 0);
+    return this.clientesFiltrados.reduce((total, est) => total + (est.totalSaldoPendiente || 0), 0);
   }
 
   getTotalSaldoVencido(): number {
-    return this.estudiantesFiltrados.reduce((total, est) => total + (est.saldoVencido || 0), 0);
+    return this.clientesFiltrados.reduce((total, est) => total + (est.saldoVencido || 0), 0);
   }
 
-  getEstudiantesConSaldo(): number {
-    return this.estudiantesFiltrados.filter(est => est.totalSaldoPendiente > 0).length;
+  getClientesConSaldo(): number {
+    return this.clientesFiltrados.filter(est => est.totalSaldoPendiente > 0).length;
   }
 
-  getEstudiantesSinTelefono(): number {
-    return this.estudiantesFiltrados.filter(est =>
-      est.totalSaldoPendiente > 0 && est.acudientes.every(a => !a.telefono)
+  getClientesSinTelefono(): number {
+    return this.clientesFiltrados.filter(est =>
+      est.totalSaldoPendiente > 0 && est.representantes.every(a => !a.telefono)
     ).length;
   }
 
   getTotalSaldoPendienteMes(mes: number): number {
-    return this.estudiantesFiltrados.reduce((total, est) => {
+    return this.clientesFiltrados.reduce((total, est) => {
       return total + this.getSaldoPendienteMes(est, mes);
     }, 0);
   }
 
-  tieneTelefono(estudiante: EstudianteCartera): boolean {
-    return estudiante.acudientes.length > 0 && estudiante.acudientes.some(a => !!a.telefono);
+  tieneTelefono(cliente: ClienteCartera): boolean {
+    return cliente.representantes.length > 0 && cliente.representantes.some(a => !!a.telefono);
   }
 
-  sinTelefono(estudiante: EstudianteCartera): boolean {
-    return estudiante.acudientes.length > 0 && estudiante.acudientes.every(a => !a.telefono);
+  sinTelefono(cliente: ClienteCartera): boolean {
+    return cliente.representantes.length > 0 && cliente.representantes.every(a => !a.telefono);
   }
 
-  getBadgeClass(estudiante: EstudianteCartera): string {
-    if (estudiante.acudientes.length === 0) return 'bg-danger';
-    if (this.tieneTelefono(estudiante)) return 'bg-success';
+  getBadgeClass(cliente: ClienteCartera): string {
+    if (cliente.representantes.length === 0) return 'bg-danger';
+    if (this.tieneTelefono(cliente)) return 'bg-success';
     return 'bg-warning text-dark';
   }
 
-  getIconoClass(estudiante: EstudianteCartera): string {
-    if (estudiante.acudientes.length === 0) return 'fa-times';
-    if (this.tieneTelefono(estudiante)) return 'fa-check';
+  getIconoClass(cliente: ClienteCartera): string {
+    if (cliente.representantes.length === 0) return 'fa-times';
+    if (this.tieneTelefono(cliente)) return 'fa-check';
     return 'fa-exclamation-triangle';
   }
 
-  async descargarEstadoCuenta(estudiante: EstudianteCartera): Promise<void> {
+  async descargarEstadoCuenta(cliente: ClienteCartera): Promise<void> {
     this.descargandoPDF = true;
 
     try {
       const logoBase64 = await this.cargarLogoBase64();
       const anioAcademico = this.institucionConfigService.getAnioAcademicoActual();
 
-      this.cuentasPorCobrarService.obtenerTodosXPersona(estudiante.id_persona).subscribe({
+      this.cuentasPorCobrarService.obtenerTodosXPersona(cliente.id_persona).subscribe({
         next: (response: any) => {
           const body = response.body as any[];
           const fechaActual = new Date();
@@ -912,9 +912,9 @@ export class RecordatorioPagosComponent implements OnInit, OnDestroy {
           const totalVencidoFiltrado = movimientosFiltrados.filter((item: any) => item.vencido).reduce((sum: number, item: any) => sum + item.saldoNumerico, 0);
 
           const datosPDF: DatosCuentasPDF = {
-            nombreEstudiante: estudiante.nombre_estudiante,
-            numeroIdentificacion: estudiante.numero_identificacion,
-            nombreGrupo: estudiante.grupo_estudiante,
+            nombreCliente: cliente.nombre_cliente,
+            numeroIdentificacion: cliente.numero_identificacion,
+            nombrePlan: cliente.plan_cliente,
             logoBase64: logoBase64,
             anioAcademico: anioAcademico,
             resumenFinanciero: {

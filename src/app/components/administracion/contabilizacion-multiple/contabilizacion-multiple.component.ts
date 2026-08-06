@@ -63,8 +63,8 @@ export class ContabilizacionMultipleComponent implements OnInit {
         alinear: 'izquierda',
       },
       {
-        clave: 'nombre_acudiente',
-        alias: 'Acudiente',
+        clave: 'nombre_representante',
+        alias: 'Representante',
         alinear: 'izquierda',
       },
       {
@@ -113,7 +113,7 @@ export class ContabilizacionMultipleComponent implements OnInit {
 
         this.datos = datos.map(item => ({
           ...item,
-          nombre_persona_display: item.nombre_estudiante || item.nombre_colaborador || 'Sin nombre'
+          nombre_persona_display: item.nombre_cliente || item.nombre_colaborador || 'Sin nombre'
         }));
 
         console.log("Pagos pendientes cargados:", this.datos.length);

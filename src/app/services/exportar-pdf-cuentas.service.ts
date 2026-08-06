@@ -3,9 +3,9 @@ import { InstitucionConfigService } from './institucion-config.service';
 import { jsPDF } from 'jspdf';
 
 export interface DatosCuentasPDF {
-    nombreEstudiante: string;
+    nombreCliente: string;
     numeroIdentificacion?: string;
-    nombreGrupo?: string;
+    nombrePlan?: string;
     logoBase64?: string;
     anioAcademico?: number;
     resumenFinanciero: {
@@ -36,7 +36,7 @@ export interface DatosCuentasPDF {
     pagos?: Array<{
         id: string;
         fecha: string;
-        acudiente: string;
+        representante: string;
         tipoPago: string;
         valorRecibido: number;
         valorAplicado: number;
@@ -46,7 +46,7 @@ export interface DatosCuentasPDF {
     pagosHistoricos?: Array<{
         id: string;
         fecha: string;
-        acudiente: string;
+        representante: string;
         tipoPago: string;
         valorRecibido: number;
         valorAplicado: number;
@@ -102,7 +102,7 @@ export class ExportarPdfCuentasService {
         this.pdf.setFont('helvetica', 'normal');
 
         this.generarEncabezado(datos);
-        this.generarDatosEstudiante(datos);
+        this.generarDatosCliente(datos);
         this.generarResumenFinanciero(datos);
         this.generarFiltrosAplicados(datos);
 
@@ -135,7 +135,7 @@ export class ExportarPdfCuentasService {
             }
         }
 
-        const nombreArchivo = `Estado_Cuenta_${datos.nombreEstudiante.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+        const nombreArchivo = `Estado_Cuenta_${datos.nombreCliente.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
         this.pdf.save(nombreArchivo);
     }
 
@@ -216,7 +216,7 @@ export class ExportarPdfCuentasService {
         this.currentY += 10;
     }
 
-    private generarDatosEstudiante(datos: DatosCuentasPDF): void {
+    private generarDatosCliente(datos: DatosCuentasPDF): void {
         const grayBgRgb = this.hexToRgb(this.colors.lightGray);
         const blackRgb = this.hexToRgb(this.colors.black);
         const darkGrayRgb = this.hexToRgb(this.colors.darkGray);
@@ -227,19 +227,19 @@ export class ExportarPdfCuentasService {
         this.pdf.setFontSize(11);
         this.pdf.setFont('helvetica', 'bold');
         this.pdf.setTextColor(blackRgb.r, blackRgb.g, blackRgb.b);
-        this.pdf.text('Datos del Estudiante', this.marginLeft + 3, this.currentY + 6);
+        this.pdf.text('Datos del Cliente', this.marginLeft + 3, this.currentY + 6);
 
         this.pdf.setFontSize(9);
         this.pdf.setFont('helvetica', 'normal');
         this.pdf.setTextColor(darkGrayRgb.r, darkGrayRgb.g, darkGrayRgb.b);
-        this.pdf.text(`Nombre: ${datos.nombreEstudiante}`, this.marginLeft + 3, this.currentY + 12);
+        this.pdf.text(`Nombre: ${datos.nombreCliente}`, this.marginLeft + 3, this.currentY + 12);
         
         if (datos.numeroIdentificacion) {
             this.pdf.text(`Documento: ${datos.numeroIdentificacion}`, this.marginLeft + 3, this.currentY + 17);
         }
         
-        if (datos.nombreGrupo) {
-            this.pdf.text(`Grupo: ${datos.nombreGrupo}`, this.marginLeft + 3, this.currentY + 22);
+        if (datos.nombrePlan) {
+            this.pdf.text(`Plan: ${datos.nombrePlan}`, this.marginLeft + 3, this.currentY + 22);
         }
 
         this.currentY += 28;
@@ -466,7 +466,7 @@ export class ExportarPdfCuentasService {
 
         this.currentY += 8;
 
-        const headers = ['#', 'Fecha', 'Acudiente', 'Tipo', 'Recibido', 'Aplicado', 'Saldo', 'Estado'];
+        const headers = ['#', 'Fecha', 'Representante', 'Tipo', 'Recibido', 'Aplicado', 'Saldo', 'Estado'];
         const columnWidths = [8, 20, 40, 22, 22, 22, 22, 18];
 
         this.dibujarEncabezadoTabla(headers, columnWidths, primaryRgb);
@@ -504,8 +504,8 @@ export class ExportarPdfCuentasService {
             this.pdf.text(pago.fecha, currentX, this.currentY + 5);
             currentX += columnWidths[1];
 
-            const acudiente = this.truncarTexto(pago.acudiente, 35);
-            this.pdf.text(acudiente, currentX, this.currentY + 5);
+            const representante = this.truncarTexto(pago.representante, 35);
+            this.pdf.text(representante, currentX, this.currentY + 5);
             currentX += columnWidths[2];
 
             const tipo = this.truncarTexto(pago.tipoPago, 18);

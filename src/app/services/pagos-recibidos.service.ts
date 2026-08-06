@@ -49,9 +49,9 @@ export class PagosRecibidosService {
       );
   }
 
-  obtenerByEstudiante(idEstudiante: any) {
+  obtenerByCliente(idCliente: any) {
     return this.http
-      .get<HttpResponse<Object>>(this.servicio + `/estudiante/${idEstudiante}`, {
+      .get<HttpResponse<Object>>(this.servicio + `/cliente/${idCliente}`, {
         observe: 'response',
       })
       .pipe(

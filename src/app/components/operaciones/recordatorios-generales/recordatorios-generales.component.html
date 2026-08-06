@@ -20,27 +20,27 @@
       <div class="modal-header modal-header-clean">
         <h5 class="modal-title">
           <i class="fab fa-whatsapp me-2 text-success"></i>
-          Enviar Recordatorio - {{ estudianteSeleccionado?.nombre_completo }}
+          Enviar Recordatorio - {{ clienteSeleccionado?.nombre_completo }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" *ngIf="estudianteSeleccionado">
+      <div class="modal-body" *ngIf="clienteSeleccionado">
 
-        <!-- Info del estudiante -->
+        <!-- Info del cliente -->
         <div class="row mb-3">
-          <div class="col-md-3"><strong>Grupo:</strong> {{ estudianteSeleccionado.nombre_grupo }}</div>
+          <div class="col-md-3"><strong>Plan:</strong> {{ clienteSeleccionado.nombre_plan }}</div>
           <div class="col-md-3 text-center">
             <strong>Contrato:</strong>
-            <span [class]="getEstadoContratoBadge(estudianteSeleccionado.estado_contrato)">{{ estudianteSeleccionado.estado_contrato }}</span>
+            <span [class]="getEstadoContratoBadge(clienteSeleccionado.estado_contrato)">{{ clienteSeleccionado.estado_contrato }}</span>
           </div>
           <div class="col-md-3 text-center">
             <strong>Saldo:</strong>
-            <span class="fw-bold" [class.text-danger]="estudianteSeleccionado.saldo_cartera > 0">{{ formatearMoneda(estudianteSeleccionado.saldo_cartera) }}</span>
+            <span class="fw-bold" [class.text-danger]="clienteSeleccionado.saldo_cartera > 0">{{ formatearMoneda(clienteSeleccionado.saldo_cartera) }}</span>
           </div>
           <div class="col-md-3 text-end">
             <strong>Docs:</strong>
-            <span *ngIf="estudianteSeleccionado.docs_pendientes_cantidad > 0" class="badge bg-danger">{{ estudianteSeleccionado.docs_pendientes_cantidad }} pend.</span>
-            <span *ngIf="estudianteSeleccionado.docs_pendientes_cantidad === 0" class="badge bg-success">OK</span>
+            <span *ngIf="clienteSeleccionado.docs_pendientes_cantidad > 0" class="badge bg-danger">{{ clienteSeleccionado.docs_pendientes_cantidad }} pend.</span>
+            <span *ngIf="clienteSeleccionado.docs_pendientes_cantidad === 0" class="badge bg-success">OK</span>
           </div>
         </div>
 
@@ -98,23 +98,23 @@
         <textarea class="form-control textarea-mensaje" rows="10" [(ngModel)]="mensajeEditable"></textarea>
         <small class="text-muted mt-1 d-block">
           <i class="fas fa-info-circle me-1"></i> 
-          El texto {{ '{' }}NOMBRE_DESTINATARIO{{ '}' }} se reemplazará automáticamente con el nombre del acudiente al enviar.
+          El texto {{ '{' }}NOMBRE_DESTINATARIO{{ '}' }} se reemplazará automáticamente con el nombre del representante al enviar.
         </small>
 
         <hr />
 
-        <!-- Acudientes -->
-        <h6 class="mb-3">Acudientes registrados</h6>
-        <div *ngIf="acudientesEstudiante.length === 0" class="alert alert-warning">
-          <i class="fas fa-exclamation-triangle"></i> No hay acudientes registrados.
+        <!-- Representantes -->
+        <h6 class="mb-3">Representantes registrados</h6>
+        <div *ngIf="representantesCliente.length === 0" class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i> No hay representantes registrados.
         </div>
 
-        <div *ngFor="let acudiente of acudientesEstudiante; let i = index" class="acudiente-card mb-3">
+        <div *ngFor="let representante of representantesCliente; let i = index" class="representante-card mb-3">
           <div class="row align-items-center">
             <div class="col-md-4">
-              <div class="fw-bold">{{ acudiente.nombre_acudiente }}</div>
-              <small class="text-muted">{{ acudiente.nombre_tipo_acudiente }}</small>
-              <div *ngIf="acudiente.correo_electronico" class="mt-1"><i class="fas fa-envelope me-1"></i><small>{{ acudiente.correo_electronico }}</small></div>
+              <div class="fw-bold">{{ representante.nombre_representante }}</div>
+              <small class="text-muted">{{ representante.nombre_tipo_representante }}</small>
+              <div *ngIf="representante.correo_electronico" class="mt-1"><i class="fas fa-envelope me-1"></i><small>{{ representante.correo_electronico }}</small></div>
             </div>
             <div class="col-md-3">
               <label class="form-label mb-1"><i class="fas fa-phone me-1"></i> Teléfono</label>
@@ -122,15 +122,15 @@
             </div>
             <div class="col-md-5 text-end mt-2 mt-md-0">
               <div class="btn-group">
-                <button class="btn btn-wa btn-sm" (click)="enviarWhatsApp(acudiente, i)" [disabled]="!telefonosEditables[i]"><i class="fab fa-whatsapp me-1"></i> WA</button>
-                <button class="btn btn-primary btn-sm" (click)="enviarCorreo(acudiente)" [disabled]="!acudiente.correo_electronico"><i class="fas fa-envelope me-1"></i> Email</button>
+                <button class="btn btn-wa btn-sm" (click)="enviarWhatsApp(representante, i)" [disabled]="!telefonosEditables[i]"><i class="fab fa-whatsapp me-1"></i> WA</button>
+                <button class="btn btn-primary btn-sm" (click)="enviarCorreo(representante)" [disabled]="!representante.correo_electronico"><i class="fas fa-envelope me-1"></i> Email</button>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Contacto adicional -->
-        <div class="acudiente-card mb-3 border-dashed">
+        <div class="representante-card mb-3 border-dashed">
           <div class="row align-items-center">
             <div class="col-md-3">
               <label class="form-label mb-1"><i class="fas fa-user me-1"></i> Nombre</label>
@@ -167,27 +167,27 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header modal-header-clean">
-        <h5 class="modal-title"><i class="fas fa-chart-bar me-2"></i> Desglose Financiero - {{ estudianteFinanciero?.nombre_completo }}</h5>
+        <h5 class="modal-title"><i class="fas fa-chart-bar me-2"></i> Desglose Financiero - {{ clienteFinanciero?.nombre_completo }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" *ngIf="estudianteFinanciero">
+      <div class="modal-body" *ngIf="clienteFinanciero">
         <div class="row mb-4">
           <div class="col-md-4">
             <div class="resumen-financiero">
               <span class="resumen-label">Saldo Cartera Total</span>
-              <span class="resumen-valor" [class.text-danger]="estudianteFinanciero.saldo_cartera > 0">{{ formatearMoneda(estudianteFinanciero.saldo_cartera) }}</span>
+              <span class="resumen-valor" [class.text-danger]="clienteFinanciero.saldo_cartera > 0">{{ formatearMoneda(clienteFinanciero.saldo_cartera) }}</span>
             </div>
           </div>
           <div class="col-md-4">
             <div class="resumen-financiero">
               <span class="resumen-label">Saldo Vencido</span>
-              <span class="resumen-valor text-danger">{{ formatearMoneda(estudianteFinanciero.saldo_vencido) }}</span>
+              <span class="resumen-valor text-danger">{{ formatearMoneda(clienteFinanciero.saldo_vencido) }}</span>
             </div>
           </div>
           <div class="col-md-4">
             <div class="resumen-financiero">
               <span class="resumen-label">Contrato</span>
-              <span [class]="getEstadoContratoBadge(estudianteFinanciero.estado_contrato)">{{ estudianteFinanciero.estado_contrato }}</span>
+              <span [class]="getEstadoContratoBadge(clienteFinanciero.estado_contrato)">{{ clienteFinanciero.estado_contrato }}</span>
             </div>
           </div>
         </div>
@@ -201,30 +201,30 @@
             <tbody>
               <tr *ngFor="let c of conceptosCartera">
                 <td>{{ c.label }}</td>
-                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(estudianteFinanciero, c.campo, 'actual', 'cobrado')) }}</td>
-                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(estudianteFinanciero, c.campo, 'actual', 'pagado')) }}</td>
-                <td class="text-end" [class.text-danger]="getCarteraConcepto(estudianteFinanciero, c.campo, 'actual', 'saldo') > 0">{{ formatearMoneda(getCarteraConcepto(estudianteFinanciero, c.campo, 'actual', 'saldo')) }}</td>
-                <td class="text-end" [class.text-danger]="estudianteFinanciero[c.campo + '_vencido'] > 0">{{ formatearMoneda(estudianteFinanciero[c.campo + '_vencido'] || 0) }}</td>
+                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(clienteFinanciero, c.campo, 'actual', 'cobrado')) }}</td>
+                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(clienteFinanciero, c.campo, 'actual', 'pagado')) }}</td>
+                <td class="text-end" [class.text-danger]="getCarteraConcepto(clienteFinanciero, c.campo, 'actual', 'saldo') > 0">{{ formatearMoneda(getCarteraConcepto(clienteFinanciero, c.campo, 'actual', 'saldo')) }}</td>
+                <td class="text-end" [class.text-danger]="clienteFinanciero[c.campo + '_vencido'] > 0">{{ formatearMoneda(clienteFinanciero[c.campo + '_vencido'] || 0) }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="table-active fw-bold">
                 <td>TOTALES</td>
-                <td class="text-end">{{ formatearMoneda(getTotalCartera(estudianteFinanciero, 'actual', 'cobrado')) }}</td>
-                <td class="text-end">{{ formatearMoneda(getTotalCartera(estudianteFinanciero, 'actual', 'pagado')) }}</td>
-                <td class="text-end" [class.text-danger]="getTotalCartera(estudianteFinanciero, 'actual', 'saldo') > 0">{{ formatearMoneda(getTotalCartera(estudianteFinanciero, 'actual', 'saldo')) }}</td>
-                <td class="text-end" [class.text-danger]="estudianteFinanciero.saldo_vencido > 0">{{ formatearMoneda(estudianteFinanciero.saldo_vencido) }}</td>
+                <td class="text-end">{{ formatearMoneda(getTotalCartera(clienteFinanciero, 'actual', 'cobrado')) }}</td>
+                <td class="text-end">{{ formatearMoneda(getTotalCartera(clienteFinanciero, 'actual', 'pagado')) }}</td>
+                <td class="text-end" [class.text-danger]="getTotalCartera(clienteFinanciero, 'actual', 'saldo') > 0">{{ formatearMoneda(getTotalCartera(clienteFinanciero, 'actual', 'saldo')) }}</td>
+                <td class="text-end" [class.text-danger]="clienteFinanciero.saldo_vencido > 0">{{ formatearMoneda(clienteFinanciero.saldo_vencido) }}</td>
               </tr>
             </tfoot>
           </table>
         </div>
 
         <h6 class="mb-2"><i class="fas fa-history me-1"></i> Cartera Años Anteriores</h6>
-        <div *ngIf="getTotalCartera(estudianteFinanciero, 'anterior', 'saldo') === 0 && getTotalCartera(estudianteFinanciero, 'anterior', 'cobrado') === 0" class="text-center py-3 mb-3">
+        <div *ngIf="getTotalCartera(clienteFinanciero, 'anterior', 'saldo') === 0 && getTotalCartera(clienteFinanciero, 'anterior', 'cobrado') === 0" class="text-center py-3 mb-3">
           <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
           <p class="text-muted mb-0">Sin registros de años anteriores ✅</p>
         </div>
-        <div *ngIf="getTotalCartera(estudianteFinanciero, 'anterior', 'saldo') !== 0 || getTotalCartera(estudianteFinanciero, 'anterior', 'cobrado') !== 0" class="table-responsive">
+        <div *ngIf="getTotalCartera(clienteFinanciero, 'anterior', 'saldo') !== 0 || getTotalCartera(clienteFinanciero, 'anterior', 'cobrado') !== 0" class="table-responsive">
           <table class="table table-sm table-bordered table-hover">
             <thead class="table-light">
               <tr><th>Concepto</th><th class="text-end">Cobrado</th><th class="text-end">Pagado</th><th class="text-end">Saldo</th></tr>
@@ -232,17 +232,17 @@
             <tbody>
               <tr *ngFor="let c of conceptosCartera">
                 <td>{{ c.label }}</td>
-                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(estudianteFinanciero, c.campo, 'anterior', 'cobrado')) }}</td>
-                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(estudianteFinanciero, c.campo, 'anterior', 'pagado')) }}</td>
-                <td class="text-end" [class.text-danger]="getCarteraConcepto(estudianteFinanciero, c.campo, 'anterior', 'saldo') > 0">{{ formatearMoneda(getCarteraConcepto(estudianteFinanciero, c.campo, 'anterior', 'saldo')) }}</td>
+                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(clienteFinanciero, c.campo, 'anterior', 'cobrado')) }}</td>
+                <td class="text-end">{{ formatearMoneda(getCarteraConcepto(clienteFinanciero, c.campo, 'anterior', 'pagado')) }}</td>
+                <td class="text-end" [class.text-danger]="getCarteraConcepto(clienteFinanciero, c.campo, 'anterior', 'saldo') > 0">{{ formatearMoneda(getCarteraConcepto(clienteFinanciero, c.campo, 'anterior', 'saldo')) }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="table-active fw-bold">
                 <td>TOTALES</td>
-                <td class="text-end">{{ formatearMoneda(getTotalCartera(estudianteFinanciero, 'anterior', 'cobrado')) }}</td>
-                <td class="text-end">{{ formatearMoneda(getTotalCartera(estudianteFinanciero, 'anterior', 'pagado')) }}</td>
-                <td class="text-end" [class.text-danger]="getTotalCartera(estudianteFinanciero, 'anterior', 'saldo') > 0">{{ formatearMoneda(getTotalCartera(estudianteFinanciero, 'anterior', 'saldo')) }}</td>
+                <td class="text-end">{{ formatearMoneda(getTotalCartera(clienteFinanciero, 'anterior', 'cobrado')) }}</td>
+                <td class="text-end">{{ formatearMoneda(getTotalCartera(clienteFinanciero, 'anterior', 'pagado')) }}</td>
+                <td class="text-end" [class.text-danger]="getTotalCartera(clienteFinanciero, 'anterior', 'saldo') > 0">{{ formatearMoneda(getTotalCartera(clienteFinanciero, 'anterior', 'saldo')) }}</td>
               </tr>
             </tfoot>
           </table>
@@ -260,22 +260,22 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header modal-header-clean">
-        <h5 class="modal-title"><i class="fas fa-history me-2"></i> Historial de Recordatorios - {{ estudianteHistorial?.nombre_completo }}</h5>
+        <h5 class="modal-title"><i class="fas fa-history me-2"></i> Historial de Recordatorios - {{ clienteHistorial?.nombre_completo }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" *ngIf="estudianteHistorial">
+      <div class="modal-body" *ngIf="clienteHistorial">
 
         <div *ngIf="cargandoHistorial" class="text-center py-4">
           <div class="spinner-border text-primary" role="status"></div>
           <p class="mt-2">Cargando historial...</p>
         </div>
 
-        <div *ngIf="!cargandoHistorial && historialEstudiante.length === 0" class="text-center py-4">
+        <div *ngIf="!cargandoHistorial && historialCliente.length === 0" class="text-center py-4">
           <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-          <p class="text-muted">Aún no se han enviado recordatorios para este estudiante.</p>
+          <p class="text-muted">Aún no se han enviado recordatorios para este cliente.</p>
         </div>
 
-        <div *ngIf="!cargandoHistorial && historialEstudiante.length > 0" class="table-responsive">
+        <div *ngIf="!cargandoHistorial && historialCliente.length > 0" class="table-responsive">
           <table class="table table-sm table-bordered table-hover">
             <thead class="table-light">
               <tr>
@@ -290,7 +290,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let h of historialEstudiante">
+              <tr *ngFor="let h of historialCliente">
                 <td><small>{{ h.fecha_envio | date:'dd/MM/yy HH:mm' }}</small></td>
                 <td><span class="badge badge-tipo">{{ getTipoRecordatorioLabel(h.tipo_recordatorio) }}</span></td>
                 <td class="text-center">

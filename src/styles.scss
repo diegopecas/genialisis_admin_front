@@ -323,7 +323,7 @@ option:disabled {
   }
   
   // Mejorar la legibilidad de las tarjetas con tu esquema de colores
-  .estudiante-card {
+  .cliente-card {
     font-family: 'Material Design Icons', sans-serif !important;
     
     &:active {
@@ -370,4 +370,52 @@ option:disabled {
       }
     }
   }
+}
+
+/* ===================================================================
+   Iconos de fuente en lugar de imagenes PNG
+   Las reglas de tamano de los modulos apuntan a `img`; estas replican
+   ese tamano para los iconos que los reemplazaron.
+   =================================================================== */
+i.mdi.icono-img {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+}
+
+.submenu-item i.mdi.icono-img,
+.card-opcion i.mdi.icono-img,
+.opcion-item i.mdi.icono-img {
+  font-size: 1.9rem;
+  width: 40px;
+  height: 40px;
+}
+
+.icono-modulo i.mdi.icono-img,
+.modulo-icono i.mdi.icono-img {
+  font-size: 2.6rem;
+  width: 100%;
+  height: 100%;
+}
+
+/* Iconos del menu principal */
+.seccion-icono-mdi {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.nodo-icono-mdi {
+  font-size: 1.25rem;
+  line-height: 1;
+  width: 1.6rem;
+  text-align: center;
+}
+
+.acceso-icono-mdi {
+  font-size: 1.4rem;
+  line-height: 1;
 }

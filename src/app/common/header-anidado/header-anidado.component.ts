@@ -34,7 +34,7 @@ export class HeaderComponentAnidado implements OnChanges, OnInit {
   public backIcon = '←';
 
   public logoGenialisis = '/assets/images/logo_app.png';
-  public nombreJardin = '';
+  public nombreOrganizacion = '';
 
   public esTrackeable = false;
   public esFijado = false;
@@ -51,7 +51,7 @@ export class HeaderComponentAnidado implements OnChanges, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.nombreJardin = this.institucionConfigService.getNombreInstitucion();
+    this.nombreOrganizacion = this.institucionConfigService.getNombreInstitucion();
     this.verificarRutaTrackeable();
   }
 

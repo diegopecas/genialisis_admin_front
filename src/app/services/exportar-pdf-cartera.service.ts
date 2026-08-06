@@ -34,7 +34,7 @@ export interface DatosCarteraPDF {
   detalleCuentas: {
     fecha: string;
     persona: string;
-    grupo: string;
+    plan: string;
     clasificacion: string;
     producto: string;
     valor: number;
@@ -46,7 +46,7 @@ export interface DatosCarteraPDF {
   filtrosAplicados: {
     clasificacion?: string;
     producto?: string;
-    grupo?: string;
+    plan?: string;
     estadoPago?: string;
   };
   logoBase64?: string;
@@ -353,7 +353,7 @@ export class ExportarPdfCarteraService {
     const nombres: { [key: string]: string } = {
       clasificacion: 'Clasificación',
       producto: 'Producto/Servicio',
-      grupo: 'Grupo',
+      plan: 'Plan',
       estadoPago: 'Estado de pago'
     };
     return nombres[filtro] || filtro;

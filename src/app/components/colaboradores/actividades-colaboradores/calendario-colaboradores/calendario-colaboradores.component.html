@@ -4,7 +4,7 @@
     [mostrarCrear]="false" 
     [raiz]="'/colaboradores/actividades'" 
     [regresar]="'/colaboradores/actividades'" 
-    [iconoTitulo]="'/assets/images/calendario_actividades.png'">
+    [iconoTitulo]="'mdi mdi-calendar-month'">
   </app-header>
 
   <div class="container-fluid px-4 py-4">
@@ -112,16 +112,16 @@
                 </select>
               </div>
 
-              <!-- Filtro de grupo -->
+              <!-- Filtro de plan -->
               <div class="col-md-2">
-                <label class="form-label"><strong>Grupo</strong></label>
+                <label class="form-label"><strong>Plan</strong></label>
                 <select 
                   class="form-select"
-                  [value]="grupoSeleccionado || ''"
-                  (change)="aplicarFiltroGrupo($event)">
-                  <option value="">Todos los grupos</option>
-                  <option *ngFor="let grupo of grupos" [value]="grupo.id">
-                    {{ grupo.nombre }}
+                  [value]="planSeleccionado || ''"
+                  (change)="aplicarFiltroPlan($event)">
+                  <option value="">Todos los planes</option>
+                  <option *ngFor="let plan of planes" [value]="plan.id">
+                    {{ plan.nombre }}
                   </option>
                 </select>
               </div>
@@ -233,7 +233,7 @@
             <div 
               *ngFor="let horario of dia.horarios.slice(0, 2)" 
               class="horario-item"
-              [style.border-left-color]="horario.color_grupo"
+              [style.border-left-color]="horario.color_plan"
               (click)="verDetalleHorario(horario); $event.stopPropagation()">
               <span class="horario-icono">📚</span>
               <span class="horario-texto">{{ capitalizar(horario.nombre_area_academica) }}</span>
@@ -338,7 +338,7 @@
                   *ngFor="let horario of dia.horarios" 
                   class="horario-bloque"
                   [class.bloque-corto]="esBloqueCorto(horario.total_minutos)"
-                  [style.border-left-color]="horario.color_grupo"
+                  [style.border-left-color]="horario.color_plan"
                   [style.top]="calcularPosicionHorario(horario.hora_inicial)"
                   [style.height]="calcularAlturaActividad(horario.total_minutos)"
                   (click)="verDetalleHorario(horario)">
@@ -440,7 +440,7 @@
               *ngFor="let horario of diasSemana[0]?.horarios" 
               class="horario-bloque-grande"
               [class.bloque-corto]="esBloqueCorto(horario.total_minutos)"
-              [style.border-left-color]="horario.color_grupo"
+              [style.border-left-color]="horario.color_plan"
               [style.top]="calcularPosicionHorario(horario.hora_inicial)"
               [style.height]="calcularAlturaActividad(horario.total_minutos)"
               (click)="verDetalleHorario(horario)">

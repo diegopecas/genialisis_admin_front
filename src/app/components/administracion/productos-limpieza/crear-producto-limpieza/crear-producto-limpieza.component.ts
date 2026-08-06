@@ -46,7 +46,7 @@ export class CrearProductoLimpiezaComponent implements OnInit {
     }
 
     @ViewChild('componentesTextarea') componentesTextarea!: ElementRef;
-    public imagenProducto: string = '/assets/images/producto.png';
+    public imagenProducto: string = 'mdi mdi-package-variant-closed';
     public datosProductoCompleto: any = null;
 
     public model: ProductoLimpiezaModel = {
@@ -414,14 +414,14 @@ export class CrearProductoLimpiezaComponent implements OnInit {
                 if (producto && producto.imagen) {
                     this.imagenProducto = this.productosService.obtenerUrlImagen(producto.imagen);
                 } else {
-                    this.imagenProducto = '/assets/images/producto.png';
+                    this.imagenProducto = 'mdi mdi-package-variant-closed';
                 }
                 // Guardar datos completos para el PDF
                 this.datosProductoCompleto = producto;
             },
             error: (error: any) => {
                 console.error("Error al cargar imagen del producto", error);
-                this.imagenProducto = '/assets/images/producto.png';
+                this.imagenProducto = 'mdi mdi-package-variant-closed';
             }
         });
     }
@@ -554,7 +554,7 @@ export class CrearProductoLimpiezaComponent implements OnInit {
                             // Si no hay imagen en el registro pero hay id_producto, intentar cargarla
                             this.cargarImagenProducto(producto.id_producto);
                         } else {
-                            this.imagenProducto = '/assets/images/producto.png';
+                            this.imagenProducto = 'mdi mdi-package-variant-closed';
                         }
 
                         // Inicializar el editor después de cargar los datos

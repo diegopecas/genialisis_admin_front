@@ -99,8 +99,8 @@ $manila-borde: #d9b45f;
 .seccion { margin-bottom: 1.5rem; &:last-child { margin-bottom: 0; } }
 .titulo-seccion { font-weight: 700; color: $black; font-size: 0.95rem; margin-bottom: 0.75rem; i { color: $gold; } }
 
-.acudiente-grupo { margin-bottom: 1rem; }
-.acudiente-nombre { font-weight: 600; color: #495057; font-size: 0.85rem; margin-bottom: 0.4rem; i { color: $gold; } }
+.representante-plan { margin-bottom: 1rem; }
+.representante-nombre { font-weight: 600; color: #495057; font-size: 0.85rem; margin-bottom: 0.4rem; i { color: $gold; } }
 
 .doc {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -188,8 +188,8 @@ $manila-borde: #d9b45f;
 .tab-contenido { animation: aparecer 0.2s ease; }
 @keyframes aparecer { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-// buscador dentro de la pestaña estudiantes
-.buscador-estudiantes {
+// buscador dentro de la pestaña clientes
+.buscador-clientes {
   position: relative; max-width: 340px; margin-bottom: 1.25rem;
   i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #adb5bd; font-size: 0.9rem; }
   input {

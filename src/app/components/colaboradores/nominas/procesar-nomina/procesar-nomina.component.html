@@ -80,7 +80,7 @@
               
               <!-- Sub-columnas Deducciones -->
               <th class="text-end bg-danger-subtle" style="width: 100px;">Salud</th>
-              <th class="text-end bg-danger-subtle" style="width: 100px;">Pensión</th>
+              <th class="text-end bg-danger-subtle" style="width: 100px;">Suscripción</th>
               <th class="text-end bg-danger-subtle" style="width: 110px;">Ded. Legales</th>
               <th class="text-end bg-warning-subtle" style="width: 100px;">Productos</th>
               <th class="text-end bg-warning-subtle" style="width: 100px;">Préstamos</th>
@@ -163,7 +163,7 @@
               
               <td class="text-end">
                 <span *ngIf="colaborador.calculado">
-                  {{ formatearNumero(colaborador.total_pension) }}
+                  {{ formatearNumero(colaborador.total_suscripcion) }}
                 </span>
                 <span *ngIf="!colaborador.calculado">-</span>
               </td>
@@ -238,7 +238,7 @@
                 {{ formatearNumero(getTotalesGenerales().total_salud) }}
               </td>
               <td class="text-end fw-bold">
-                {{ formatearNumero(getTotalesGenerales().total_pension) }}
+                {{ formatearNumero(getTotalesGenerales().total_suscripcion) }}
               </td>
               <td class="text-end fw-bold">
                 {{ formatearNumero(getTotalesGenerales().total_deducciones_legales) }}

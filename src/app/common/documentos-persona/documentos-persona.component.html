@@ -447,7 +447,7 @@
       </div>
       <div class="modal-body" *ngIf="documentoSeleccionado">
         <!-- Nombre del Archivo -->
-        <div class="detalle-grupo">
+        <div class="detalle-plan">
           <label class="detalle-label">
             <i class="fas fa-file me-2"></i>Nombre del Archivo
           </label>
@@ -461,7 +461,7 @@
         </div>
 
         <!-- Tipo de Documento -->
-        <div class="detalle-grupo">
+        <div class="detalle-plan">
           <label class="detalle-label">
             <i class="fas fa-tag me-2"></i>Tipo de Documento
           </label>
@@ -471,7 +471,7 @@
         </div>
 
         <!-- Tamaño -->
-        <div class="detalle-grupo">
+        <div class="detalle-plan">
           <label class="detalle-label">
             <i class="fas fa-hdd me-2"></i>Tamaño
           </label>
@@ -481,7 +481,7 @@
         </div>
 
         <!-- Fecha de Subida -->
-        <div class="detalle-grupo">
+        <div class="detalle-plan">
           <label class="detalle-label">
             <i class="fas fa-calendar-plus me-2"></i>Fecha de Subida
           </label>
@@ -492,7 +492,7 @@
 
         <!-- Usuario que Subió -->
         <div
-          class="detalle-grupo"
+          class="detalle-plan"
           *ngIf="documentoSeleccionado.nombre_usuario_subio"
         >
           <label class="detalle-label">
@@ -505,7 +505,7 @@
 
         <!-- Fecha de Vencimiento -->
         <div
-          class="detalle-grupo"
+          class="detalle-plan"
           *ngIf="documentoSeleccionado.fecha_vencimiento"
         >
           <label class="detalle-label">
@@ -532,7 +532,7 @@
         </div>
 
         <!-- Observaciones -->
-        <div class="detalle-grupo" *ngIf="documentoSeleccionado.observaciones">
+        <div class="detalle-plan" *ngIf="documentoSeleccionado.observaciones">
           <label class="detalle-label">
             <i class="fas fa-comment-dots me-2"></i>Observaciones
           </label>
@@ -542,7 +542,7 @@
         </div>
 
         <!-- Sin Observaciones -->
-        <div class="detalle-grupo" *ngIf="!documentoSeleccionado.observaciones">
+        <div class="detalle-plan" *ngIf="!documentoSeleccionado.observaciones">
           <label class="detalle-label">
             <i class="fas fa-comment-dots me-2"></i>Observaciones
           </label>

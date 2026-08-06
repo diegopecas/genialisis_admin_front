@@ -1,0 +1,115 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [mostrarCrear]="puedeAdministrar"
+    [accion]="'ConsultarTodos'"
+    [raiz]="'/clientes'"
+    [regresar]="'/menu'"
+    [iconoTitulo]="'mdi mdi-account-tie'"
+  ></app-header>
+
+  <!-- Barra de filtros (se envían al backend) -->
+  <div class="filtros-bar">
+    <div class="filtro-campo">
+      <label>Plan</label>
+      <select [(ngModel)]="filtroPlan">
+        <option value="">Todos</option>
+        <option *ngFor="let plan of planes" [value]="plan.id">{{ plan.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="filtro-campo">
+      <label>Estado</label>
+      <select [(ngModel)]="filtroEstado">
+        <option value="">Todos</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+    </div>
+
+    <div class="filtro-campo">
+      <label>Permanente</label>
+      <select [(ngModel)]="filtroPermanente">
+        <option value="">Todos</option>
+        <option value="1">Sí</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+
+    <div class="filtro-campo filtro-nombre">
+      <label>Nombre</label>
+      <input
+        type="search"
+        placeholder="Parte del nombre..."
+        [(ngModel)]="filtroNombre"
+        (keyup.enter)="buscar()"
+      >
+    </div>
+
+    <div class="filtro-acciones">
+      <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
+        {{ cargando ? 'Buscando...' : 'Buscar' }}
+      </button>
+      <button class="btn-limpiar" (click)="limpiar()" [disabled]="cargando">
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensaje inicial antes de la primera búsqueda -->
+  <div *ngIf="!busquedaRealizada && !cargando" class="estado-inicial">
+    <p>Selecciona filtros y presiona <strong>Buscar</strong>. Sin filtros se traen todos los clientes.</p>
+  </div>
+
+  <ng-container *ngIf="busquedaRealizada">
+    <!-- Vista de tabla para desktop/tablet (sin buscador propio: el filtro va en la barra) -->
+    <app-tablas
+      *ngIf="!isMobile"
+      [titulos]="titulos"
+      [datos]="datos"
+      [raiz]="'/clientes'"
+      [acciones]="acciones"
+      [accionEditar]="puedeAdministrar"
+      [mostrarBuscar]="false"
+      (clicAccion)="clicAccion($event)"
+    ></app-tablas>
+
+    <!-- Vista móvil -->
+    <div *ngIf="isMobile" class="lista-clientes-movil">
+      <!-- Tarjetas de clientes -->
+      <div
+        *ngFor="let cliente of datos"
+        class="cliente-card"
+        [class.inactivo]="cliente.activo === 0"
+        (click)="opcionesMovil($event, cliente)"
+      >
+        <div class="card-header">
+          <div class="cliente-info">
+            <div class="nombre">{{ cliente.nombre_completo }}</div>
+            <div class="plan">{{ cliente.nombre_plan }}</div>
+          </div>
+          <span
+            class="estado-badge"
+            [class.activo]="cliente.activo === 1"
+            [class.inactivo]="cliente.activo === 0"
+          >
+            {{ cliente.estado }}
+          </span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-opciones" (click)="opcionesMovil($event, cliente)">
+            Opciones
+          </button>
+          <button *ngIf="puedeAdministrar" class="btn-editar" (click)="editarMovil($event, cliente)">
+            Editar
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay resultados -->
+      <div *ngIf="datos.length === 0" class="no-resultados">
+        <p>No se encontraron clientes</p>
+      </div>
+    </div>
+  </ng-container>
+</div>

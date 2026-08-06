@@ -33,7 +33,7 @@ export class ColaboradoresComponent implements OnInit {
 
   // Única acción personalizada: abre el hub de opciones del colaborador.
   public acciones = [
-    { id: 'opciones', label: 'Opciones', icono: '/assets/images/opciones.png' }
+    { id: 'opciones', label: 'Opciones', icono: 'mdi mdi-dots-horizontal-circle' }
   ] as any[];
 
   constructor(

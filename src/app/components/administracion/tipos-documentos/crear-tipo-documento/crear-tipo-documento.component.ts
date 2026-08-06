@@ -34,7 +34,7 @@ export class CrearTipoDocumentoComponent implements OnInit {
     dias_alerta_vencimiento: null,
     permite_multiples: true,
     requiere_firma: false,
-    modificable_acudientes: true,
+    modificable_representantes: true,
     activo: true,
   } as any;
 
@@ -80,7 +80,7 @@ export class CrearTipoDocumentoComponent implements OnInit {
             requiere_vencimiento: !!registro.requiere_vencimiento,
             permite_multiples: !!registro.permite_multiples,
             requiere_firma: !!registro.requiere_firma,
-            modificable_acudientes: !!registro.modificable_acudientes,
+            modificable_representantes: !!registro.modificable_representantes,
             activo: !!registro.activo,
           };
 
@@ -180,7 +180,7 @@ export class CrearTipoDocumentoComponent implements OnInit {
         : undefined,
       permite_multiples: this.model.permite_multiples ? 1 : 0,
       requiere_firma: this.model.requiere_firma ? 1 : 0,
-      modificable_acudientes: this.model.modificable_acudientes ? 1 : 0,
+      modificable_representantes: this.model.modificable_representantes ? 1 : 0,
       activo: this.model.activo ? 1 : 0,
     };
 

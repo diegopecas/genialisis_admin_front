@@ -155,7 +155,7 @@ export class PersonasService {
   }
 
   /**
-   * Obtiene todos los cumpleañeros del día (estudiantes y colaboradores activos)
+   * Obtiene todos los cumpleañeros del día (clientes y colaboradores activos)
    */
   obtenerCumpleanosHoy() {
     return this.http

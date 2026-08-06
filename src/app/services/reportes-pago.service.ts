@@ -45,11 +45,11 @@ export class ReportesPagoService {
       );
   }
 
-  obtenerByEstudiante(idEstudiante: any) {
+  obtenerByCliente(idCliente: any) {
     return this.http
       .get<
         HttpResponse<Object>
-      >(this.servicio + '/estudiante/' + idEstudiante, { observe: 'response' })
+      >(this.servicio + '/cliente/' + idCliente, { observe: 'response' })
       .pipe(
         tap((response: HttpResponse<Object>) => {
           let respuesta: any = response.body;
@@ -105,11 +105,11 @@ export class ReportesPagoService {
       );
   }
 
-  obtenerPendientesByEstudiante(idEstudiante: any) {
+  obtenerPendientesByCliente(idCliente: any) {
     return this.http
       .get<
         HttpResponse<Object>
-      >(this.servicio + '/pendientes-estudiante/' + idEstudiante, { observe: 'response' })
+      >(this.servicio + '/pendientes-cliente/' + idCliente, { observe: 'response' })
       .pipe(
         tap((response: HttpResponse<Object>) => {
           let respuesta: any = response.body;

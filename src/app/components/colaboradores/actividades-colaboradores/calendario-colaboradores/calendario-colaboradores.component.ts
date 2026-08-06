@@ -42,7 +42,7 @@ interface Actividad {
 
 interface Horario {
   id: string;
-  id_grupo: string;
+  id_plan: string;
   id_area_academica: string;
   id_dia_semana: number;
   hora_inicial: string;
@@ -54,8 +54,8 @@ interface Horario {
   sobrenombre_docente: string;
   nombre_area_academica: string;
   icono_area: string;
-  nombre_grupo: string;
-  color_grupo: string;
+  nombre_plan: string;
+  color_plan: string;
   nombre_dia_semana: string;
   hora_entrada: string;
   hora_salida: string;
@@ -64,7 +64,7 @@ interface Horario {
 interface Tarea {
   id: string;
   id_colaborador: string;
-  id_estudiante: string | null;
+  id_cliente: string | null;
   id_tipo_tarea: string | null;
   nombre_tipo_tarea: string;
   descripcion: string;
@@ -80,10 +80,10 @@ interface Tarea {
   id_usuario_registro: string;
   fecha_registro: string;
   nombre_colaborador: string;
-  nombre_estudiante: string;
+  nombre_cliente: string;
 }
 
-interface Grupo {
+interface Plan {
   id: string;
   nombre: string;
   icono: string;
@@ -133,7 +133,7 @@ export class CalendarioColaboradoresComponent implements OnInit {
   public horarios: Horario[] = [];
   public tareas: Tarea[] = [];
   public colaboradores: Colaborador[] = [];
-  public grupos: Grupo[] = [];
+  public planes: Plan[] = [];
   public diasCalendario: DiaCalendario[] = [];
   public diasSemana: DiaCalendario[] = [];
 
@@ -150,7 +150,7 @@ export class CalendarioColaboradoresComponent implements OnInit {
 
   // Filtros
   public colaboradorSeleccionado: string | null = null;
-  public grupoSeleccionado: string | null = null;
+  public planSeleccionado: string | null = null;
   public categoriaSeleccionada: number | null = null;
   public estadoSeleccionado: number | null = null;
   public mostrarHorarios: boolean = true;
@@ -191,7 +191,7 @@ export class CalendarioColaboradoresComponent implements OnInit {
     this.generarAniosDisponibles();
     this.cargarCatalogoDiasSemana();
     this.cargarColaboradores();
-    this.cargarGrupos();
+    this.cargarPlanes();
     this.cargarDatosDelMes();
     this.cargarHorarios();
   }
@@ -239,13 +239,13 @@ export class CalendarioColaboradoresComponent implements OnInit {
     });
   }
 
-  cargarGrupos() {
-    this.actividadesColaboradoresService.obtenerGruposParaCalendario().subscribe({
+  cargarPlanes() {
+    this.actividadesColaboradoresService.obtenerPlanesParaCalendario().subscribe({
       next: (response: any) => {
-        this.grupos = response.body as Grupo[];
+        this.planes = response.body as Plan[];
       },
       error: error => {
-        console.error('Error al cargar grupos:', error);
+        console.error('Error al cargar planes:', error);
       }
     });
   }
@@ -523,10 +523,10 @@ export class CalendarioColaboradoresComponent implements OnInit {
     return this.horarios.filter(hor => {
       const cumpleColaborador = this.colaboradorSeleccionado === null ||
                                 hor.id_colaborador === this.colaboradorSeleccionado;
-      const cumpleGrupo = this.grupoSeleccionado === null ||
-                         hor.id_grupo === this.grupoSeleccionado;
+      const cumplePlan = this.planSeleccionado === null ||
+                         hor.id_plan === this.planSeleccionado;
 
-      return hor.id_dia_semana === diaSemana && cumpleColaborador && cumpleGrupo;
+      return hor.id_dia_semana === diaSemana && cumpleColaborador && cumplePlan;
     });
   }
 
@@ -744,9 +744,9 @@ export class CalendarioColaboradoresComponent implements OnInit {
     this.generarCalendario();
   }
 
-  aplicarFiltroGrupo(event: any) {
+  aplicarFiltroPlan(event: any) {
     const valor = event.target.value;
-    this.grupoSeleccionado = valor === '' ? null : valor;
+    this.planSeleccionado = valor === '' ? null : valor;
     this.generarCalendario();
   }
 
@@ -781,7 +781,7 @@ export class CalendarioColaboradoresComponent implements OnInit {
 
   limpiarFiltros() {
     this.colaboradorSeleccionado = null;
-    this.grupoSeleccionado = null;
+    this.planSeleccionado = null;
     this.categoriaSeleccionada = null;
     this.estadoSeleccionado = null;
     this.mostrarHorarios = true;
@@ -823,7 +823,7 @@ export class CalendarioColaboradoresComponent implements OnInit {
       html: `
         <div style="text-align: left;">
           <p><strong>Colaborador:</strong> ${horario.nombre_docente}</p>
-          <p><strong>Grupo:</strong> <span style="color: ${horario.color_grupo}">${horario.nombre_grupo}</span></p>
+          <p><strong>Plan:</strong> <span style="color: ${horario.color_plan}">${horario.nombre_plan}</span></p>
           <p><strong>Día:</strong> ${horario.nombre_dia_semana}</p>
           <p><strong>Horario:</strong> ${horario.hora_inicial} - ${horario.hora_final}</p>
           <p><strong>Duración:</strong> ${this.formatearMinutos(horario.total_minutos)}</p>
@@ -847,7 +847,7 @@ export class CalendarioColaboradoresComponent implements OnInit {
       html: `
         <div style="text-align: left;">
           <p><strong>Colaborador:</strong> ${tarea.nombre_colaborador}</p>
-          ${tarea.nombre_estudiante ? `<p><strong>Estudiante:</strong> ${tarea.nombre_estudiante}</p>` : ''}
+          ${tarea.nombre_cliente ? `<p><strong>Cliente:</strong> ${tarea.nombre_cliente}</p>` : ''}
           <p><strong>Descripción:</strong> ${tarea.descripcion}</p>
           <p><strong>Estado:</strong> <span style="color: ${tarea.color_estado}">${tarea.nombre_estado}</span></p>
           <p><strong>Fecha límite:</strong> ${this.formatearFechaCorta(tarea.fecha_limite)}</p>
@@ -959,8 +959,8 @@ export class CalendarioColaboradoresComponent implements OnInit {
         const area = this.capitalizar(hor.nombre_area_academica);
         contenido += `
           <div class="item-todo-dia" data-tipo="horario" data-idx="${idx}"
-               style="background: #f5f5f5; border-left: 4px solid ${hor.color_grupo}; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; color: #424242;">
-            <div style="font-weight: 600;">📚 ${hor.nombre_grupo} - ${area} - ${horaIni} - ${horaFin}</div>
+               style="background: #f5f5f5; border-left: 4px solid ${hor.color_plan}; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; color: #424242;">
+            <div style="font-weight: 600;">📚 ${hor.nombre_plan} - ${area} - ${horaIni} - ${horaFin}</div>
             <small style="color: #757575;">${docente}</small>
           </div>
         `;
@@ -1055,13 +1055,13 @@ export class CalendarioColaboradoresComponent implements OnInit {
 
   /**
    * Título compacto para un horario de clase en vista semana.
-   * Formato: "Grupo - Area - HH:MM - HH:MM"
+   * Formato: "Plan - Area - HH:MM - HH:MM"
    */
   tituloCompactoHorario(horario: Horario): string {
     const inicio = this.formatearHora(horario.hora_inicial);
     const fin = this.formatearHora(horario.hora_final);
     const area = this.abreviarArea(horario.nombre_area_academica);
-    return `${horario.nombre_grupo} - ${area} - ${inicio} - ${fin}`;
+    return `${horario.nombre_plan} - ${area} - ${inicio} - ${fin}`;
   }
 
   /**

@@ -12,7 +12,7 @@ import { MenuArbolService, MenuNodo } from '../../services/menu-arbol.service';
 
 interface CumpleaneroInfo {
   nombre: string;
-  tipo: 'usuario' | 'estudiante' | 'colaborador';
+  tipo: 'usuario' | 'cliente' | 'colaborador';
   esMio: boolean;
   id_genero?: number;
   sobrenombre?: string;
@@ -51,7 +51,7 @@ export class MenuComponent implements OnInit {
   public terminoBusqueda: string = '';
   public enBusqueda: boolean = false;
 
-  // Ids de grupos expandidos manualmente (cuando NO hay búsqueda activa)
+  // Ids de planes expandidos manualmente (cuando NO hay búsqueda activa)
   private expandidos: Set<string> = new Set<string>();
 
   constructor(
@@ -107,6 +107,14 @@ export class MenuComponent implements OnInit {
     }
   }
 
+  /**
+   * Los iconos pueden venir como emoji ('📢') o como clase de fuente
+   * ('mdi mdi-broom'). Esto decide cual de los dos se pinta.
+   */
+  esIcono(valor: any): boolean {
+    return typeof valor === 'string' && valor.startsWith('mdi');
+  }
+
   irAccesoRapido(acceso: AccesoRapido): void {
     this.router.navigate(['/' + acceso.ruta]);
   }
@@ -138,7 +146,7 @@ export class MenuComponent implements OnInit {
   /**
    * Devuelve una copia del árbol conservando solo los nodos visibles según permisos.
    * Reglas: un nodo con `permiso` se conserva si el usuario lo tiene; los nodos sin
-   * `permiso` se muestran siempre; un grupo se conserva solo si le queda al menos un hijo visible.
+   * `permiso` se muestran siempre; un plan se conserva solo si le queda al menos un hijo visible.
    */
   private filtrarPorPermiso(nodos: MenuNodo[]): MenuNodo[] {
     const resultado: MenuNodo[] = [];
@@ -185,7 +193,7 @@ export class MenuComponent implements OnInit {
 
   /**
    * Filtra el árbol dejando los nodos cuyo label coincide con el término y la cadena
-   * de ancestros necesaria para llegar a ellos. Si un grupo coincide por sí mismo,
+   * de ancestros necesaria para llegar a ellos. Si un plan coincide por sí mismo,
    * se conserva con todos sus hijos.
    */
   private filtrarPorTexto(nodos: MenuNodo[], termino: string): MenuNodo[] {
@@ -232,12 +240,12 @@ export class MenuComponent implements OnInit {
     return false;
   }
 
-  esGrupo(nodo: MenuNodo): boolean {
+  esPlan(nodo: MenuNodo): boolean {
     return !!(nodo.hijos && nodo.hijos.length > 0);
   }
 
   estaExpandido(nodo: MenuNodo): boolean {
-    // Durante la búsqueda todos los grupos del resultado se muestran expandidos
+    // Durante la búsqueda todos los planes del resultado se muestran expandidos
     if (this.enBusqueda) {
       return true;
     }
@@ -256,7 +264,7 @@ export class MenuComponent implements OnInit {
   }
 
   seleccionarNodo(nodo: MenuNodo): void {
-    if (this.esGrupo(nodo)) {
+    if (this.esPlan(nodo)) {
       this.toggleNodo(nodo);
     } else if (nodo.ruta) {
       this.selectOption(nodo.ruta);
@@ -398,8 +406,8 @@ export class MenuComponent implements OnInit {
     this.generarConfetti();
 
     const usuarioCumple = this.cumpleaneros.filter((c) => c.tipo === 'usuario');
-    const estudiantesCumple = this.cumpleaneros.filter(
-      (c) => c.tipo === 'estudiante',
+    const clientesCumple = this.cumpleaneros.filter(
+      (c) => c.tipo === 'cliente',
     );
     const colaboradoresCumple = this.cumpleaneros.filter(
       (c) => c.tipo === 'colaborador',
@@ -413,17 +421,17 @@ export class MenuComponent implements OnInit {
       );
     }
 
-    if (estudiantesCumple.length === 1) {
+    if (clientesCumple.length === 1) {
       const prefijo =
         usuarioCumple.length > 0 ? 'Hoy también celebramos' : 'Hoy celebramos';
       partes.push(
-        `${prefijo} el cumpleaños de ${estudiantesCumple[0].nombre}. 🎂`,
+        `${prefijo} el cumpleaños de ${clientesCumple[0].nombre}. 🎂`,
       );
-    } else if (estudiantesCumple.length > 1) {
+    } else if (clientesCumple.length > 1) {
       const prefijo =
         usuarioCumple.length > 0 ? 'Hoy también celebramos' : 'Hoy celebramos';
       const nombres = this.formatearNombres(
-        estudiantesCumple.map((e) => e.nombre),
+        clientesCumple.map((e) => e.nombre),
       );
       partes.push(`${prefijo} el cumpleaños de ${nombres}. 🎂`);
     }

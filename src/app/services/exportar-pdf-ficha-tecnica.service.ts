@@ -66,7 +66,7 @@ export class ExportarPdfFichaTecnicaService {
 
         // Intentar cargar la imagen del producto
         if (datos.productoLimpieza.imagen_producto &&
-            !datos.productoLimpieza.imagen_producto.includes('/assets/images/producto.png') &&
+            !datos.productoLimpieza.imagen_producto.includes('mdi mdi-package-variant-closed') &&
             datos.productoLimpieza.imagen_producto.startsWith('data:image')) {
             try {
                 // La imagen ya viene en base64

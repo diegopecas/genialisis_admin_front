@@ -49,24 +49,24 @@ export class IaChatFloatingComponent implements OnInit, OnDestroy, AfterViewChec
   sugerencias: string[] = [];
 
   private sugerenciasPorRol: Record<string, string[]> = {
-    acudiente: [
+    representante: [
       '¿Cuánto debo?',
       '¿Cómo va mi hijo?',
       '¿Cuál es el horario?',
     ],
     docente: [
-      '¿Cuántos estudiantes tengo?',
+      '¿Cuántos clientes tengo?',
       '¿Qué pendientes tengo?',
       'Resumen de asistencia',
     ],
     admin: [
-      'Resumen del jardín',
-      '¿Cuántos estudiantes hay?',
+      'Resumen de la organización',
+      '¿Cuántos clientes hay?',
       'Estado financiero',
     ],
     general: [
       '¿Cómo me puedes ayudar?',
-      'Información del jardín',
+      'Información de la organización',
       'Horarios',
     ],
   };
@@ -162,7 +162,7 @@ export class IaChatFloatingComponent implements OnInit, OnDestroy, AfterViewChec
   private determinarRolLocal(usuario: any): string {
     if (usuario.id_docente) return 'docente';
     if (usuario.id_colaborador) return 'admin';
-    return 'acudiente';
+    return 'representante';
   }
 
   // =====================================================

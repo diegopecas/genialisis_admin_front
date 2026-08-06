@@ -176,7 +176,7 @@ export class DocumentosPersonasService {
       .get<any>(this.servicio + '/download-token/' + id, opciones)
       .pipe(
         map((respuesta: any) => {
-          const tenant = this.institucionConfigService.getJardinCodigo();
+          const tenant = this.institucionConfigService.getOrganizacionCodigo();
           return (
             environment.api +
             'documentos-personas/download/' +
@@ -286,7 +286,7 @@ export class DocumentosPersonasService {
   }
 
   obtenerUrlDescarga(id: string): string {
-    const tenant = this.institucionConfigService.getJardinCodigo();
+    const tenant = this.institucionConfigService.getOrganizacionCodigo();
     return (
       environment.api +
       'documentos-personas/download/' +

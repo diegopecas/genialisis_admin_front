@@ -36,7 +36,7 @@ export class ReporteAseoComponent implements OnInit {
 
   // Registros planos (todos), y agrupados para la vista
   registros: any[] = [];
-  grupos: any[] = [];
+  planes: any[] = [];
   productosUsados: any[] = [];
   cargando = false;
   yaConsulto = false;
@@ -109,7 +109,7 @@ export class ReporteAseoComponent implements OnInit {
       error: (error: any) => {
         this.cargando = false;
         this.registros = [];
-        this.grupos = [];
+        this.planes = [];
         this.productosUsados = [];
         Swal.fire('Error', error.error?.error || 'No se pudo generar el reporte', 'error');
       }
@@ -137,20 +137,20 @@ export class ReporteAseoComponent implements OnInit {
     ordenados.forEach(r => {
       const clave = this.agruparPor === 'area' ? r.id_area_fisica : r.fecha;
       const titulo = this.agruparPor === 'area' ? r.area : this.formatearFechaVista(r.fecha);
-      let grupo = mapa.get(clave);
-      if (!grupo) {
-        grupo = { clave, titulo, registros: [] };
-        mapa.set(clave, grupo);
+      let plan = mapa.get(clave);
+      if (!plan) {
+        plan = { clave, titulo, registros: [] };
+        mapa.set(clave, plan);
       }
-      grupo.registros.push(r);
+      plan.registros.push(r);
     });
 
-    this.grupos = Array.from(mapa.values());
+    this.planes = Array.from(mapa.values());
 
     // En la vista por fecha, el título lleva la fecha + el/los rango(s) de horas
     // de la jornada, para no repetir la hora en cada área.
     if (this.agruparPor === 'fecha') {
-      this.grupos.forEach(g => {
+      this.planes.forEach(g => {
         g.titulo = `${this.formatearFechaVista(g.registros[0].fecha)}  ·  ${this.rangosHorario(g.registros)}`;
       });
     }
@@ -200,17 +200,17 @@ export class ReporteAseoComponent implements OnInit {
     registro.seleccionado = !registro.seleccionado;
   }
 
-  toggleGrupo(grupo: any) {
-    const marcar = !grupo.registros.every((r: any) => r.seleccionado);
-    grupo.registros.forEach((r: any) => r.seleccionado = marcar);
+  togglePlan(plan: any) {
+    const marcar = !plan.registros.every((r: any) => r.seleccionado);
+    plan.registros.forEach((r: any) => r.seleccionado = marcar);
   }
 
-  grupoCompleto(grupo: any): boolean {
-    return grupo.registros.every((r: any) => r.seleccionado);
+  planCompleto(plan: any): boolean {
+    return plan.registros.every((r: any) => r.seleccionado);
   }
 
-  seleccionadosDe(grupo: any): number {
-    return grupo.registros.filter((r: any) => r.seleccionado).length;
+  seleccionadosDe(plan: any): number {
+    return plan.registros.filter((r: any) => r.seleccionado).length;
   }
 
   resumenMobiliario(registro: any): string {
@@ -234,7 +234,7 @@ export class ReporteAseoComponent implements OnInit {
   /** Aplana los registros seleccionados a filas, en el orden de la agrupación activa */
   private construirFilas(): any[] {
     const filas: any[] = [];
-    this.grupos.forEach(g => {
+    this.planes.forEach(g => {
       g.registros
         .filter((r: any) => r.seleccionado)
         .forEach((r: any) => {

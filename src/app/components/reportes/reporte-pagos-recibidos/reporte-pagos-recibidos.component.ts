@@ -41,7 +41,7 @@ export class ReportePagosRecibidosComponent implements OnInit {
   };
 
   public acciones = [
-    { id: 'imprimir', label: 'Imprimir', icono: '/assets/images/comprobante_pago.png' }
+    { id: 'imprimir', label: 'Imprimir', icono: 'mdi mdi-receipt-text' }
   ] as any[];
 
   constructor(
@@ -80,8 +80,8 @@ export class ReportePagosRecibidosComponent implements OnInit {
         alinear: 'izquierda',
       },
       {
-        clave: 'nombre_acudiente',
-        alias: 'Acudiente',
+        clave: 'nombre_representante',
+        alias: 'Representante',
         alinear: 'izquierda',
       },
       {
@@ -141,19 +141,19 @@ export class ReportePagosRecibidosComponent implements OnInit {
         const datos = response.body as any[];
 
         this.datos = datos.map(item => {
-          // Determinar tipo de persona: Estudiante, Colaborador o Acudiente
+          // Determinar tipo de persona: Cliente, Colaborador o Representante
           let tipoPersona = 'Desconocido';
           let nombrePersona = 'Sin nombre';
 
-          if (item.id_estudiante) {
-            tipoPersona = 'Estudiante';
-            nombrePersona = item.nombre_estudiante || 'Sin nombre';
+          if (item.id_cliente) {
+            tipoPersona = 'Cliente';
+            nombrePersona = item.nombre_cliente || 'Sin nombre';
           } else if (item.id_colaborador) {
             tipoPersona = 'Colaborador';
             nombrePersona = item.nombre_colaborador || 'Sin nombre';
-          } else if (item.id_acudiente) {
-            tipoPersona = 'Acudiente';
-            nombrePersona = item.nombre_acudiente || 'Sin nombre';
+          } else if (item.id_representante) {
+            tipoPersona = 'Representante';
+            nombrePersona = item.nombre_representante || 'Sin nombre';
           }
 
           // Determinar el estado
@@ -295,7 +295,7 @@ export class ReportePagosRecibidosComponent implements OnInit {
       }
     }
 
-    const esColaborador = !!event.registro.id_colaborador && !event.registro.id_estudiante;
+    const esColaborador = !!event.registro.id_colaborador && !event.registro.id_cliente;
 
     if (event.accion === 'editar') {
       if (esColaborador) {
@@ -303,8 +303,8 @@ export class ReportePagosRecibidosComponent implements OnInit {
           queryParams: { origen: 'reporte' }
         });
       } else {
-        const idEstudiante = event.registro.id_estudiante || '0';
-        this.router.navigate(['estudiantes/pagos/editar/' + event.id + '/' + idEstudiante], {
+        const idCliente = event.registro.id_cliente || '0';
+        this.router.navigate(['clientes/pagos/editar/' + event.id + '/' + idCliente], {
           queryParams: { origen: 'reporte' }
         });
       }
@@ -318,8 +318,8 @@ export class ReportePagosRecibidosComponent implements OnInit {
           queryParams: { origen: 'reporte' }
         });
       } else {
-        const idEstudiante = event.registro.id_estudiante || '0';
-        this.router.navigate(['estudiantes/pagos/consultar/' + event.id + '/' + idEstudiante], {
+        const idCliente = event.registro.id_cliente || '0';
+        this.router.navigate(['clientes/pagos/consultar/' + event.id + '/' + idCliente], {
           queryParams: { origen: 'reporte' }
         });
       }
@@ -406,7 +406,7 @@ export class ReportePagosRecibidosComponent implements OnInit {
       return;
     }
 
-    const esColaborador = !!registro.id_colaborador && !registro.id_estudiante;
+    const esColaborador = !!registro.id_colaborador && !registro.id_cliente;
 
     Swal.fire({
       title: 'Generando comprobante',
@@ -452,7 +452,7 @@ export class ReportePagosRecibidosComponent implements OnInit {
           Swal.close();
 
           if (response && response.body) {
-            this.router.navigate(['estudiantes/pagos/comprobante', id], {
+            this.router.navigate(['clientes/pagos/comprobante', id], {
               queryParams: { origen: 'reporte' }
             });
           } else {

@@ -1,0 +1,44 @@
+<div class="modulo">
+    <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [raiz]="'/'" [regresar]="'/menu'" [iconoTitulo]="'mdi mdi-account-tie'"></app-header>
+
+    <div class="container-fluid mt-5">
+
+        <!-- Tarjetas de opciones -->
+        <div class="row justify-content-center">
+
+            <!-- Clientes -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['clientes.administrar', 'clientes.listado'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'clientes'" (click)="toggleMenu('clientes', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container clientes">
+                            <i class="mdi mdi-account-tie icono-img"></i>
+                        </div>
+                        <h3 class="card-titulo">Clientes</h3>
+                        <p class="card-descripcion">Administra los clientes, sus planes, grados, horarios y datos académicos</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('clientes.listado')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('clientes', $event)">
+                                    <i class="mdi mdi-account-tie icono-img"></i>
+                                    <span>Gestión</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('clientes.administrar')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('registro-rapido-cliente', $event)">
+                                    <i class="mdi mdi-account-plus icono-img"></i>
+                                    <span>Registro rápido</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

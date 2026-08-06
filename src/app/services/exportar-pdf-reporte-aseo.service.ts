@@ -17,7 +17,7 @@ export class ExportarPdfReporteAseoService {
 
     private readonly AMBAR: [number, number, number] = [201, 138, 0];
     private readonly GRIS_HEAD: [number, number, number] = [245, 243, 238];
-    private readonly GRIS_GRUPO: [number, number, number] = [237, 231, 218];
+    private readonly GRIS_PLAN: [number, number, number] = [237, 231, 218];
     private readonly TINTA: [number, number, number] = [42, 38, 32];
     private readonly LINEA: [number, number, number] = [214, 205, 185];
 
@@ -170,7 +170,7 @@ export class ExportarPdfReporteAseoService {
                         content: `${this.formatearFecha(f.fecha)}   \u00b7   ${f.horario || ''}`,
                         colSpan: 4,
                         styles: {
-                            fillColor: this.GRIS_GRUPO,
+                            fillColor: this.GRIS_PLAN,
                             textColor: this.TINTA,
                             fontStyle: 'bold',
                             fontSize: 8.5

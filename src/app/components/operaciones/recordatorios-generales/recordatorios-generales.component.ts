@@ -5,29 +5,29 @@ import { Subscription } from 'rxjs';
 
 import { HeaderComponent } from '../../../common/header/header.component';
 import { TablasComponent } from '../../../common/tablas/tablas.component';
-import { EstudiantesService } from '../../../services/estudiantes.service';
+import { ClientesService } from '../../../services/clientes.service';
 import { HistorialRecordatoriosGeneralesService } from '../../../services/historial-recordatorios-generales.service';
 import { TareasColaboradoresService } from '../../../services/tareas-colaboradores.service';
 import { InstitucionConfigService } from '../../../services/institucion-config.service';
 import { UtilService } from '../../../common/constantes/util.service';
 
-interface AcudienteRecordatorio {
-  id_acudiente: string;
-  id_estudiante: string;
+interface RepresentanteRecordatorio {
+  id_representante: string;
+  id_cliente: string;
   id_persona: string;
-  nombre_estudiante: string;
-  id_tipo_acudiente: number;
-  nombre_tipo_acudiente: string;
-  id_persona_acudiente: string;
-  nombre_acudiente: string;
+  nombre_cliente: string;
+  id_tipo_representante: number;
+  nombre_tipo_representante: string;
+  id_persona_representante: string;
+  nombre_representante: string;
   telefono: string;
   correo_electronico: string;
 }
 
 interface HistorialRecordatorio {
   id: string;
-  id_estudiante: string;
-  id_persona_acudiente: string | null;
+  id_cliente: string;
+  id_persona_representante: string | null;
   telefono_usado: string;
   nombre_destinatario: string;
   tipo_recordatorio: string;
@@ -57,7 +57,7 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   public titulos: any[] = [];
   public datos: any[] = [];
   public columnasFiltro: (string | { columna: string, tipoFiltro?: 'fecha' | 'normal' | 'rango' })[] = [
-    'Grupo',
+    'Plan',
     'Estado',
     'Mes Cumpleaños',
     'Estado Contrato',
@@ -70,12 +70,12 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   public acciones: any[] = [];
 
   private subscriptions: Subscription[] = [];
-  private acudientesData: AcudienteRecordatorio[] = [];
+  private representantesData: RepresentanteRecordatorio[] = [];
 
   // Conceptos de cartera para el modal de desglose
   conceptosCartera = [
-    { key: 'matricula', label: 'Matrícula', campo: 'matricula' },
-    { key: 'pension', label: 'Pensión', campo: 'pension' },
+    { key: 'implementacion', label: 'Implementación', campo: 'implementacion' },
+    { key: 'suscripcion', label: 'Suscripción', campo: 'suscripcion' },
     { key: 'almuerzo', label: 'Almuerzo', campo: 'almuerzo' },
     { key: 'onces', label: 'Onces', campo: 'onces' },
     { key: 'horasExtras', label: 'Horas Extras', campo: 'horas_extras' },
@@ -83,12 +83,12 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   ];
 
   private camposCartera = [
-    'matricula_cobrado_actual', 'matricula_pagado_actual', 'matricula_saldo_actual',
-    'matricula_cobrado_anterior', 'matricula_pagado_anterior', 'matricula_saldo_anterior',
-    'matricula_vencido',
-    'pension_cobrado_actual', 'pension_pagado_actual', 'pension_saldo_actual',
-    'pension_cobrado_anterior', 'pension_pagado_anterior', 'pension_saldo_anterior',
-    'pension_vencido',
+    'implementacion_cobrado_actual', 'implementacion_pagado_actual', 'implementacion_saldo_actual',
+    'implementacion_cobrado_anterior', 'implementacion_pagado_anterior', 'implementacion_saldo_anterior',
+    'implementacion_vencido',
+    'suscripcion_cobrado_actual', 'suscripcion_pagado_actual', 'suscripcion_saldo_actual',
+    'suscripcion_cobrado_anterior', 'suscripcion_pagado_anterior', 'suscripcion_saldo_anterior',
+    'suscripcion_vencido',
     'almuerzo_cobrado_actual', 'almuerzo_pagado_actual', 'almuerzo_saldo_actual',
     'almuerzo_cobrado_anterior', 'almuerzo_pagado_anterior', 'almuerzo_saldo_anterior',
     'almuerzo_vencido',
@@ -104,8 +104,8 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   ];
 
   // Modal recordatorio
-  public estudianteSeleccionado: any = null;
-  public acudientesEstudiante: AcudienteRecordatorio[] = [];
+  public clienteSeleccionado: any = null;
+  public representantesCliente: RepresentanteRecordatorio[] = [];
   public telefonosEditables: string[] = [];
   public telefonoAdicional: string = '';
   public nombreAdicional: string = '';
@@ -122,11 +122,11 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   public tratoCercano: boolean = false;
 
   // Modal desglose financiero
-  public estudianteFinanciero: any = null;
+  public clienteFinanciero: any = null;
 
   // Modal historial con compromisos
-  public estudianteHistorial: any = null;
-  public historialEstudiante: HistorialRecordatorio[] = [];
+  public clienteHistorial: any = null;
+  public historialCliente: HistorialRecordatorio[] = [];
   public cargandoHistorial: boolean = false;
 
   private get nombreColegio(): string {
@@ -134,7 +134,7 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private estudiantesService: EstudiantesService,
+    private clientesService: ClientesService,
     private historialRecordatoriosService: HistorialRecordatoriosGeneralesService,
     private tareasColaboradoresService: TareasColaboradoresService,
     private institucionConfigService: InstitucionConfigService,
@@ -161,16 +161,16 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
       { clave: 'edad', alias: 'Edad', alinear: 'centrado' },
       { clave: 'edad_a_cumplir', alias: 'Edad a Cumplir', alinear: 'centrado' },
       { clave: 'mes_cumpleanos', alias: 'Mes Cumpleaños', alinear: 'centrado' },
-      { clave: 'nombre_grupo', alias: 'Grupo', alinear: 'centrado' },
+      { clave: 'nombre_plan', alias: 'Plan', alinear: 'centrado' },
       { clave: 'fecha_ingreso', alias: 'F. Ingreso', alinear: 'centrado', tipo: 'date' },
       { clave: 'anno', alias: 'Año', alinear: 'centrado' },
       { clave: 'alimentacion_texto', alias: 'Alimentación', alinear: 'centrado' },
       { clave: 'estado', alias: 'Estado', alinear: 'centrado' },
       { clave: 'estado_contrato', alias: 'Estado Contrato', alinear: 'centrado' },
-      { clave: 'acudientes', alias: 'Acudientes', alinear: 'izquierda' },
+      { clave: 'representantes', alias: 'Representantes', alinear: 'izquierda' },
       { clave: 'docs_pendientes_texto', alias: 'Docs. Pendientes', alinear: 'izquierda' },
-      { clave: 'valor_matricula', alias: 'Matrícula', alinear: 'centrado', tipo: 'money' },
-      { clave: 'valor_pension', alias: 'Pensión', alinear: 'centrado', tipo: 'money' },
+      { clave: 'valor_implementacion', alias: 'Implementación', alinear: 'centrado', tipo: 'money' },
+      { clave: 'valor_suscripcion', alias: 'Suscripción', alinear: 'centrado', tipo: 'money' },
       { clave: 'saldo_cartera', alias: 'Saldo Cartera', alinear: 'centrado', tipo: 'money' },
       { clave: 'saldo_vencido', alias: 'Saldo Vencido', alinear: 'centrado', tipo: 'money' },
     ];
@@ -178,20 +178,20 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
   crearAcciones(): void {
     this.acciones = [
-      { id: 'recordatorio', label: 'Enviar Recordatorio', icono: '/assets/images/recordatorio-general.png' },
-      { id: 'ver_cartera', label: 'Ver Cartera', icono: '/assets/images/finanzas.png' },
-      { id: 'ver_historial', label: 'Historial', icono: '/assets/images/seguimiento-asistencia.png' },
+      { id: 'recordatorio', label: 'Enviar Recordatorio', icono: 'mdi mdi-bullhorn' },
+      { id: 'ver_cartera', label: 'Ver Cartera', icono: 'mdi mdi-finance' },
+      { id: 'ver_historial', label: 'Historial', icono: 'mdi mdi-calendar-account' },
     ];
   }
 
   cargarDatos(): void {
     this.cargando = true;
-    const sub = this.estudiantesService.obtenerReporteRecordatorios().subscribe({
+    const sub = this.clientesService.obtenerReporteRecordatorios().subscribe({
       next: (response: any) => {
         const data = response.body;
-        if (data && data.estudiantes) {
-          this.acudientesData = data.acudientes || [];
-          this.procesarDatos(data.estudiantes);
+        if (data && data.clientes) {
+          this.representantesData = data.representantes || [];
+          this.procesarDatos(data.clientes);
         } else { this.datos = []; }
         this.cargando = false;
       },
@@ -200,16 +200,16 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub);
   }
 
-  procesarDatos(estudiantesRaw: any[]): void {
-    this.datos = estudiantesRaw.map((est: any) => {
+  procesarDatos(clientesRaw: any[]): void {
+    this.datos = clientesRaw.map((est: any) => {
       const cantPendientes = parseInt(est.docs_pendientes_cantidad) || 0;
       const detallePendientes = est.docs_pendientes_detalle || '';
       const mapped: any = {
         ...est,
-        valor_matricula: parseFloat(est.valor_matricula) || 0,
-        valor_pension: parseFloat(est.valor_pension) || 0,
-        matricula_mes_actual: parseFloat(est.matricula_mes_actual) || 0,
-        pension_mes_actual: parseFloat(est.pension_mes_actual) || 0,
+        valor_implementacion: parseFloat(est.valor_implementacion) || 0,
+        valor_suscripcion: parseFloat(est.valor_suscripcion) || 0,
+        implementacion_mes_actual: parseFloat(est.implementacion_mes_actual) || 0,
+        suscripcion_mes_actual: parseFloat(est.suscripcion_mes_actual) || 0,
         mes_cumpleanos: this.obtenerNombreMes(est.fecha_nacimiento),
         edad_a_cumplir: this.calcularEdadACumplir(est.fecha_nacimiento, est.edad),
         docs_pendientes_cantidad: cantPendientes,
@@ -258,8 +258,8 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   }
 
   // Helper de género
-  private getGeneroTexto(estudiante: any): { articulo: string, querido: string } {
-    const esFemenino = estudiante.nombre_genero === 'Femenino';
+  private getGeneroTexto(cliente: any): { articulo: string, querido: string } {
+    const esFemenino = cliente.nombre_genero === 'Femenino';
     return {
       articulo: esFemenino ? 'nuestra' : 'nuestro',
       querido: esFemenino ? 'querida' : 'querido'
@@ -276,9 +276,9 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
   // ==================== MODAL RECORDATORIO ====================
 
-  verDetalle(estudiante: any): void {
-    this.estudianteSeleccionado = estudiante;
-    this.acudientesEstudiante = this.acudientesData.filter(a => a.id_estudiante === estudiante.id);
+  verDetalle(cliente: any): void {
+    this.clienteSeleccionado = cliente;
+    this.representantesCliente = this.representantesData.filter(a => a.id_cliente === cliente.id);
     this.tipoRecordatorioSeleccionado = 'general';
     this.telefonoAdicional = '';
     this.nombreAdicional = '';
@@ -287,7 +287,7 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
     this.solicitarReunionVirtual = false;
     this.solicitarFechaCompromiso = false;
     this.tratoCercano = false;
-    this.telefonosEditables = this.acudientesEstudiante.map(a => a.telefono || '');
+    this.telefonosEditables = this.representantesCliente.map(a => a.telefono || '');
     this.regenerarMensaje();
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalRecordatorioGeneral'));
     modal.show();
@@ -295,43 +295,43 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
   // Se llama cada vez que cambia el tipo, los checks o cualquier opción
   regenerarMensaje(): void {
-    if (!this.estudianteSeleccionado) return;
-    this.mensajeEditable = this.construirMensaje(this.estudianteSeleccionado);
+    if (!this.clienteSeleccionado) return;
+    this.mensajeEditable = this.construirMensaje(this.clienteSeleccionado);
   }
 
   // ==================== MODAL DESGLOSE FINANCIERO ====================
 
-  verCartera(estudiante: any): void {
-    this.estudianteFinanciero = estudiante;
+  verCartera(cliente: any): void {
+    this.clienteFinanciero = cliente;
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalDesgloseFinanciero'));
     modal.show();
   }
 
-  getCarteraConcepto(estudiante: any, campo: string, periodo: string, tipo: string): number {
-    return estudiante[campo + '_' + tipo + '_' + periodo] || 0;
+  getCarteraConcepto(cliente: any, campo: string, periodo: string, tipo: string): number {
+    return cliente[campo + '_' + tipo + '_' + periodo] || 0;
   }
 
-  getTotalCartera(estudiante: any, periodo: string, tipo: string): number {
+  getTotalCartera(cliente: any, periodo: string, tipo: string): number {
     let total = 0;
-    this.conceptosCartera.forEach(c => { total += this.getCarteraConcepto(estudiante, c.campo, periodo, tipo); });
+    this.conceptosCartera.forEach(c => { total += this.getCarteraConcepto(cliente, c.campo, periodo, tipo); });
     return total;
   }
 
   // ==================== MODAL HISTORIAL CON COMPROMISOS ====================
 
-  verHistorial(estudiante: any): void {
-    this.estudianteHistorial = estudiante;
-    this.historialEstudiante = [];
-    this.cargarHistorial(estudiante.id);
+  verHistorial(cliente: any): void {
+    this.clienteHistorial = cliente;
+    this.historialCliente = [];
+    this.cargarHistorial(cliente.id);
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalHistorial'));
     modal.show();
   }
 
-  cargarHistorial(idEstudiante: string): void {
+  cargarHistorial(idCliente: string): void {
     this.cargandoHistorial = true;
-    const sub = this.historialRecordatoriosService.obtenerPorEstudiante(idEstudiante).subscribe({
+    const sub = this.historialRecordatoriosService.obtenerPorCliente(idCliente).subscribe({
       next: (response: any) => {
-        this.historialEstudiante = (response.body || []).map((h: any) => ({
+        this.historialCliente = (response.body || []).map((h: any) => ({
           ...h,
           editando: false,
           compromiso_editado: h.compromiso || '',
@@ -382,8 +382,8 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
   // ==================== CONSTRUCCIÓN DE MENSAJE ====================
 
-  private construirMensaje(estudiante: any): string {
-    const g = this.getGeneroTexto(estudiante);
+  private construirMensaje(cliente: any): string {
+    const g = this.getGeneroTexto(cliente);
     const tu = this.tratoCercano;
     let msg = '';
 
@@ -393,38 +393,38 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
       : `Cordial saludo {NOMBRE_DESTINATARIO},\n\n`;
 
     msg += tu
-      ? `Te escribimos desde *${this.nombreColegio}* con relación a ${g.articulo} estudiante *${estudiante.nombre_completo}*.\n\n`
-      : `Le escribimos desde *${this.nombreColegio}* con relación a ${g.articulo} estudiante *${estudiante.nombre_completo}*.\n\n`;
+      ? `Te escribimos desde *${this.nombreColegio}* con relación a ${g.articulo} cliente *${cliente.nombre_completo}*.\n\n`
+      : `Le escribimos desde *${this.nombreColegio}* con relación a ${g.articulo} cliente *${cliente.nombre_completo}*.\n\n`;
 
     // Cuerpo según tipo
     if (this.tipoRecordatorioSeleccionado === 'contrato') {
-      if (estudiante.estado_contrato === 'Sin contrato') {
+      if (cliente.estado_contrato === 'Sin contrato') {
         msg += tu
-          ? `Te recordamos que aún no se ha formalizado el contrato de matrícula para este año. Te invitamos a acercarte al jardín para completar este proceso.\n\n`
-          : `Le recordamos que aún no se ha formalizado el contrato de matrícula para este año. Le invitamos a acercarse al jardín para completar este proceso.\n\n`;
+          ? `Te recordamos que aún no se ha formalizado el contrato de implementación para este año. Te invitamos a acercarte a la organización para completar este proceso.\n\n`
+          : `Le recordamos que aún no se ha formalizado el contrato de implementación para este año. Le invitamos a acercarse a la organización para completar este proceso.\n\n`;
       } else {
         msg += tu
-          ? `Te recordamos que el contrato de matrícula está listo y pendiente de firma. Te invitamos a acercarte al jardín para firmarlo.\n\n`
-          : `Le recordamos que el contrato de matrícula está listo y pendiente de firma. Le invitamos a acercarse al jardín para firmarlo.\n\n`;
+          ? `Te recordamos que el contrato de implementación está listo y pendiente de firma. Te invitamos a acercarte a la organización para firmarlo.\n\n`
+          : `Le recordamos que el contrato de implementación está listo y pendiente de firma. Le invitamos a acercarse a la organización para firmarlo.\n\n`;
       }
     } else if (this.tipoRecordatorioSeleccionado === 'documentos') {
-      const tieneContratoPendiente = estudiante.estado_contrato === 'Pendiente' || estudiante.estado_contrato === 'Sin contrato';
+      const tieneContratoPendiente = cliente.estado_contrato === 'Pendiente' || cliente.estado_contrato === 'Sin contrato';
 
       if (tieneContratoPendiente) {
-        if (estudiante.estado_contrato === 'Sin contrato') {
+        if (cliente.estado_contrato === 'Sin contrato') {
           msg += tu
-            ? `Te recordamos que el contrato de matrícula aún no se ha formalizado.\n\n`
-            : `Le recordamos que el contrato de matrícula aún no se ha formalizado.\n\n`;
+            ? `Te recordamos que el contrato de implementación aún no se ha formalizado.\n\n`
+            : `Le recordamos que el contrato de implementación aún no se ha formalizado.\n\n`;
         } else {
           msg += tu
-            ? `Te recordamos que el contrato de matrícula está pendiente de firma.\n\n`
-            : `Le recordamos que el contrato de matrícula está pendiente de firma.\n\n`;
+            ? `Te recordamos que el contrato de implementación está pendiente de firma.\n\n`
+            : `Le recordamos que el contrato de implementación está pendiente de firma.\n\n`;
         }
       }
 
-      if (estudiante.docs_pendientes_detalle) {
+      if (cliente.docs_pendientes_detalle) {
         msg += `Tenemos pendiente la entrega de los siguientes documentos:\n`;
-        estudiante.docs_pendientes_detalle.split(', ').forEach((doc: string) => {
+        cliente.docs_pendientes_detalle.split(', ').forEach((doc: string) => {
           msg += `- ${doc}\n`;
         });
         msg += tu
@@ -478,36 +478,36 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
   // ==================== ENVÍO ====================
 
-  enviarWhatsApp(acudiente: AcudienteRecordatorio, indice: number): void {
+  enviarWhatsApp(representante: RepresentanteRecordatorio, indice: number): void {
     const telefono = this.telefonosEditables[indice];
     if (!telefono) { alert('Ingrese un número de teléfono.'); return; }
     const telefonoLimpio = this.limpiarTelefono(telefono);
-    const mensaje = this.getMensajeParaEnvio(acudiente.nombre_acudiente);
-    this.guardarHistorialSilencioso(acudiente.id_persona_acudiente, telefonoLimpio, acudiente.nombre_acudiente, 'whatsapp');
+    const mensaje = this.getMensajeParaEnvio(representante.nombre_representante);
+    this.guardarHistorialSilencioso(representante.id_persona_representante, telefonoLimpio, representante.nombre_representante, 'whatsapp');
     window.open(`https://wa.me/57${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
   enviarWhatsAppAdicional(): void {
     if (!this.telefonoAdicional) { alert('Ingrese un número de teléfono.'); return; }
-    const nombre = this.nombreAdicional.trim() || 'Señor(a) acudiente';
+    const nombre = this.nombreAdicional.trim() || 'Señor(a) representante';
     const telefonoLimpio = this.limpiarTelefono(this.telefonoAdicional);
     const mensaje = this.getMensajeParaEnvio(nombre);
     this.guardarHistorialSilencioso(null, telefonoLimpio, nombre, 'whatsapp');
     window.open(`https://wa.me/57${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 
-  enviarCorreo(acudiente: AcudienteRecordatorio): void {
-    if (!acudiente.correo_electronico) { alert('El acudiente no tiene correo electrónico registrado.'); return; }
-    const asunto = `Recordatorio - ${this.estudianteSeleccionado.nombre_completo} - ${this.nombreColegio}`;
-    const cuerpo = this.getMensajeCorreo(acudiente.nombre_acudiente);
-    this.guardarHistorialSilencioso(acudiente.id_persona_acudiente, acudiente.correo_electronico, acudiente.nombre_acudiente, 'correo');
-    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(acudiente.correo_electronico)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
+  enviarCorreo(representante: RepresentanteRecordatorio): void {
+    if (!representante.correo_electronico) { alert('El representante no tiene correo electrónico registrado.'); return; }
+    const asunto = `Recordatorio - ${this.clienteSeleccionado.nombre_completo} - ${this.nombreColegio}`;
+    const cuerpo = this.getMensajeCorreo(representante.nombre_representante);
+    this.guardarHistorialSilencioso(representante.id_persona_representante, representante.correo_electronico, representante.nombre_representante, 'correo');
+    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(representante.correo_electronico)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
   }
 
   enviarCorreoAdicional(): void {
     if (!this.correoAdicional) { alert('Ingrese un correo electrónico.'); return; }
-    const nombre = this.nombreAdicional.trim() || 'Señor(a) acudiente';
-    const asunto = `Recordatorio - ${this.estudianteSeleccionado.nombre_completo} - ${this.nombreColegio}`;
+    const nombre = this.nombreAdicional.trim() || 'Señor(a) representante';
+    const asunto = `Recordatorio - ${this.clienteSeleccionado.nombre_completo} - ${this.nombreColegio}`;
     const cuerpo = this.getMensajeCorreo(nombre);
     this.guardarHistorialSilencioso(null, this.correoAdicional, nombre, 'correo');
     window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(this.correoAdicional)}&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_blank');
@@ -516,14 +516,14 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
   // ==================== GUARDADO ====================
 
   private guardarHistorialSilencioso(
-    idPersonaAcudiente: string | null, contactoUsado: string,
+    idPersonaRepresentante: string | null, contactoUsado: string,
     nombreDestinatario: string, medioEnvio: string
   ): void {
     const idUsuario = this.utilService.obtenerIdUsuarioActual();
     const idColaborador = this.utilService.obtenerIdColaboradorActual();
     const registro: any = {
-      id_estudiante: this.estudianteSeleccionado.id,
-      id_persona_acudiente: idPersonaAcudiente,
+      id_cliente: this.clienteSeleccionado.id,
+      id_persona_representante: idPersonaRepresentante,
       telefono_usado: contactoUsado,
       nombre_destinatario: nombreDestinatario,
       tipo_recordatorio: this.tipoRecordatorioSeleccionado,
@@ -533,15 +533,15 @@ export class RecordatoriosGeneralesComponent implements OnInit, OnDestroy {
 
     this.historialRecordatoriosService.crear(registro).subscribe({
       next: (response: any) => {
-        this.estudianteSeleccionado.ultimo_recordatorio = new Date().toISOString();
-        this.estudianteSeleccionado.ultimo_recordatorio_texto = this.formatearFecha(new Date().toISOString());
+        this.clienteSeleccionado.ultimo_recordatorio = new Date().toISOString();
+        this.clienteSeleccionado.ultimo_recordatorio_texto = this.formatearFecha(new Date().toISOString());
 
         // Crear tarea automáticamente
         if (idColaborador) {
-          const descripcion = `Seguimiento recordatorio (${this.tipoRecordatorioSeleccionado}) - ${this.estudianteSeleccionado.nombre_completo} - Enviado a: ${nombreDestinatario}`;
+          const descripcion = `Seguimiento recordatorio (${this.tipoRecordatorioSeleccionado}) - ${this.clienteSeleccionado.nombre_completo} - Enviado a: ${nombreDestinatario}`;
           const tarea: any = {
             id_colaborador: idColaborador,
-            id_estudiante: this.estudianteSeleccionado.id,
+            id_cliente: this.clienteSeleccionado.id,
             descripcion: descripcion,
             origen: 'recordatorio_general',
             id_historial_origen: response.id || null,

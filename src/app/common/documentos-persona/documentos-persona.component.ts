@@ -33,7 +33,7 @@ export class DocumentosPersonaComponent implements OnInit, OnDestroy {
   @Input() soloContratoFirmado = false;
   @Input() soloLectura = false;
   @Input() emailsFirmantes: string[] = [];
-  @Input() validarAcudientes = false;
+  @Input() validarRepresentantes = false;
   @Input() filtroCodigosTipoDocumento: string[] = [];
   @Input() modoSoloSubir = false;
   @Output() documentoSubido = new EventEmitter<{
@@ -132,7 +132,7 @@ export class DocumentosPersonaComponent implements OnInit, OnDestroy {
 
           if (this.soloContratoFirmado) {
             this.tiposDocumentos = this.tiposDocumentos.filter(
-              (td) => td.codigo === 'contrato_matricula_firmado',
+              (td) => td.codigo === 'contrato_implementacion_firmado',
             );
           }
 
@@ -154,7 +154,7 @@ export class DocumentosPersonaComponent implements OnInit, OnDestroy {
 
     const idTipoDoc = this.soloContratoFirmado
       ? this.tiposDocumentos.find(
-          (td) => td.codigo === 'contrato_matricula_firmado',
+          (td) => td.codigo === 'contrato_implementacion_firmado',
         )?.id
       : undefined;
 
@@ -173,13 +173,13 @@ export class DocumentosPersonaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Determina si el acudiente puede modificar (subir/eliminar) un tipo de documento.
-   * Si validarAcudientes es false, siempre retorna true (no restringe).
-   * Si validarAcudientes es true, revisa modificable_acudientes del tipo de documento.
+   * Determina si el representante puede modificar (subir/eliminar) un tipo de documento.
+   * Si validarRepresentantes es false, siempre retorna true (no restringe).
+   * Si validarRepresentantes es true, revisa modificable_representantes del tipo de documento.
    */
   puedeModificar(tipoDoc: any): boolean {
-    if (!this.validarAcudientes) return true;
-    return tipoDoc.modificable_acudientes !== 0 && tipoDoc.modificable_acudientes !== '0';
+    if (!this.validarRepresentantes) return true;
+    return tipoDoc.modificable_representantes !== 0 && tipoDoc.modificable_representantes !== '0';
   }
 
   abrirModal(tipoDocumento: TipoDocumento) {

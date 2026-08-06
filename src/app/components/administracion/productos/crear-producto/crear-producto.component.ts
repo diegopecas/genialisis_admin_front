@@ -43,7 +43,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     public proveedoresAsignados: any[] = [];
 
     // Propiedades para manejo de imagen
-    public imagenPreview: string = '/assets/images/producto.png';
+    public imagenPreview: string = 'mdi mdi-package-variant-closed';
     public imagenFile: File | null = null;
     public imagenCambiada: boolean = false;
     public imagenAnterior: string | null = null;
@@ -329,7 +329,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     eliminarImagen() {
         this.imagenFile = null;
         this.imagenCambiada = true;
-        this.imagenPreview = '/assets/images/producto.png';
+        this.imagenPreview = 'mdi mdi-package-variant-closed';
         this.model.imagen = null;
     }
 
@@ -865,7 +865,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         this.guardando = false;
         this.productoActivoSwitch = true;
         this.proveedoresAsignados = [];
-        this.imagenPreview = '/assets/images/producto.png';
+        this.imagenPreview = 'mdi mdi-package-variant-closed';
         this.imagenFile = null;
         this.imagenCambiada = false;
         this.imagenAnterior = null;
@@ -881,6 +881,6 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         this.model.stockMinimo = 0;
         this.model.precioUnitario = 0;
         this.productoActivoSwitch = true;
-        this.imagenPreview = '/assets/images/producto.png';
+        this.imagenPreview = 'mdi mdi-package-variant-closed';
     }
 }

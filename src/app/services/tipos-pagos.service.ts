@@ -50,9 +50,9 @@ import {
         );
     }
   
-    crear(tipoAcudiente: any) {
+    crear(tipoRepresentante: any) {
       const body = JSON.stringify({
-        nombre: tipoAcudiente.nombre
+        nombre: tipoRepresentante.nombre
       });
       
       return this.http.post<any>(this.servicio, body, httpOptions).pipe(
@@ -67,10 +67,10 @@ import {
       );
     }
   
-    actualizar(tipoAcudiente: any) {
+    actualizar(tipoRepresentante: any) {
       const body = JSON.stringify({
-        id: tipoAcudiente.id,
-        nombre: tipoAcudiente.nombre
+        id: tipoRepresentante.id,
+        nombre: tipoRepresentante.nombre
       });
       
       return this.http.put<any>(this.servicio, body, httpOptions).pipe(

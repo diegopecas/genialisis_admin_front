@@ -329,13 +329,13 @@ export class HistorialActividadesComponent implements OnInit {
   }
 
   agruparPorColaborador() {
-    const grupos: { [key: string]: ColaboradorAgrupado } = {};
+    const planes: { [key: string]: ColaboradorAgrupado } = {};
     const filtradas = this.actividadesFiltradas;
 
     filtradas.forEach(actividad => {
       const id = actividad.id_colaborador;
-      if (!grupos[id]) {
-        grupos[id] = {
+      if (!planes[id]) {
+        planes[id] = {
           nombre: actividad.colaborador,
           id_colaborador: id,
           total_actividades: 0,
@@ -346,13 +346,13 @@ export class HistorialActividadesComponent implements OnInit {
       // Mantener estado expandido si ya existía
       const existing = this.colaboradoresAgrupados.find(c => c.id_colaborador === id);
       if (existing) {
-        grupos[id].expandido = existing.expandido;
+        planes[id].expandido = existing.expandido;
       }
-      grupos[id].actividades.push(actividad);
-      grupos[id].total_actividades++;
+      planes[id].actividades.push(actividad);
+      planes[id].total_actividades++;
     });
 
-    this.colaboradoresAgrupados = Object.values(grupos)
+    this.colaboradoresAgrupados = Object.values(planes)
       .sort((a, b) => a.nombre.localeCompare(b.nombre));
   }
 

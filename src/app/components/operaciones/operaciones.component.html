@@ -13,7 +13,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'actividades'" (click)="toggleMenu('actividades', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container actividades">
-                            <img src="assets/images/actividades.png" alt="Actividades" />
+                            <i class="mdi mdi-clipboard-list icono-img"></i>
                         </div>
                         <h3 class="card-titulo">Actividades</h3>
                         <p class="card-descripcion">Registro de medidas y gestión de galerías</p>
@@ -37,7 +37,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'inventario'" (click)="toggleMenu('inventario', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container inventario">
-                            <img src="assets/images/inventario.png" alt="Inventario" />
+                            <i class="mdi mdi-warehouse icono-img"></i>
                         </div>
                         <h3 class="card-titulo">Inventario</h3>
                         <p class="card-descripcion">Movimientos y salidas de productos</p>
@@ -49,7 +49,7 @@
                         <div class="row g-2">
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.movimientos_productos')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('movimientos-inventario')">
-                                    <img src="assets/images/movimientos-inventario.png" alt="Movimientos de Inventario" />
+                                    <i class="mdi mdi-swap-horizontal icono-img"></i>
                                     <span>Movimientos de Inventario</span>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'apoyo'" (click)="toggleMenu('apoyo', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container apoyo">
-                            <img src="assets/images/apoyo.png" alt="Apoyo" />
+                            <i class="mdi mdi-lifebuoy icono-img"></i>
                         </div>
                         <h3 class="card-titulo">Apoyo</h3>
                         <p class="card-descripcion">Registro, control de limpieza y cocina</p>
@@ -77,37 +77,37 @@
                         <div class="row g-2">
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registros_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('registros-limpieza')">
-                                    <img src="assets/images/limpieza.png" alt="Registro de Limpieza" />
+                                    <i class="mdi mdi-broom icono-img"></i>
                                     <span>Registro de Limpieza</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_rapido_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('registro-rapido-limpieza')">
-                                    <img src="assets/images/registro_limpieza_rapido.png" alt="Registro Rápido de Aseo" />
+                                    <i class="mdi mdi-lightning-bolt icono-img"></i>
                                     <span>Registro Rápido de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_masivo_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('registro-masivo-limpieza')">
-                                    <img src="assets/images/registro_masivo_limpieza.png" alt="Registro Masivo de Aseo" />
+                                    <i class="mdi mdi-checkbox-multiple-marked icono-img"></i>
                                     <span>Registro Masivo de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.edicion_masiva_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('edicion-masiva-limpieza')">
-                                    <img src="assets/images/edicion_masiva_limpieza.png" alt="Edición Masiva de Aseo" />
+                                    <i class="mdi mdi-playlist-edit icono-img"></i>
                                     <span>Edición Masiva de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.supervision_limpieza')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('supervision-limpieza')">
-                                    <img src="assets/images/supervision_limpieza.png" alt="Supervisión de Aseo" />
+                                    <i class="mdi mdi-clipboard-check icono-img"></i>
                                     <span>Supervisión de Aseo</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.reporte_aseo')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('reporte-aseo')">
-                                    <img src="assets/images/reporte_aseo.png" alt="Reporte de Aseo" />
+                                    <i class="mdi mdi-file-chart icono-img"></i>
                                     <span>Reporte de Aseo</span>
                                 </div>
                             </div>
@@ -124,15 +124,15 @@
                 </div>
             </div>
 
-            <!-- Estudiantes -->
-            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['estudiantes.observaciones.administrar', 'operaciones.actualizacion_datos', 'operaciones.evaluacion_desarrollo', 'operaciones.inscripcion_cursos_extra', 'operaciones.perfil_desarrollo', 'operaciones.recordatorios_generales', 'operaciones.seguimiento_asistencia'])">
-                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'estudiantes'" (click)="toggleMenu('estudiantes', $event)">
+            <!-- Clientes -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['clientes.observaciones.administrar', 'operaciones.actualizacion_datos', 'operaciones.evaluacion_desarrollo', 'operaciones.inscripcion_cursos_extra', 'operaciones.perfil_desarrollo', 'operaciones.recordatorios_generales', 'operaciones.seguimiento_asistencia'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'clientes'" (click)="toggleMenu('clientes', $event)">
                     <div class="card-maestro-content">
-                        <div class="icono-container estudiantes">
-                            <img src="assets/images/estudiantes.png" alt="Estudiantes" />
+                        <div class="icono-container clientes">
+                            <i class="mdi mdi-account-tie icono-img"></i>
                         </div>
-                        <h3 class="card-titulo">Estudiantes</h3>
-                        <p class="card-descripcion">Gestión y seguimiento de estudiantes</p>
+                        <h3 class="card-titulo">Clientes</h3>
+                        <p class="card-descripcion">Gestión y seguimiento de clientes</p>
                         <div class="card-footer-custom">
                             <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
                         </div>
@@ -149,17 +149,17 @@
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.recordatorios_generales')">
                                 <div class="submenu-item" (click)="seleccionarOpcion('recordatorio-pagos')">
-                                    <img src="assets/images/recordatorio-pagos.png" alt="Recordatorio de Pagos" />
+                                    <i class="mdi mdi-message-alert icono-img"></i>
                                     <span>Recordatorio de Pagos</span>
                                 </div>
                                 <div class="submenu-item" (click)="seleccionarOpcion('recordatorios-generales')">
-                                    <img src="assets/images/recordatorio-pagos.png" alt="Recordatorios Generales" />
+                                    <i class="mdi mdi-message-alert icono-img"></i>
                                     <span>Recordatorios Generales</span>
                                 </div>
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.inscripcion_cursos_extra')">
                             </div>
-                            <div class="col-6" *ngIf="permisosService.tienePermiso('estudiantes.observaciones.administrar')">
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('clientes.observaciones.administrar')">
                             </div>
                         </div>
                     </div>
@@ -171,7 +171,7 @@
                 <div class="card-maestro menu-principal" [class.active]="menuActivo === 'financiero'" (click)="toggleMenu('financiero', $event)">
                     <div class="card-maestro-content">
                         <div class="icono-container financiero">
-                            <img src="assets/images/finanzas.png" alt="Financiero" />
+                            <i class="mdi mdi-finance icono-img"></i>
                         </div>
                         <h3 class="card-titulo">Financiero</h3>
                         <p class="card-descripcion">Recordatorios de cobro y gestión de pagos</p>

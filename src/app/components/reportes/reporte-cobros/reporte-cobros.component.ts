@@ -14,7 +14,7 @@ interface CobroDesagregado {
   nombre_persona: string;
   numero_identificacion: string;
   tipo_persona: string;
-  grupo_o_cargo: string;
+  plan_o_cargo: string;
   nombre_producto_servicio: string;
   nombre_clasificacion: string;
   valor: number;
@@ -68,7 +68,7 @@ export class ReporteCobrosComponent implements OnInit, OnDestroy {
     { clave: 'nombre_persona', alias: 'Persona' },
     { clave: 'tipo_persona', alias: 'Tipo' },
     { clave: 'numero_identificacion', alias: 'Identificación' },
-    { clave: 'grupo_o_cargo', alias: 'Grupo / Cargo' },
+    { clave: 'plan_o_cargo', alias: 'Plan / Cargo' },
     { clave: 'nombre_producto_servicio', alias: 'Producto' },
     { clave: 'nombre_clasificacion', alias: 'Clasificación' },
     { clave: 'valor', alias: 'Valor Cobrado', tipo: 'money' },
@@ -80,7 +80,7 @@ export class ReporteCobrosComponent implements OnInit, OnDestroy {
     { columna: 'Fecha', tipoFiltro: 'rango' },
     'Año',
     'Tipo',
-    'Grupo / Cargo',
+    'Plan / Cargo',
     'Clasificación',
     'Producto',
     'Saldo'
@@ -160,7 +160,7 @@ export class ReporteCobrosComponent implements OnInit, OnDestroy {
         nombre_persona: (item.nombre_persona || '').trim().replace(/\s+/g, ' '),
         numero_identificacion: item.numero_identificacion || '',
         tipo_persona: item.tipo_persona || 'Otro',
-        grupo_o_cargo: item.grupo_o_cargo || 'Sin asignar',
+        plan_o_cargo: item.plan_o_cargo || 'Sin asignar',
         nombre_producto_servicio: item.nombre_producto_servicio || 'Sin producto',
         nombre_clasificacion: item.nombre_clasificacion || 'Sin clasificación',
         valor: parseFloat(item.valor) || 0,

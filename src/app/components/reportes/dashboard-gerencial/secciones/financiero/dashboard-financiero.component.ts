@@ -11,7 +11,7 @@ type DireccionOrden = 'asc' | 'desc';
 
 type ColumnaCartera =
   | 'nombre_persona'
-  | 'grupo_o_cargo'
+  | 'plan_o_cargo'
   | 'activo'
   | 'cuentas_pendientes'
   | 'cuentas_vencidas'
@@ -39,7 +39,7 @@ type ColumnaMovimiento =
   | 'estado';
 
 type FiltroEstado = 'todos' | 'activos' | 'inactivos';
-type FiltroTipoPersona = 'todos' | 'estudiantes' | 'colaboradores' | 'acudientes';
+type FiltroTipoPersona = 'todos' | 'clientes' | 'colaboradores' | 'representantes';
 type FiltroTipoMov = 'todos' | 'ingresos' | 'gastos';
 type FiltroEstadoMov = 'todos' | 'aprobados' | 'pendientes' | 'anulados';
 type RangoRecaudo = 'hoy' | 'mes' | 'anio';
@@ -78,7 +78,7 @@ export class DashboardFinancieroComponent implements OnInit, OnChanges, OnDestro
     delta_vencido: 0,
     saldo_mes_actual: { total_cuentas: 0, saldo: 0 },
     saldo_meses_anteriores: { total_cuentas: 0, saldo: 0 },
-    saldo_estudiantes: { total_cuentas: 0, saldo: 0 },
+    saldo_clientes: { total_cuentas: 0, saldo: 0 },
     saldo_colaboradores: { total_cuentas: 0, saldo: 0 },
     cuentas_anuladas_mes: { cantidad: 0, total: 0 },
     buckets: {
@@ -101,7 +101,7 @@ export class DashboardFinancieroComponent implements OnInit, OnChanges, OnDestro
     recaudado_anio: { cantidad: 0, total: 0 },
     recaudado_mes_corriente: { total: 0 },
     recaudado_mes_anteriores: { total: 0 },
-    mes_estudiantes: { cantidad: 0, total: 0 },
+    mes_clientes: { cantidad: 0, total: 0 },
     mes_colaboradores: { cantidad: 0, total: 0 },
     anulados_mes: { cantidad: 0, total: 0 },
     por_tipo_pago: [] as any[]
@@ -352,7 +352,7 @@ export class DashboardFinancieroComponent implements OnInit, OnChanges, OnDestro
     if (q.length > 0) {
       lista = lista.filter(m =>
         (m.nombre_persona || '').toLowerCase().includes(q) ||
-        (m.grupo_o_cargo || '').toLowerCase().includes(q) ||
+        (m.plan_o_cargo || '').toLowerCase().includes(q) ||
         (m.numero_identificacion || '').toLowerCase().includes(q)
       );
     }
@@ -384,7 +384,7 @@ export class DashboardFinancieroComponent implements OnInit, OnChanges, OnDestro
   private compararCartera(a: any, b: any): number {
     switch (this.columnaOrdenCartera) {
       case 'nombre_persona': return (a.nombre_persona || '').localeCompare(b.nombre_persona || '');
-      case 'grupo_o_cargo': return (a.grupo_o_cargo || '').localeCompare(b.grupo_o_cargo || '');
+      case 'plan_o_cargo': return (a.plan_o_cargo || '').localeCompare(b.plan_o_cargo || '');
       case 'activo': return (a.activo || 0) - (b.activo || 0);
       case 'cuentas_pendientes': return (a.cuentas_pendientes || 0) - (b.cuentas_pendientes || 0);
       case 'cuentas_vencidas': return (a.cuentas_vencidas || 0) - (b.cuentas_vencidas || 0);
@@ -425,8 +425,8 @@ export class DashboardFinancieroComponent implements OnInit, OnChanges, OnDestro
   }
 
   irAPerfil(item: any) {
-    if (item.id_estudiante) {
-      this.router.navigate(['/estudiantes/consultar', item.id_estudiante]);
+    if (item.id_cliente) {
+      this.router.navigate(['/clientes/consultar', item.id_cliente]);
     } else if (item.id_colaborador) {
       this.router.navigate(['/colaboradores/consultar', item.id_colaborador]);
     }
@@ -473,12 +473,12 @@ export class DashboardFinancieroComponent implements OnInit, OnChanges, OnDestro
   private aplicarFiltrosRecaudo() {
     let lista = [...this.pagosOriginal];
 
-    if (this.filtroTipoPersonaRec === 'estudiantes') {
-      lista = lista.filter(p => p.tipo_persona === 'Estudiante');
+    if (this.filtroTipoPersonaRec === 'clientes') {
+      lista = lista.filter(p => p.tipo_persona === 'Cliente');
     } else if (this.filtroTipoPersonaRec === 'colaboradores') {
       lista = lista.filter(p => p.tipo_persona === 'Colaborador');
-    } else if (this.filtroTipoPersonaRec === 'acudientes') {
-      lista = lista.filter(p => p.tipo_persona === 'Acudiente');
+    } else if (this.filtroTipoPersonaRec === 'representantes') {
+      lista = lista.filter(p => p.tipo_persona === 'Representante');
     }
 
     if (this.filtroTipoPagoId) {

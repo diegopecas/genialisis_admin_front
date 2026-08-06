@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 /**
  * Nodo del árbol de menú.
  * - Si tiene `ruta` es una hoja navegable.
- * - Si tiene `hijos` es un grupo expandible.
+ * - Si tiene `hijos` es un plan expandible.
  * - `permiso` (opcional) gatea la visibilidad; los nodos sin permiso se muestran siempre.
  * - `keywords` (opcional) son términos alternativos para que la búsqueda encuentre el nodo
  *   aunque el usuario escriba una palabra distinta al label.
@@ -32,22 +32,21 @@ export class MenuArbolService {
   getArbol(): MenuNodo[] {
     return [
       {
-        id: 'estudiantes',
-        label: 'Estudiantes',
-        icono: '🎓',
-        imagen: '/assets/images/estudiantes.png',
-        permiso: 'estudiantes.ver',
-        keywords: ['alumnos', 'niños', 'matricula', 'matrícula', 'estudiantado', 'parvulos'],
+        id: 'clientes',
+        label: 'Clientes',
+        icono: 'mdi mdi-account-tie',
+        permiso: 'clientes.ver',
+        keywords: ['alumnos', 'niños', 'implementacion', 'implementación', 'estudiantado', 'parvulos'],
         hijos: [
           {
-            id: 'estudiantes-gestion',
+            id: 'clientes-gestion',
             label: 'Gestión',
             icono: '🎓',
-            keywords: ['alumnos', 'niños', 'matricula'],
+            keywords: ['alumnos', 'niños', 'implementacion'],
             hijos: [
-              { id: 'estudiantes-gestion-estudiantes', label: 'Gestión Estudiantes', icono: '🎓', ruta: '/estudiantes/gestion', permiso: 'estudiantes.gestion', keywords: ['alumnos', 'niños', 'matricula', 'registro rapido', 'registro civil'] },
-              { id: 'estudiantes-registro-rapido', label: 'Registro Rápido', icono: '⚡', ruta: '/estudiantes/registro-rapido', permiso: 'estudiantes.administrar', keywords: ['registro rapido', 'registro civil', 'matricula', 'nuip', 'foto'] },
-              { id: 'estudiantes-listado', label: 'Estudiantes', icono: '🎓', ruta: '/estudiantes', permiso: 'estudiantes.listado', keywords: ['alumnos', 'niños', 'estudiantado', 'parvulos'] }
+              { id: 'clientes-gestion-clientes', label: 'Gestión Clientes', icono: '🎓', ruta: '/clientes/gestion', permiso: 'clientes.gestion', keywords: ['alumnos', 'niños', 'implementacion', 'registro rapido', 'registro civil'] },
+              { id: 'clientes-registro-rapido', label: 'Registro Rápido', icono: '⚡', ruta: '/clientes/registro-rapido', permiso: 'clientes.administrar', keywords: ['registro rapido', 'registro civil', 'implementacion', 'nuip', 'foto'] },
+              { id: 'clientes-listado', label: 'Clientes', icono: '🎓', ruta: '/clientes', permiso: 'clientes.listado', keywords: ['alumnos', 'niños', 'estudiantado', 'parvulos'] }
             ]
           }
         ]
@@ -55,8 +54,7 @@ export class MenuArbolService {
       {
         id: 'reportes',
         label: 'Reportes',
-        icono: '📊',
-        imagen: '/assets/images/detalle.png',
+        icono: 'mdi mdi-format-list-bulleted',
         permiso: 'reportes.ver',
         keywords: ['informes', 'reporteria', 'estadisticas', 'tablero'],
         hijos: [
@@ -90,7 +88,7 @@ export class MenuArbolService {
             label: 'Operativos',
             icono: '📋',
             hijos: [
-              { id: 'reportes-estudiantes-general', label: 'Reporte Estudiantes', icono: '📋', ruta: '/reportes/estudiantes-general', permiso: 'reportes.estudiantes_general', keywords: ['listado estudiantes', 'alumnos'] }
+              { id: 'reportes-clientes-general', label: 'Reporte Clientes', icono: '📋', ruta: '/reportes/clientes-general', permiso: 'reportes.clientes_general', keywords: ['listado clientes', 'alumnos'] }
             ]
           }
         ]
@@ -98,8 +96,7 @@ export class MenuArbolService {
       {
         id: 'operaciones',
         label: 'Operaciones',
-        icono: '⚙️',
-        imagen: '/assets/images/operaciones.png',
+        icono: 'mdi mdi-cogs',
         permiso: 'operaciones.ver',
         keywords: ['operativo', 'dia a dia', 'gestion diaria'],
         hijos: [
@@ -133,8 +130,7 @@ export class MenuArbolService {
       {
         id: 'colaboradores',
         label: 'Colaboradores',
-        icono: '🧑‍💼',
-        imagen: '/assets/images/colaboradores.png',
+        icono: 'mdi mdi-account-group',
         permiso: 'colaboradores.ver',
         keywords: ['empleados', 'personal', 'trabajadores', 'staff'],
         hijos: [
@@ -175,8 +171,7 @@ export class MenuArbolService {
       {
         id: 'administracion',
         label: 'Administración',
-        icono: '🏛️',
-        imagen: '/assets/images/administracion.png',
+        icono: 'mdi mdi-cog-outline',
         permiso: 'administracion.ver',
         keywords: ['admin', 'configuracion', 'ajustes', 'parametros'],
         hijos: [

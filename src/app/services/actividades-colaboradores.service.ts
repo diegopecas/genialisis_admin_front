@@ -244,11 +244,11 @@ export class ActividadesColaboradoresService {
       );
   }
   /**
-   * Obtener lista de grupos para filtros del calendario
+   * Obtener lista de planes para filtros del calendario
    */
-  obtenerGruposParaCalendario() {
+  obtenerPlanesParaCalendario() {
     return this.http
-      .get<HttpResponse<Object>>(environment.api + 'grupos-calendario', {
+      .get<HttpResponse<Object>>(environment.api + 'planes-calendario', {
         observe: 'response',
       })
       .pipe(

@@ -1,7 +1,7 @@
 <div class="modulo">
     <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [raiz]="'/operaciones/registros-limpieza'"
         [regresar]="'/operaciones/registros-limpieza'"
-        [iconoTitulo]="'/assets/images/supervision_limpieza.png'">
+        [iconoTitulo]="'mdi mdi-clipboard-check'">
     </app-header>
 
     <div class="container-fluid mt-3">
@@ -99,35 +99,35 @@
                     <i class="fas fa-spinner fa-spin"></i> Cargando...
                 </div>
 
-                <div *ngIf="!cargando && grupos.length === 0" class="alert alert-success mb-0">
+                <div *ngIf="!cargando && planes.length === 0" class="alert alert-success mb-0">
                     <i class="fas fa-check-circle"></i>
                     No hay registros pendientes de supervisión.
                 </div>
 
-                <div class="grupos" *ngIf="!cargando && grupos.length > 0">
-                    <div *ngFor="let grupo of grupos" class="grupo"
-                        [class.grupo-activo]="seleccionadosDe(grupo) > 0">
+                <div class="planes" *ngIf="!cargando && planes.length > 0">
+                    <div *ngFor="let plan of planes" class="plan"
+                        [class.plan-activo]="seleccionadosDe(plan) > 0">
 
-                        <div class="grupo-header" (click)="toggleExpandir(grupo)">
-                            <span class="grupo-check" (click)="toggleGrupo(grupo, $event)">
-                                <i class="fas" [ngClass]="grupoCompleto(grupo) ? 'fa-square-check'
-                                    : (grupoParcial(grupo) ? 'fa-square-minus' : 'fa-square')"></i>
+                        <div class="plan-header" (click)="toggleExpandir(plan)">
+                            <span class="plan-check" (click)="togglePlan(plan, $event)">
+                                <i class="fas" [ngClass]="planCompleto(plan) ? 'fa-square-check'
+                                    : (planParcial(plan) ? 'fa-square-minus' : 'fa-square')"></i>
                             </span>
 
-                            <div class="grupo-info">
-                                <span class="grupo-fecha">{{grupo.fecha | date:'dd/MM/yyyy'}}</span>
-                                <span class="grupo-proceso">{{grupo.proceso}}</span>
-                                <span class="grupo-conteo">
-                                    {{seleccionadosDe(grupo)}}/{{grupo.registros.length}} áreas
+                            <div class="plan-info">
+                                <span class="plan-fecha">{{plan.fecha | date:'dd/MM/yyyy'}}</span>
+                                <span class="plan-proceso">{{plan.proceso}}</span>
+                                <span class="plan-conteo">
+                                    {{seleccionadosDe(plan)}}/{{plan.registros.length}} áreas
                                 </span>
                             </div>
 
-                            <i class="fas grupo-chevron"
-                                [ngClass]="grupo.expandido ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                            <i class="fas plan-chevron"
+                                [ngClass]="plan.expandido ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                         </div>
 
-                        <div class="grupo-detalle" *ngIf="grupo.expandido">
-                            <div *ngFor="let registro of grupo.registros" class="registro"
+                        <div class="plan-detalle" *ngIf="plan.expandido">
+                            <div *ngFor="let registro of plan.registros" class="registro"
                                 [class.seleccionado]="registro.seleccionado" (click)="toggleRegistro(registro)">
                                 <span class="registro-check">
                                     <i class="fas"

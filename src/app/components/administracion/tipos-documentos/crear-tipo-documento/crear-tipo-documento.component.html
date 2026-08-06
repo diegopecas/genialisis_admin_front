@@ -5,7 +5,7 @@
         [accion]="accion" 
         [raiz]="'/administracion/datos-maestros/tipos-documentos'"
         [regresar]="regresar" 
-        [iconoTitulo]="'/assets/images/tipos-documentos.png'">
+        [iconoTitulo]="'mdi mdi-file-cog'">
     </app-header>
 
     <div class="container mt-4">
@@ -160,24 +160,24 @@
                         </div>
                     </div>
 
-                    <!-- Toggle: Modificable por Acudientes -->
+                    <!-- Toggle: Modificable por Representantes -->
                     <div class="col-md-6">
-                        <div class="toggle-card" [class.active]="model.modificable_acudientes">
+                        <div class="toggle-card" [class.active]="model.modificable_representantes">
                             <div class="toggle-info">
                                 <div class="toggle-icon">
                                     <i class="fas fa-user-edit"></i>
                                 </div>
                                 <div class="toggle-text">
-                                    <span class="toggle-label">Modificable por Acudientes</span>
-                                    <small class="toggle-description">Los acudientes pueden subir/modificar este documento</small>
+                                    <span class="toggle-label">Modificable por Representantes</span>
+                                    <small class="toggle-description">Los representantes pueden subir/modificar este documento</small>
                                 </div>
                             </div>
                             <div class="form-check form-switch">
                                 <input 
                                     class="form-check-input custom-switch" 
                                     type="checkbox" 
-                                    id="modificable_acudientes"
-                                    [(ngModel)]="model.modificable_acudientes"
+                                    id="modificable_representantes"
+                                    [(ngModel)]="model.modificable_representantes"
                                     [disabled]="!editable">
                             </div>
                         </div>

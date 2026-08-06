@@ -38,12 +38,12 @@ export class MiPerfilComponent implements OnInit {
   public tabsCargados: Set<TabPerfil> = new Set(['ingreso-salida']);
 
   public tabs: { id: TabPerfil; label: string; icono: string }[] = [
-    { id: 'ingreso-salida', label: 'Ingreso / Salida', icono: '/assets/images/asistencia.png' },
-    { id: 'mis-datos', label: 'Mis Datos', icono: '/assets/images/colaboradores.png' },
-    { id: 'productos-servicios', label: 'Productos / Servicios', icono: '/assets/images/productos.png' },
-    { id: 'pagos-recibidos', label: 'Pagos Recibidos', icono: '/assets/images/pagos.png' },
-    { id: 'prestamos', label: 'Préstamos', icono: '/assets/images/prestamos.png' },
-    { id: 'seguridad', label: 'Seguridad', icono: '/assets/images/seguridad.png' },
+    { id: 'ingreso-salida', label: 'Ingreso / Salida', icono: 'mdi mdi-calendar-check' },
+    { id: 'mis-datos', label: 'Mis Datos', icono: 'mdi mdi-account-group' },
+    { id: 'productos-servicios', label: 'Productos / Servicios', icono: 'mdi mdi-package-variant' },
+    { id: 'pagos-recibidos', label: 'Pagos Recibidos', icono: 'mdi mdi-cash-multiple' },
+    { id: 'prestamos', label: 'Préstamos', icono: 'mdi mdi-hand-coin' },
+    { id: 'seguridad', label: 'Seguridad', icono: 'mdi mdi-shield-lock' },
   ];
 
   constructor(private router: Router) {}

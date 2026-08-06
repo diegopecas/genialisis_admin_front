@@ -1,7 +1,7 @@
 <div class="modulo">
   <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [accion]="accion"
     [raiz]="'/operaciones/movimientos-productos'" [regresar]="regresar"
-    [iconoTitulo]="'/assets/images/movimientos-inventario.png'">
+    [iconoTitulo]="'mdi mdi-swap-horizontal'">
   </app-header>
 
   <!-- Contenedor principal -->
@@ -307,7 +307,7 @@
             </div>
 
             <!-- Cantidad -->
-            <div class="campo-grupo">
+            <div class="campo-plan">
               <label class="campo-label">
                 <i class="fas fa-boxes me-1"></i>Cantidad <span class="text-danger">*</span>
               </label>
@@ -336,7 +336,7 @@
             </div>
 
             <!-- Precio (solo para entradas) -->
-            <div class="campo-grupo" *ngIf="tipoMovimiento === 'E'">
+            <div class="campo-plan" *ngIf="tipoMovimiento === 'E'">
               <label class="campo-label">
                 <i class="fas fa-dollar-sign me-1"></i>Precio unitario
               </label>
@@ -350,7 +350,7 @@
             </div>
 
             <!-- Fecha vencimiento (opcional) -->
-            <div class="campo-grupo" *ngIf="tipoMovimiento === 'E'">
+            <div class="campo-plan" *ngIf="tipoMovimiento === 'E'">
               <label class="campo-label">
                 <i class="fas fa-calendar-check me-1"></i>Fecha vencimiento (opcional)
               </label>

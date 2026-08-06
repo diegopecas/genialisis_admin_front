@@ -241,7 +241,7 @@ export class ProductosService {
 
   obtenerUrlImagen(imagen: string | null): string {
     if (!imagen) {
-      return '/assets/images/producto.png';
+      return 'mdi mdi-package-variant-closed';
     }
     // Si la imagen ya es una URL completa, la devolvemos
     if (imagen.startsWith('http')) {

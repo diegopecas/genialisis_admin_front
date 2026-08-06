@@ -28,7 +28,7 @@ export class SupervisionLimpiezaComponent implements OnInit {
   fechaHasta = '';
   filtroProceso = '';
 
-  grupos: any[] = [];
+  planes: any[] = [];
   cargando = false;
   guardando = false;
 
@@ -102,7 +102,7 @@ export class SupervisionLimpiezaComponent implements OnInit {
 
     this.registrosService.obtenerPendientesSupervision(filtros).subscribe({
       next: (response: any) => {
-        this.grupos = this.agrupar(response.body || []);
+        this.planes = this.agrupar(response.body || []);
         this.cargando = false;
       },
       error: (error: any) => {
@@ -129,35 +129,35 @@ export class SupervisionLimpiezaComponent implements OnInit {
 
     registros.forEach(registro => {
       const clave = `${registro.fecha}|${registro.id_tipo_proceso_limpieza}`;
-      let grupo = mapa.get(clave);
+      let plan = mapa.get(clave);
 
-      if (!grupo) {
-        grupo = {
+      if (!plan) {
+        plan = {
           clave,
           fecha: registro.fecha,
           proceso: registro.proceso,
           expandido: false,
           registros: []
         };
-        mapa.set(clave, grupo);
+        mapa.set(clave, plan);
       }
 
-      grupo.registros.push({ ...registro, seleccionado: true });
+      plan.registros.push({ ...registro, seleccionado: true });
     });
 
     return Array.from(mapa.values());
   }
 
-  toggleExpandir(grupo: any) {
-    grupo.expandido = !grupo.expandido;
+  toggleExpandir(plan: any) {
+    plan.expandido = !plan.expandido;
   }
 
-  toggleGrupo(grupo: any, event: Event) {
+  togglePlan(plan: any, event: Event) {
     event.stopPropagation();
     if (this.guardando) return;
 
-    const marcar = !this.grupoCompleto(grupo);
-    grupo.registros.forEach((r: any) => r.seleccionado = marcar);
+    const marcar = !this.planCompleto(plan);
+    plan.registros.forEach((r: any) => r.seleccionado = marcar);
   }
 
   toggleRegistro(registro: any) {
@@ -165,33 +165,33 @@ export class SupervisionLimpiezaComponent implements OnInit {
     registro.seleccionado = !registro.seleccionado;
   }
 
-  grupoCompleto(grupo: any): boolean {
-    return grupo.registros.every((r: any) => r.seleccionado);
+  planCompleto(plan: any): boolean {
+    return plan.registros.every((r: any) => r.seleccionado);
   }
 
-  grupoParcial(grupo: any): boolean {
-    const marcados = this.seleccionadosDe(grupo);
-    return marcados > 0 && marcados < grupo.registros.length;
+  planParcial(plan: any): boolean {
+    const marcados = this.seleccionadosDe(plan);
+    return marcados > 0 && marcados < plan.registros.length;
   }
 
-  seleccionadosDe(grupo: any): number {
-    return grupo.registros.filter((r: any) => r.seleccionado).length;
+  seleccionadosDe(plan: any): number {
+    return plan.registros.filter((r: any) => r.seleccionado).length;
   }
 
   marcarTodos() {
-    this.grupos.forEach(g => g.registros.forEach((r: any) => r.seleccionado = true));
+    this.planes.forEach(g => g.registros.forEach((r: any) => r.seleccionado = true));
   }
 
   marcarNinguno() {
-    this.grupos.forEach(g => g.registros.forEach((r: any) => r.seleccionado = false));
+    this.planes.forEach(g => g.registros.forEach((r: any) => r.seleccionado = false));
   }
 
   get totalPendientes(): number {
-    return this.grupos.reduce((total, g) => total + g.registros.length, 0);
+    return this.planes.reduce((total, g) => total + g.registros.length, 0);
   }
 
   get idsSeleccionados(): string[] {
-    return this.grupos
+    return this.planes
       .flatMap(g => g.registros)
       .filter((r: any) => r.seleccionado)
       .map((r: any) => r.id);
@@ -205,14 +205,14 @@ export class SupervisionLimpiezaComponent implements OnInit {
     if (!this.puedeSupervisar) return;
 
     const total = this.idsSeleccionados.length;
-    const gruposAfectados = this.grupos.filter(g => this.seleccionadosDe(g) > 0).length;
+    const planesAfectados = this.planes.filter(g => this.seleccionadosDe(g) > 0).length;
 
     const result = await Swal.fire({
       title: '¿Marcar como supervisados?',
       html: `
         <div class="text-start">
           <p class="mb-1">
-            <strong>${total}</strong> registro(s) de <strong>${gruposAfectados}</strong> jornada(s)
+            <strong>${total}</strong> registro(s) de <strong>${planesAfectados}</strong> jornada(s)
             pasarán a estado <strong>Supervisado</strong>.
           </p>
           <p class="mb-0 text-muted small">Esta acción no se puede deshacer desde la aplicación.</p>
