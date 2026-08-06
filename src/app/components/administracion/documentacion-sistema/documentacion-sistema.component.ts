@@ -392,7 +392,7 @@ export class DocumentacionSistemaComponent implements OnInit, OnDestroy {
   }
 
   onImageError(event: any): void {
-    event.target.src = 'mdi mdi-image-off';
+    event.target.src = 'fas fa-image';
   }
 
   getRutaImagen(img: string): string {

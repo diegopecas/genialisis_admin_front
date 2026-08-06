@@ -61,8 +61,8 @@ export class RolesComponent implements OnInit {
 
   crearAcciones() {
     this.acciones = [
-      { id: 'permisos', label: 'Permisos', icono: 'mdi mdi-shield-lock' },
-      { id: 'usuarios', label: 'Usuarios', icono: 'mdi mdi-account-group' },
+      { id: 'permisos', label: 'Permisos', icono: 'fas fa-shield-halved' },
+      { id: 'usuarios', label: 'Usuarios', icono: 'fas fa-users' },
     ];
   }
 

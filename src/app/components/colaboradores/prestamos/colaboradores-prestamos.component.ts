@@ -33,13 +33,13 @@ export class ColaboradoresPrestamosComponent implements OnInit {
     {
       id: 'registrar_pago',
       label: 'Registrar Pago',
-      icono: 'mdi mdi-cash-multiple',
+      icono: 'fas fa-money-bills',
       color: '#28a745'  // Color verde para pago
     },
     {
       id: 'anular',
       label: 'Anular Préstamo',
-      icono: 'mdi mdi-close-octagon',
+      icono: 'fas fa-ban',
       color: '#dc3545'  // Color rojo para anular
     }
   ] as any[];

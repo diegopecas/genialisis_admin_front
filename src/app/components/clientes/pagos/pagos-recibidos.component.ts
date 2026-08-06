@@ -53,8 +53,8 @@ export class PagosRecibidosComponent implements OnInit {
   private registrosSeleccionados = new Set<any>();
 
   public acciones = [
-    { id: 'contabilizar', label: 'Contabilizar', icono: 'mdi mdi-calculator-variant' },
-    { id: 'imprimir', label: 'Imprimir recibo', icono: 'mdi mdi-receipt-text' }
+    { id: 'contabilizar', label: 'Contabilizar', icono: 'fas fa-calculator' },
+    { id: 'imprimir', label: 'Imprimir recibo', icono: 'fas fa-receipt' }
   ] as any[];
 
   // Variables de permisos
@@ -223,7 +223,7 @@ export class PagosRecibidosComponent implements OnInit {
         alias: 'Comprobante',
         alinear: 'centrado',
         tipo: 'boton',
-        icono: 'mdi mdi-receipt-text',
+        icono: 'fas fa-receipt',
         accionId: 'descargar-comprobante',
         tooltip: 'Descargar comprobante'
       },

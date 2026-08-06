@@ -27,7 +27,7 @@ export class ProductosComponent implements OnInit {
   public unidadesMedida = [] as any[];
 
   public acciones = [
-    { id: 'movimientos', label: 'Movimientos', icono: 'mdi mdi-package-variant-closed' }
+    { id: 'movimientos', label: 'Movimientos', icono: 'fas fa-box' }
   ] as any[];
 
   public puedeCrear = true;

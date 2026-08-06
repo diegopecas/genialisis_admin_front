@@ -24,7 +24,7 @@ export class ProveedoresComponent implements OnInit {
   public tiposProveedor = [] as any[];
 
   public acciones = [
-    { id: 'productos', label: 'Productos', icono: 'mdi mdi-package-variant' },
+    { id: 'productos', label: 'Productos', icono: 'fas fa-box-open' },
   ] as any[];
 
   constructor(

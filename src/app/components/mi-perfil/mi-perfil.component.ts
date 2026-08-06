@@ -38,12 +38,12 @@ export class MiPerfilComponent implements OnInit {
   public tabsCargados: Set<TabPerfil> = new Set(['ingreso-salida']);
 
   public tabs: { id: TabPerfil; label: string; icono: string }[] = [
-    { id: 'ingreso-salida', label: 'Ingreso / Salida', icono: 'mdi mdi-calendar-check' },
-    { id: 'mis-datos', label: 'Mis Datos', icono: 'mdi mdi-account-group' },
-    { id: 'productos-servicios', label: 'Productos / Servicios', icono: 'mdi mdi-package-variant' },
-    { id: 'pagos-recibidos', label: 'Pagos Recibidos', icono: 'mdi mdi-cash-multiple' },
-    { id: 'prestamos', label: 'Préstamos', icono: 'mdi mdi-hand-coin' },
-    { id: 'seguridad', label: 'Seguridad', icono: 'mdi mdi-shield-lock' },
+    { id: 'ingreso-salida', label: 'Ingreso / Salida', icono: 'fas fa-calendar-check' },
+    { id: 'mis-datos', label: 'Mis Datos', icono: 'fas fa-users' },
+    { id: 'productos-servicios', label: 'Productos / Servicios', icono: 'fas fa-box-open' },
+    { id: 'pagos-recibidos', label: 'Pagos Recibidos', icono: 'fas fa-money-bills' },
+    { id: 'prestamos', label: 'Préstamos', icono: 'fas fa-hand-holding-dollar' },
+    { id: 'seguridad', label: 'Seguridad', icono: 'fas fa-shield-halved' },
   ];
 
   constructor(private router: Router) {}

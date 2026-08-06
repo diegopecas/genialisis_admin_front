@@ -31,10 +31,10 @@ export class RegistrosLimpiezaComponent implements OnInit {
   public estados = [] as any[];
 
   public acciones = [
-    { id: 'iniciar', label: 'Iniciar', icono: 'mdi mdi-play-circle' },
-    { id: 'finalizar', label: 'Finalizar', icono: 'mdi mdi-stop-circle' },
-    { id: 'supervisar', label: 'Supervisar', icono: 'mdi mdi-check-decagram' },
-    { id: 'cancelar', label: 'Cancelar', icono: 'mdi mdi-close-octagon' }
+    { id: 'iniciar', label: 'Iniciar', icono: 'fas fa-circle-play' },
+    { id: 'finalizar', label: 'Finalizar', icono: 'fas fa-circle-stop' },
+    { id: 'supervisar', label: 'Supervisar', icono: 'fas fa-circle-check' },
+    { id: 'cancelar', label: 'Cancelar', icono: 'fas fa-ban' }
   ] as any[];
 
   constructor(

@@ -241,7 +241,7 @@ export class ProductosService {
 
   obtenerUrlImagen(imagen: string | null): string {
     if (!imagen) {
-      return 'mdi mdi-package-variant-closed';
+      return 'fas fa-box';
     }
     // Si la imagen ya es una URL completa, la devolvemos
     if (imagen.startsWith('http')) {

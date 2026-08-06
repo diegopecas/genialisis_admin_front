@@ -17,7 +17,7 @@
                 [src]="obtenerUrlFoto()" 
                 [alt]="nombrePersona"
                 class="foto-img">
-            <i class="mdi mdi-camera icono-img foto-img" *ngIf="!fotoActual"></i>
+            <i class="fas fa-camera icono-img foto-img" *ngIf="!fotoActual"></i>
             <div class="foto-overlay">
                 <i class="fas fa-search-plus"></i>
             </div>
@@ -54,7 +54,7 @@
         <button class="lightbox-cerrar" (click)="cerrarLightbox()" title="Cerrar">
             <i class="fas fa-times"></i>
         </button>
-        <i class="mdi mdi-camera icono-img lightbox-img"></i>
+        <i class="fas fa-camera icono-img lightbox-img"></i>
         <div *ngIf="nombrePersona" class="lightbox-nombre">{{ nombrePersona }}</div>
     </div>
 </div>

@@ -23,11 +23,11 @@ export class ServiciosComponent {
   public planes = [] as any[];
 
   public acciones = [
-    { id: 'academico', label: 'Académico', icono: 'mdi mdi-school' },
-    { id: 'extraacademico', label: 'Extra académico', icono: 'mdi mdi-basketball' },
-    { id: 'alimentacion', label: 'Alimentación', icono: 'mdi mdi-food' },
-    { id: 'vestuario', label: 'Vestuario', icono: 'mdi mdi-tshirt-crew' },
-    { id: 'insumos', label: 'Insumos', icono: 'mdi mdi-package-variant' }
+    { id: 'academico', label: 'Académico', icono: 'fas fa-graduation-cap' },
+    { id: 'extraacademico', label: 'Extra académico', icono: 'fas fa-basketball' },
+    { id: 'alimentacion', label: 'Alimentación', icono: 'fas fa-utensils' },
+    { id: 'vestuario', label: 'Vestuario', icono: 'fas fa-shirt' },
+    { id: 'insumos', label: 'Insumos', icono: 'fas fa-box-open' }
   ] as any[];
 
   constructor(

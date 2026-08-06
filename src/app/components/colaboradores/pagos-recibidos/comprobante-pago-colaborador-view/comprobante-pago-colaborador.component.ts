@@ -223,7 +223,7 @@ Este es un comprobante de pago del ${this.nombreInstitucion}. Gracias por su pag
 
   private async cargarLogoBase64(): Promise<string> {
     try {
-      const response = await fetch('mdi mdi-shape');
+      const response = await fetch('fas fa-shapes');
       const blob = await response.blob();
 
       return new Promise((resolve, reject) => {

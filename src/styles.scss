@@ -233,189 +233,49 @@ body {
     background-color: #e9ecef;
     /* Cambia el fondo para indicar que están deshabilitados */
     opacity: 0.5;
-    /* Baja la opacidad de los controles deshabilitados */
 }
 
-option:disabled {
-    color: #aaa;
-}
-
-// =====================================================
-// NUEVOS ESTILOS PARA MÓVIL Y SWEETALERT2
-// =====================================================
-
-// Estilos para SweetAlert2 en móvil
-@media (max-width: 768px) {
-  .swal2-popup {
-    width: 90% !important;
-    font-size: 14px !important;
-    font-family: 'Material Design Icons', sans-serif !important;
-  }
-  
-  .swal2-title {
-    font-size: 18px !important;
-  }
-  
-  .swal2-html-container {
-    font-size: 14px !important;
-  }
-  
-  .swal2-input,
-  .swal2-select {
-    font-size: 16px !important; // Previene zoom en iOS
-    padding: 10px !important;
-  }
-  
-  .swal2-actions {
-    flex-direction: column !important;
-    gap: 10px !important;
-    
-    button {
-      width: 100% !important;
-      margin: 0 !important;
-    }
-  }
-}
-
-// Clase específica para móvil
-.swal-mobile {
-  @media (max-width: 768px) {
-    border-radius: 20px !important;
-    
-    .swal-mobile-title {
-      padding: 20px 20px 10px !important;
-    }
-    
-    .swal-mobile-input {
-      margin: 20px auto !important;
-      width: 90% !important;
-    }
-  }
-}
-
-// Mensaje cuando no hay resultados en móvil
-.no-resultados {
-  text-align: center;
-  padding: 40px 20px;
-  color: #6c757d;
-  font-family: 'Material Design Icons', sans-serif;
-  
-  p {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-  
-  &::before {
-    content: "📋";
-    font-size: 48px;
-    display: block;
-    margin-bottom: 20px;
-    opacity: 0.5;
-  }
-}
-
-// Ajustes adicionales para componentes móviles con tu tema
-@media (max-width: 768px) {
-  // Ajustar el módulo en móvil
-  .modulo {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; // Smooth scrolling en iOS
-  }
-  
-  // Mejorar la legibilidad de las tarjetas con tu esquema de colores
-  .cliente-card {
-    font-family: 'Material Design Icons', sans-serif !important;
-    
-    &:active {
-      background-color: #ffbd3115 !important;
-    }
-    
-    .ver-mas {
-      color: #ffbd31 !important;
-      font-weight: 600;
-      
-      &:hover {
-        text-decoration: none;
-        color: #e5a82b !important;
-      }
-    }
-  }
-  
-  // Estilo para los filtros activos con tu color primario
-  .filtro-chip.active {
-    background: #ffbd31 !important;
-    color: #000000 !important;
-    font-weight: 600;
-  }
-  
-  // Mejorar el contraste del buscador
-  .buscador-movil {
-    background: rgba(255, 255, 255, 0.98) !important;
-    
-    input:focus {
-      border-color: #ffbd31 !important;
-      box-shadow: 0 0 0 3px rgba(255, 189, 49, 0.2) !important;
-    }
-  }
-  
-  // Ajustar las acciones móviles con tu tema
-  .acciones-movil {
-    .accion-item {
-      &:active {
-        background: #ffbd31 !important;
-        
-        span {
-          color: #000000 !important;
-        }
-      }
-    }
-  }
-}
 
 /* ===================================================================
-   Iconos de fuente en lugar de imagenes PNG
-   Las reglas de tamano de los modulos apuntan a `img`; estas replican
-   ese tamano para los iconos que los reemplazaron.
+   Iconos de fuente en lugar de imagenes PNG (Font Awesome solido)
+   Los tamanos replican el espacio que ocupaban las imagenes.
    =================================================================== */
-i.mdi.icono-img {
+i.fas.icono-img,
+i.fa.icono-img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  line-height: 1;
-  width: 40px;
-  height: 40px;
-}
-
-.submenu-item i.mdi.icono-img,
-.card-opcion i.mdi.icono-img,
-.opcion-item i.mdi.icono-img {
-  font-size: 1.9rem;
-  width: 40px;
-  height: 40px;
-}
-
-.icono-modulo i.mdi.icono-img,
-.modulo-icono i.mdi.icono-img {
   font-size: 2.6rem;
+  line-height: 1;
   width: 100%;
   height: 100%;
 }
 
-/* Iconos del menu principal */
-.seccion-icono-mdi {
-  font-size: 1.8rem;
-  line-height: 1;
+/* Tarjetas y submenus: el icono va dentro de un circulo */
+.submenu-item i.fas.icono-img,
+.card-opcion i.fas.icono-img,
+.opcion-item i.fas.icono-img {
+  font-size: 2rem;
+  width: 44px;
+  height: 44px;
 }
 
-.nodo-icono-mdi {
-  font-size: 1.25rem;
+/* Iconos del menu principal */
+.seccion-icono-fa {
+  font-size: 1.9rem;
   line-height: 1;
-  width: 1.6rem;
+  width: 2.2rem;
   text-align: center;
 }
 
-.acceso-icono-mdi {
-  font-size: 1.4rem;
+.nodo-icono-fa {
+  font-size: 1.35rem;
+  line-height: 1;
+  width: 1.8rem;
+  text-align: center;
+}
+
+.acceso-icono-fa {
+  font-size: 1.5rem;
   line-height: 1;
 }

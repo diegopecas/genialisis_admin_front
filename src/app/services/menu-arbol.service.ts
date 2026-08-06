@@ -34,7 +34,7 @@ export class MenuArbolService {
       {
         id: 'clientes',
         label: 'Clientes',
-        icono: 'mdi mdi-account-tie',
+        icono: 'fas fa-user-tie',
         permiso: 'clientes.ver',
         keywords: ['alumnos', 'niños', 'implementacion', 'implementación', 'estudiantado', 'parvulos'],
         hijos: [
@@ -54,7 +54,7 @@ export class MenuArbolService {
       {
         id: 'reportes',
         label: 'Reportes',
-        icono: 'mdi mdi-format-list-bulleted',
+        icono: 'fas fa-list',
         permiso: 'reportes.ver',
         keywords: ['informes', 'reporteria', 'estadisticas', 'tablero'],
         hijos: [
@@ -96,7 +96,7 @@ export class MenuArbolService {
       {
         id: 'operaciones',
         label: 'Operaciones',
-        icono: 'mdi mdi-cogs',
+        icono: 'fas fa-gears',
         permiso: 'operaciones.ver',
         keywords: ['operativo', 'dia a dia', 'gestion diaria'],
         hijos: [
@@ -130,7 +130,7 @@ export class MenuArbolService {
       {
         id: 'colaboradores',
         label: 'Colaboradores',
-        icono: 'mdi mdi-account-group',
+        icono: 'fas fa-users',
         permiso: 'colaboradores.ver',
         keywords: ['empleados', 'personal', 'trabajadores', 'staff'],
         hijos: [
@@ -171,7 +171,7 @@ export class MenuArbolService {
       {
         id: 'administracion',
         label: 'Administración',
-        icono: 'mdi mdi-cog-outline',
+        icono: 'fas fa-gear',
         permiso: 'administracion.ver',
         keywords: ['admin', 'configuracion', 'ajustes', 'parametros'],
         hijos: [

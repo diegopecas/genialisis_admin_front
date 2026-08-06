@@ -42,9 +42,9 @@ export class ProductosServiciosComponent implements OnInit {
   private registrosSeleccionados = new Set<any>();
 
   public acciones = [
-    { id: 'cambiar_plan', label: 'Cambiar Plan', icono: 'mdi mdi-pencil' },
-    { id: 'registro_medidas', label: 'Registo Medidas', icono: 'mdi mdi-ruler' },
-    { id: 'productos_servicios', label: 'Productos Servicios', icono: 'mdi mdi-room-service-outline' },
+    { id: 'cambiar_plan', label: 'Cambiar Plan', icono: 'fas fa-pen' },
+    { id: 'registro_medidas', label: 'Registo Medidas', icono: 'fas fa-ruler' },
+    { id: 'productos_servicios', label: 'Productos Servicios', icono: 'fas fa-bell-concierge' },
   ] as any[];
   public columnasFiltro = [
     { columna: 'Fecha', tipoFiltro: 'fecha' as 'fecha' | 'normal' },

@@ -43,7 +43,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     public proveedoresAsignados: any[] = [];
 
     // Propiedades para manejo de imagen
-    public imagenPreview: string = 'mdi mdi-package-variant-closed';
+    public imagenPreview: string = 'fas fa-box';
     public imagenFile: File | null = null;
     public imagenCambiada: boolean = false;
     public imagenAnterior: string | null = null;
@@ -329,7 +329,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
     eliminarImagen() {
         this.imagenFile = null;
         this.imagenCambiada = true;
-        this.imagenPreview = 'mdi mdi-package-variant-closed';
+        this.imagenPreview = 'fas fa-box';
         this.model.imagen = null;
     }
 
@@ -865,7 +865,7 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         this.guardando = false;
         this.productoActivoSwitch = true;
         this.proveedoresAsignados = [];
-        this.imagenPreview = 'mdi mdi-package-variant-closed';
+        this.imagenPreview = 'fas fa-box';
         this.imagenFile = null;
         this.imagenCambiada = false;
         this.imagenAnterior = null;
@@ -881,6 +881,6 @@ export class CrearProductoComponent implements OnInit, OnDestroy {
         this.model.stockMinimo = 0;
         this.model.precioUnitario = 0;
         this.productoActivoSwitch = true;
-        this.imagenPreview = 'mdi mdi-package-variant-closed';
+        this.imagenPreview = 'fas fa-box';
     }
 }

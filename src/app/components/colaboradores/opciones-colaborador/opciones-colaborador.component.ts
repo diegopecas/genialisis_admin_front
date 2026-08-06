@@ -39,14 +39,14 @@ export class OpcionesColaboradorComponent implements OnInit {
   private registroDesdeState: any = null;
 
   private opciones: OpcionColaborador[] = [
-    { id: 'asistencia', label: 'Asistencia', icono: 'mdi mdi-calendar-check', categoria: 'Tiempo y asistencia', permiso: null, ruta: '/colaboradores/asistencia/' },
-    { id: 'gestion_tiempo', label: 'Gestión Tiempo', icono: 'mdi mdi-clock-outline', categoria: 'Tiempo y asistencia', permiso: null, ruta: '/colaboradores/gestion-tiempo/' },
-    { id: 'productos_servicios', label: 'Productos/Servicios', icono: 'mdi mdi-package-variant', categoria: 'Servicios y cobros', permiso: null, ruta: '/colaboradores/productos-servicios/' },
-    { id: 'pagos_recibidos', label: 'Pagos Recibidos', icono: 'mdi mdi-cash-multiple', categoria: 'Servicios y cobros', permiso: null, ruta: '/colaboradores/pagos-recibidos/' },
-    { id: 'prestamos', label: 'Préstamos', icono: 'mdi mdi-hand-coin', categoria: 'Servicios y cobros', permiso: null, ruta: '/colaboradores/prestamos/' },
-    { id: 'contratos', label: 'Contratos', icono: 'mdi mdi-file-document-edit', categoria: 'Servicios y cobros', permiso: 'colaboradores.contratos', ruta: '/colaboradores/contratos/' },
-    { id: 'editar', label: 'Editar', icono: 'mdi mdi-pencil', categoria: 'Gestión', permiso: null, ruta: '/colaboradores/editar/' },
-    { id: 'eliminar', label: 'Eliminar', icono: 'mdi mdi-delete', categoria: 'Gestión', permiso: null, ruta: null },
+    { id: 'asistencia', label: 'Asistencia', icono: 'fas fa-calendar-check', categoria: 'Tiempo y asistencia', permiso: null, ruta: '/colaboradores/asistencia/' },
+    { id: 'gestion_tiempo', label: 'Gestión Tiempo', icono: 'fas fa-clock', categoria: 'Tiempo y asistencia', permiso: null, ruta: '/colaboradores/gestion-tiempo/' },
+    { id: 'productos_servicios', label: 'Productos/Servicios', icono: 'fas fa-box-open', categoria: 'Servicios y cobros', permiso: null, ruta: '/colaboradores/productos-servicios/' },
+    { id: 'pagos_recibidos', label: 'Pagos Recibidos', icono: 'fas fa-money-bills', categoria: 'Servicios y cobros', permiso: null, ruta: '/colaboradores/pagos-recibidos/' },
+    { id: 'prestamos', label: 'Préstamos', icono: 'fas fa-hand-holding-dollar', categoria: 'Servicios y cobros', permiso: null, ruta: '/colaboradores/prestamos/' },
+    { id: 'contratos', label: 'Contratos', icono: 'fas fa-file-pen', categoria: 'Servicios y cobros', permiso: 'colaboradores.contratos', ruta: '/colaboradores/contratos/' },
+    { id: 'editar', label: 'Editar', icono: 'fas fa-pen', categoria: 'Gestión', permiso: null, ruta: '/colaboradores/editar/' },
+    { id: 'eliminar', label: 'Eliminar', icono: 'fas fa-trash', categoria: 'Gestión', permiso: null, ruta: null },
   ];
 
   private ordenCategorias = ['Tiempo y asistencia', 'Servicios y cobros', 'Gestión'];

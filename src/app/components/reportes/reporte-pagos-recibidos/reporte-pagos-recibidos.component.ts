@@ -41,7 +41,7 @@ export class ReportePagosRecibidosComponent implements OnInit {
   };
 
   public acciones = [
-    { id: 'imprimir', label: 'Imprimir', icono: 'mdi mdi-receipt-text' }
+    { id: 'imprimir', label: 'Imprimir', icono: 'fas fa-receipt' }
   ] as any[];
 
   constructor(

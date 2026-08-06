@@ -43,7 +43,7 @@ export class ClientesComponent implements OnInit {
 
   // Única acción personalizada: abre el hub de opciones del cliente.
   public acciones = [
-    { id: 'opciones', label: 'Opciones', icono: 'mdi mdi-dots-horizontal-circle' },
+    { id: 'opciones', label: 'Opciones', icono: 'fas fa-ellipsis' },
   ];
 
   // Variables de permisos

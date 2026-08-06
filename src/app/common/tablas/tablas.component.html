@@ -356,7 +356,7 @@
         *ngIf="cantidadFiltrosActivos > 0"
       >
         <button class="btn btn-sm btn-reset-filters" (click)="resetFiltros()">
-          <i class="mdi mdi-filter-remove"></i>
+          <i class="fas fa-filter-circle-xmark"></i>
           Limpiar filtros
           <span class="filter-count">{{ cantidadFiltrosActivos }}</span>
         </button>
@@ -462,7 +462,7 @@
                     *ngIf="accionEditarActivo"
                     (click)="seleccionar('editar', dato.id, dato)"
                   >
-                    <i class="mdi mdi-pencil icono-img me-2"></i>
+                    <i class="fas fa-pen icono-img me-2"></i>
                     Editar
                   </a>
 
@@ -476,7 +476,7 @@
                       "
                       (click)="seleccionar(accion.id, dato.id, dato)"
                     >
-                      <i class="mdi mdi-format-list-bulleted icono-img me-2"></i>
+                      <i class="fas fa-list icono-img me-2"></i>
                       {{ accion.label }}
                     </a>
                   </ng-container>
@@ -487,7 +487,7 @@
                     *ngIf="accionVerActivo"
                     (click)="seleccionar('consultar', dato.id, dato)"
                   >
-                    <i class="mdi mdi-format-list-bulleted icono-img me-2"></i>
+                    <i class="fas fa-list icono-img me-2"></i>
                     Ver detalle
                   </a>
                   <a
@@ -495,7 +495,7 @@
                     *ngIf="accionEliminarActivo"
                     (click)="seleccionar('eliminar', dato.id, dato)"
                   >
-                    <i class="mdi mdi-delete icono-img me-2"></i>
+                    <i class="fas fa-trash icono-img me-2"></i>
                     Eliminar
                   </a>
                 </div>
@@ -1084,7 +1084,7 @@
         <!-- Acción de editar primero (similar al menú desplegable) -->
         <div class="col" *ngIf="accionEditarActivo">
           <p class="accion">
-            <i class="mdi mdi-pencil icono-img"></i>
+            <i class="fas fa-pen icono-img"></i>
           </p>
         </div>
 
@@ -1095,7 +1095,7 @@
             *ngIf="!accion.condicion || dato[accion.condicion] === accion.valor"
           >
             <p class="accion">
-              <i class="mdi mdi-format-list-bulleted icono-img"></i>
+              <i class="fas fa-list icono-img"></i>
             </p>
           </div>
         </ng-container>
@@ -1103,12 +1103,12 @@
         <!-- Otras acciones predefinidas al final -->
         <div class="col" *ngIf="accionVerActivo">
           <p class="accion">
-            <i class="mdi mdi-format-list-bulleted icono-img"></i>
+            <i class="fas fa-list icono-img"></i>
           </p>
         </div>
         <div class="col" *ngIf="accionEliminarActivo">
           <p class="accion">
-            <i class="mdi mdi-delete icono-img"></i>
+            <i class="fas fa-trash icono-img"></i>
           </p>
         </div>
       </div>
