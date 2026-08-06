@@ -1,0 +1,188 @@
+<div class="modulo">
+    <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [raiz]="'/'" [regresar]="'/menu'"></app-header>
+
+    <div class="container-fluid mt-5">
+        <div class="text-center mb-5">
+            <h2 class="titulo-seccion">¿Qué operación deseas realizar hoy?</h2>
+            <p class="subtitulo-seccion">Selecciona una opción para comenzar</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <!-- Actividades -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['operaciones.galerias', 'operaciones.registro_medidas'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'actividades'" (click)="toggleMenu('actividades', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container actividades">
+                            <img src="assets/images/actividades.png" alt="Actividades" />
+                        </div>
+                        <h3 class="card-titulo">Actividades</h3>
+                        <p class="card-descripcion">Registro de medidas y gestión de galerías</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_medidas')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.galerias')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventario -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['operaciones.movimientos_productos', 'operaciones.salidas_alimentacion'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'inventario'" (click)="toggleMenu('inventario', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container inventario">
+                            <img src="assets/images/inventario.png" alt="Inventario" />
+                        </div>
+                        <h3 class="card-titulo">Inventario</h3>
+                        <p class="card-descripcion">Movimientos y salidas de productos</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.movimientos_productos')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('movimientos-inventario')">
+                                    <img src="assets/images/movimientos-inventario.png" alt="Movimientos de Inventario" />
+                                    <span>Movimientos de Inventario</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.salidas_alimentacion')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apoyo -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['operaciones.asignacion_onces', 'operaciones.disponibilidad_cocina', 'operaciones.edicion_masiva_limpieza', 'operaciones.entrega_alimentacion', 'operaciones.inventario_alimentacion', 'operaciones.registro_masivo_limpieza', 'operaciones.registro_rapido_limpieza', 'operaciones.registros_limpieza', 'operaciones.reporte_aseo', 'operaciones.supervision_limpieza'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'apoyo'" (click)="toggleMenu('apoyo', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container apoyo">
+                            <img src="assets/images/apoyo.png" alt="Apoyo" />
+                        </div>
+                        <h3 class="card-titulo">Apoyo</h3>
+                        <p class="card-descripcion">Registro, control de limpieza y cocina</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registros_limpieza')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('registros-limpieza')">
+                                    <img src="assets/images/limpieza.png" alt="Registro de Limpieza" />
+                                    <span>Registro de Limpieza</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_rapido_limpieza')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('registro-rapido-limpieza')">
+                                    <img src="assets/images/registro_limpieza_rapido.png" alt="Registro Rápido de Aseo" />
+                                    <span>Registro Rápido de Aseo</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.registro_masivo_limpieza')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('registro-masivo-limpieza')">
+                                    <img src="assets/images/registro_masivo_limpieza.png" alt="Registro Masivo de Aseo" />
+                                    <span>Registro Masivo de Aseo</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.edicion_masiva_limpieza')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('edicion-masiva-limpieza')">
+                                    <img src="assets/images/edicion_masiva_limpieza.png" alt="Edición Masiva de Aseo" />
+                                    <span>Edición Masiva de Aseo</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.supervision_limpieza')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('supervision-limpieza')">
+                                    <img src="assets/images/supervision_limpieza.png" alt="Supervisión de Aseo" />
+                                    <span>Supervisión de Aseo</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.reporte_aseo')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('reporte-aseo')">
+                                    <img src="assets/images/reporte_aseo.png" alt="Reporte de Aseo" />
+                                    <span>Reporte de Aseo</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.disponibilidad_cocina')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.asignacion_onces')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.entrega_alimentacion')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.inventario_alimentacion')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estudiantes -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['estudiantes.observaciones.administrar', 'operaciones.actualizacion_datos', 'operaciones.evaluacion_desarrollo', 'operaciones.inscripcion_cursos_extra', 'operaciones.perfil_desarrollo', 'operaciones.recordatorios_generales', 'operaciones.seguimiento_asistencia'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'estudiantes'" (click)="toggleMenu('estudiantes', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container estudiantes">
+                            <img src="assets/images/estudiantes.png" alt="Estudiantes" />
+                        </div>
+                        <h3 class="card-titulo">Estudiantes</h3>
+                        <p class="card-descripcion">Gestión y seguimiento de estudiantes</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.actualizacion_datos')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.evaluacion_desarrollo')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.perfil_desarrollo')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.seguimiento_asistencia')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.recordatorios_generales')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('recordatorios-generales')">
+                                    <img src="assets/images/recordatorio-pagos.png" alt="Recordatorios Generales" />
+                                    <span>Recordatorios Generales</span>
+                                </div>
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.inscripcion_cursos_extra')">
+                            </div>
+                            <div class="col-6" *ngIf="permisosService.tienePermiso('estudiantes.observaciones.administrar')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financiero -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['operaciones.recordatorio_pagos'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'financiero'" (click)="toggleMenu('financiero', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container financiero">
+                            <img src="assets/images/finanzas.png" alt="Financiero" />
+                        </div>
+                        <h3 class="card-titulo">Financiero</h3>
+                        <p class="card-descripcion">Recordatorios de cobro y gestión de pagos</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-12" *ngIf="permisosService.tienePermiso('operaciones.recordatorio_pagos')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+<div class="modulo">
+  <app-header [tituloModulo]="titulo" [mostrarCrear]="false" [accion]="accion" [raiz]="'/administracion/operaciones/entes-control'" [regresar]="'/administracion/operaciones/entes-control'" [iconoTitulo]="'/assets/images/entes-control.png'"></app-header>
+
+  <div class="layout-container mt-3">
+
+    <!-- SIDEBAR DESKTOP -->
+    <aside class="sidebar-desktop" *ngIf="!nuevo">
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" [class.active]="seccionActiva === 'datos-ente'" (click)="cambiarSeccion('datos-ente')"><i class="fas fa-landmark"></i> <span>Datos del Ente</span></a>
+        <a class="sidebar-link" *ngIf="model.idPersona" [class.active]="seccionActiva === 'documentos'" (click)="cambiarSeccion('documentos')"><i class="fas fa-file-alt"></i> <span>Documentos</span></a>
+        <a class="sidebar-link" *ngIf="model.idEnte" [class.active]="seccionActiva === 'recursos'" (click)="cambiarSeccion('recursos')"><i class="fas fa-list-check"></i> <span>Recursos</span></a>
+      </nav>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <div class="mobile-header-bar" *ngIf="!nuevo">
+      <button class="btn-seccion-mobile" (click)="toggleSidebar()">
+        <i [class]="obtenerIconoSeccion()"></i> <span>{{ obtenerNombreSeccion() }}</span> <i class="fas fa-bars ms-auto"></i>
+      </button>
+    </div>
+
+    <!-- SIDEBAR MOBILE OVERLAY -->
+    <div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="cerrarSidebar()"></div>
+    <aside class="sidebar-mobile" [class.abierto]="sidebarAbierto">
+      <div class="sidebar-mobile-header"><h6><i class="fas fa-th-list me-2"></i>Secciones</h6><button class="btn-cerrar-sidebar" (click)="cerrarSidebar()"><i class="fas fa-times"></i></button></div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" [class.active]="seccionActiva === 'datos-ente'" (click)="cambiarSeccion('datos-ente')"><i class="fas fa-landmark"></i> <span>Datos del Ente</span></a>
+        <a class="sidebar-link" *ngIf="model.idPersona" [class.active]="seccionActiva === 'documentos'" (click)="cambiarSeccion('documentos')"><i class="fas fa-file-alt"></i> <span>Documentos</span></a>
+        <a class="sidebar-link" *ngIf="model.idEnte" [class.active]="seccionActiva === 'recursos'" (click)="cambiarSeccion('recursos')"><i class="fas fa-list-check"></i> <span>Recursos</span></a>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido-principal" [class.con-sidebar]="!nuevo">
+
+      <!-- ==================== DATOS DEL ENTE ==================== -->
+      <div [hidden]="!(seccionActiva === 'datos-ente' || nuevo)">
+        <div class="row mb-4">
+          <div class="col-sm-12 col-md-6"><label for="tipoDocumento" class="form-label">Tipo de documento <span class="text-danger">*</span></label><select class="form-select form-select-lg" id="tipoDocumento" [(ngModel)]="model.tipoIdentificacion" required [ngClass]="{ 'is-invalid': !model.tipoIdentificacion && submitted }" [disabled]="documentoEncontrado || !editable"><option value="">Seleccionar</option><ng-container *ngFor="let ti of listas.tiposIdentificacion"><option [value]="ti.id">{{ ti.nombre }}</option></ng-container></select></div>
+          <div class="col-sm-12 col-md-6"><label for="numeroDocumento" class="form-label">Número de documento <span class="text-danger">*</span></label><input class="form-control form-control-lg" type="text" id="numeroDocumento" [(ngModel)]="model.numeroIdentificacion" required [ngClass]="{ 'is-invalid': !model.numeroIdentificacion && submitted }" [disabled]="documentoEncontrado || !editable" /></div>
+        </div>
+        <div class="row mt-1 mb-3" *ngIf="editable && !documentoEncontrado"><div class="col-sm-12 col-md-6"><button class="btn btn-sm btn-warning" (click)="consultaPersona()"><i class="fas fa-search me-1"></i> Verificar</button></div></div>
+        <hr />
+        <div [ngClass]="{ 'disabled-container': !camposHabilitados && editable }">
+          <div class="row"><div class="col-sm-12"><label for="razonSocial" class="form-label">Nombre del ente / Razón social <span class="text-danger">*</span></label><input class="form-control form-control-lg" type="text" id="razonSocial" [(ngModel)]="model.razonSocial" required placeholder="Ej: Secretaría de Educación de Chía" [ngClass]="{ 'is-invalid': !model.razonSocial && submitted }" [disabled]="!camposHabilitados && editable" /></div></div>
+          <div class="row mt-3"><div class="col-sm-12 col-md-6"><label for="correoElectronico" class="form-label">Correo electrónico</label><input class="form-control form-control-lg" type="email" id="correoElectronico" [(ngModel)]="model.correoElectronico" placeholder="ejemplo@correo.com" [disabled]="!camposHabilitados && editable" /></div><div class="col-sm-12 col-md-6"><label for="telefono" class="form-label">Teléfono</label><input class="form-control form-control-lg" type="text" id="telefono" [(ngModel)]="model.telefono" placeholder="Ej: 3001234567" [disabled]="!camposHabilitados && editable" /></div></div>
+          <div class="row mt-3"><div class="col-sm-12"><label for="direccion" class="form-label">Dirección</label><input class="form-control form-control-lg" type="text" id="direccion" [(ngModel)]="model.direccion" [disabled]="!camposHabilitados && editable" /></div></div>
+          <div class="row mt-3"><div class="col-sm-12"><label for="funciones" class="form-label">Funciones / Marco legal</label><textarea class="form-control form-control-lg" id="funciones" rows="4" [(ngModel)]="model.funciones" placeholder="Funciones o competencias del ente de control..." [disabled]="!camposHabilitados && editable"></textarea></div></div>
+        </div>
+        <div class="row mt-4" *ngIf="editable"><div class="col-12 d-flex gap-2"><button class="btn-save" (click)="guardar()" [disabled]="!camposHabilitados"><i class="fas fa-save"></i> Guardar</button><button class="btn-cancel" (click)="volver()"><i class="fas fa-times-circle"></i> Cancelar</button></div></div>
+      </div>
+
+      <!-- ==================== RECURSOS ==================== -->
+      <div *ngIf="!nuevo && model.idEnte" [hidden]="seccionActiva !== 'recursos'">
+        <app-recursos-ente-control
+          [idEnteControl]="model.idEnte"
+          [nombreEnte]="model.razonSocial"
+          [soloLectura]="!editable">
+        </app-recursos-ente-control>
+      </div>
+
+      <!-- ==================== DOCUMENTOS ==================== -->
+      <div *ngIf="!nuevo && model.idPersona" [hidden]="seccionActiva !== 'documentos'">
+        <app-documentos-persona
+          [idPersona]="model.idPersona"
+          [tipoPersona]="'ente_control'"
+          [nombrePersona]="model.razonSocial"
+          [soloLectura]="!editable">
+        </app-documentos-persona>
+      </div>
+
+    </main>
+  </div>
+</div>

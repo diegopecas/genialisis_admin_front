@@ -96,6 +96,40 @@ export class MenuArbolService {
         ]
       },
       {
+        id: 'operaciones',
+        label: 'Operaciones',
+        icono: '⚙️',
+        imagen: '/assets/images/operaciones.png',
+        permiso: 'operaciones.ver',
+        keywords: ['operativo', 'dia a dia', 'gestion diaria'],
+        hijos: [
+          {
+            id: 'operaciones-productos',
+            label: 'Productos',
+            icono: '📦',
+            keywords: ['inventario', 'stock', 'bodega'],
+            hijos: [
+              { id: 'operaciones-mov-productos', label: 'Movimientos Productos', icono: '📦', ruta: '/operaciones/movimientos-productos', permiso: 'operaciones.movimientos_productos', keywords: ['inventario', 'stock', 'bodega'] },
+              { id: 'operaciones-registros-limpieza', label: 'Registros Limpieza', icono: '🧼', ruta: '/operaciones/registros-limpieza', permiso: 'operaciones.registros_limpieza', keywords: ['aseo', 'limpieza'] },
+              { id: 'operaciones-registro-rapido-limpieza', label: 'Registro Rápido de Aseo', icono: '⚡', ruta: '/operaciones/registro-rapido-limpieza', permiso: 'operaciones.registro_rapido_limpieza', keywords: ['aseo', 'limpieza', 'rapido', 'express'] },
+              { id: 'operaciones-registro-masivo-limpieza', label: 'Registro Masivo de Aseo', icono: '📅', ruta: '/operaciones/registro-masivo-limpieza', permiso: 'operaciones.registro_masivo_limpieza', keywords: ['aseo', 'limpieza', 'masivo', 'rango', 'fechas', 'varios dias', 'lote'] },
+              { id: 'operaciones-edicion-masiva-limpieza', label: 'Edición Masiva de Aseo', icono: '✏️', ruta: '/operaciones/edicion-masiva-limpieza', permiso: 'operaciones.edicion_masiva_limpieza', keywords: ['aseo', 'limpieza', 'editar', 'edicion', 'masiva', 'lote', 'corregir', 'eliminar', 'borrar'] },
+              { id: 'operaciones-supervision-limpieza', label: 'Supervisión de Aseo', icono: '✅', ruta: '/operaciones/supervision-limpieza', permiso: 'operaciones.supervision_limpieza', keywords: ['aseo', 'limpieza', 'supervisar', 'supervision', 'aprobar'] },
+              { id: 'operaciones-reporte-aseo', label: 'Reporte de Aseo', icono: '📄', ruta: '/operaciones/reporte-aseo', permiso: 'operaciones.reporte_aseo', keywords: ['aseo', 'limpieza', 'reporte', 'informe', 'pdf'] }
+            ]
+          },
+          {
+            id: 'operaciones-comunicaciones',
+            label: 'Comunicaciones y Seguimiento',
+            icono: '📢',
+            keywords: ['whatsapp', 'avisos', 'notificaciones'],
+            hijos: [
+              { id: 'operaciones-recordatorios-generales', label: 'Recordatorios Generales', icono: '📢', ruta: '/operaciones/recordatorios-generales', permiso: 'operaciones.recordatorios_generales', keywords: ['avisos', 'notificaciones', 'whatsapp'] }
+            ]
+          }
+        ]
+      },
+      {
         id: 'colaboradores',
         label: 'Colaboradores',
         icono: '🧑‍💼',
@@ -148,6 +182,17 @@ export class MenuArbolService {
           { id: 'administracion-inicio', label: 'Administración', icono: '🏛️', ruta: '/administracion', permiso: 'administracion.ver' },
           { id: 'administracion-datos-maestros', label: 'Datos Maestros', icono: '🗃️', ruta: '/administracion/datos-maestros', permiso: 'administracion.datos_maestros', keywords: ['catalogos', 'parametros'] },
           {
+            id: 'administracion-operaciones',
+            label: 'Operaciones',
+            icono: '⚙️',
+            keywords: ['operaciones', 'entes', 'control'],
+            hijos: [
+              { id: 'administracion-oper-inicio', label: 'Operaciones', icono: '⚙️', ruta: '/administracion/operaciones', permiso: 'administracion.operaciones' },
+              { id: 'administracion-entes-control', label: 'Entes de Control', icono: '🏛️', ruta: '/administracion/operaciones/entes-control', permiso: 'admin.entes_control', keywords: ['entes', 'control', 'vigilancia', 'secretaria', 'icbf'] },
+              { id: 'administracion-consulta-entes-control', label: 'Consulta Entes de Control', icono: '🔎', ruta: '/administracion/operaciones/consulta-entes-control', permiso: 'admin.consulta_entes_control', keywords: ['consulta', 'entes', 'control', 'visita', 'documentos', 'reportes'] }
+            ]
+          },
+          {
             id: 'administracion-financiero',
             label: 'Financiero',
             icono: '💵',
@@ -168,7 +213,12 @@ export class MenuArbolService {
             hijos: [
               { id: 'administracion-prod', label: 'Productos', icono: '📦', ruta: '/administracion/datos-maestros/productos', permiso: 'admin.productos', keywords: ['inventario', 'articulos'] },
               { id: 'administracion-prod-servicios', label: 'Productos y Servicios', icono: '🛒', ruta: '/administracion/datos-maestros/productos-servicios', permiso: 'admin.productos_servicios', keywords: ['servicios', 'tarifas', 'precios'] },
-              { id: 'administracion-proveedores', label: 'Proveedores', icono: '🚚', ruta: '/administracion/datos-maestros/proveedores', permiso: 'admin.proveedores', keywords: ['compras'] }
+              { id: 'administracion-prod-mobiliario', label: 'Productos Mobiliario', icono: '🪑', ruta: '/administracion/datos-maestros/productos-mobiliario', permiso: 'admin.productos_mobiliario', keywords: ['muebles'] },
+              { id: 'administracion-prod-limpieza', label: 'Productos Limpieza', icono: '🧹', ruta: '/administracion/datos-maestros/productos-limpieza', permiso: 'admin.productos_limpieza', keywords: ['aseo'] },
+              { id: 'administracion-proveedores', label: 'Proveedores', icono: '🚚', ruta: '/administracion/datos-maestros/proveedores', permiso: 'admin.proveedores', keywords: ['compras'] },
+              { id: 'administracion-areas-fisicas', label: 'Áreas Físicas', icono: '🏗️', ruta: '/administracion/datos-maestros/areas-fisicas', permiso: 'admin.areas_fisicas', keywords: ['espacios', 'salones'] },
+              { id: 'administracion-elementos-fisicos', label: 'Elementos Físicos', icono: '🔧', ruta: '/administracion/datos-maestros/elementos-fisicos', permiso: 'admin.elementos_fisicos', keywords: ['activos'] },
+              { id: 'administracion-config-aseo', label: 'Configuración de Aseo', icono: '🧹', ruta: '/administracion/datos-maestros/config-aseo', permiso: 'admin.config_aseo', keywords: ['aseo', 'limpieza', 'procesos', 'configurar', 'masiva', 'tiempos', 'dias'] }
             ]
           },
           {

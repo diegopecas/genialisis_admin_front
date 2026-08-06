@@ -68,6 +68,22 @@ export class DatosMaestrosComponent {
       case 'institucion':
         this.router.navigate(['/administracion/datos-maestros/institucion']);
         break;
+
+      case 'productos-mobiliario':
+        this.router.navigate(['/administracion/datos-maestros/productos-mobiliario']);
+        break;
+      case 'productos-limpieza':
+        this.router.navigate(['/administracion/datos-maestros/productos-limpieza']);
+        break;
+      case 'areas-fisicas':
+        this.router.navigate(['/administracion/datos-maestros/areas-fisicas']);
+        break;
+      case 'elementos-fisicos':
+        this.router.navigate(['/administracion/datos-maestros/elementos-fisicos']);
+        break;
+      case 'config-aseo':
+        this.router.navigate(['/administracion/datos-maestros/config-aseo']);
+        break;
     }
   }
 
