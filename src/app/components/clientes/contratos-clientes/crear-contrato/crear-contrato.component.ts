@@ -240,19 +240,13 @@ export class CrearContratoComponent implements OnInit {
 
         console.log('=== REPRESENTANTES PROCESADOS ===', this.representantesDisponibles);
 
-        this.emailsFirmantes = this.representantesDisponibles
-          .map((a: any) => a.correo_electronico)
-          .filter((email: string) => email && email.trim().length > 0);
-
-        // El representante legal de la institucion tambien firma el contrato.
-        // Su correo no esta en los representantes: sale de configuracion_global.
-        this.agregarRepresentanteAFirmantes();
-
         if (this.accion === 'crear') {
           this.representantesDisponibles.forEach((a) => {
             this.model.representantes?.push(a.id);
           });
         }
+
+        this.actualizarEmailsFirmantes();
       });
   }
 
@@ -445,6 +439,9 @@ export class CrearContratoComponent implements OnInit {
               this.model.representantes = representantes.map(
                 (a: any) => a.id_representante
               );
+
+              // La lista de correos depende de quienes quedaron seleccionados
+              this.actualizarEmailsFirmantes();
             });
 
           // Cargar valores detallados
@@ -1083,6 +1080,31 @@ export class CrearContratoComponent implements OnInit {
       });
   }
 
+  /**
+   * Arma la lista de correos a los que se envia el documento: los
+   * representantes marcados en el contrato, mas quienes firman por la
+   * organizacion. Se recalcula cada vez que cambia la seleccion, y no se
+   * repiten correos aunque dos personas compartan el mismo.
+   */
+  actualizarEmailsFirmantes() {
+    const seleccionados = this.model.representantes || [];
+
+    const correos = this.representantesDisponibles
+      .filter((a: any) => seleccionados.includes(a.id))
+      .map((a: any) => (a.correo_electronico || '').trim())
+      .filter((email: string) => email.length > 0);
+
+    const unicos: string[] = [];
+    correos.forEach((email: string) => {
+      if (!unicos.some((e: string) => e.toLowerCase() === email.toLowerCase())) {
+        unicos.push(email);
+      }
+    });
+
+    this.emailsFirmantes = unicos;
+    this.agregarRepresentanteAFirmantes();
+  }
+
   toggleRepresentante(idRepresentante: string) {
     if (!this.model.representantes) {
       this.model.representantes = [];
@@ -1093,6 +1115,8 @@ export class CrearContratoComponent implements OnInit {
     } else {
       this.model.representantes.push(idRepresentante);
     }
+
+    this.actualizarEmailsFirmantes();
   }
 
   isRepresentanteSeleccionado(idRepresentante: string): boolean {
