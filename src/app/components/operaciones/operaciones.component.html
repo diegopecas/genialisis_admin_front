@@ -148,6 +148,10 @@
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.seguimiento_asistencia')">
                             </div>
                             <div class="col-6" *ngIf="permisosService.tienePermiso('operaciones.recordatorios_generales')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('recordatorio-pagos')">
+                                    <img src="assets/images/recordatorio-pagos.png" alt="Recordatorio de Pagos" />
+                                    <span>Recordatorio de Pagos</span>
+                                </div>
                                 <div class="submenu-item" (click)="seleccionarOpcion('recordatorios-generales')">
                                     <img src="assets/images/recordatorio-pagos.png" alt="Recordatorios Generales" />
                                     <span>Recordatorios Generales</span>

@@ -175,6 +175,8 @@ export const routes: Routes = [
 
   { path: 'operaciones', loadComponent: () => import('./components/operaciones/operaciones.component').then(m => m.OperacionesComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.ver', trackear: true, labelAcceso: 'Operaciones', iconoAcceso: '⚙️' } },
 
+  { path: 'operaciones/recordatorio-pagos', loadComponent: () => import('./components/operaciones/recordatorio-pagos/recordatorio-pagos.component').then(m => m.RecordatorioPagosComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.recordatorio_pagos', trackear: true, labelAcceso: 'Recordatorio Pagos', iconoAcceso: '💬' } },
+
   // Ruta comodín
   { path: '**', redirectTo: 'login' }
 ];

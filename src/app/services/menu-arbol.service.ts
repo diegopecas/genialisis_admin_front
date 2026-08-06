@@ -124,6 +124,7 @@ export class MenuArbolService {
             icono: '📢',
             keywords: ['whatsapp', 'avisos', 'notificaciones'],
             hijos: [
+              { id: 'operaciones-recordatorio-pagos', label: 'Recordatorio Pagos', icono: '💬', ruta: '/operaciones/recordatorio-pagos', permiso: 'operaciones.recordatorio_pagos', keywords: ['cobro', 'whatsapp'] },
               { id: 'operaciones-recordatorios-generales', label: 'Recordatorios Generales', icono: '📢', ruta: '/operaciones/recordatorios-generales', permiso: 'operaciones.recordatorios_generales', keywords: ['avisos', 'notificaciones', 'whatsapp'] }
             ]
           }
