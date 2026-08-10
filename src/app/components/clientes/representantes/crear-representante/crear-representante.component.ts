@@ -34,7 +34,7 @@ interface RepresentanteModel {
   ocupacion: string;
   rh: string;
   tipoRepresentante: number | string;
-  empresa: string;
+  area: string;
   cargo: string;
   telefonoOficina: string;
   responsablePago: boolean;
@@ -125,7 +125,7 @@ export class CrearRepresentanteComponent implements OnInit {
     ocupacion: "",
     rh: "",
     tipoRepresentante: "",
-    empresa: "",
+    area: "",
     cargo: "",
     telefonoOficina: "",
     responsablePago: false,
@@ -321,7 +321,7 @@ export class CrearRepresentanteComponent implements OnInit {
 
                 this.model.idRepresentante = representante.id;
                 this.model.tipoRepresentante = representante.id_tipo_representante;
-                this.model.empresa = representante.empresa || '';
+                this.model.area = representante.area || '';
                 this.model.cargo = representante.cargo || '';
                 this.model.telefonoOficina = representante.telefono_oficina || '';
                 this.model.responsablePago = representante.es_responsable_pago === 1;
@@ -483,7 +483,7 @@ export class CrearRepresentanteComponent implements OnInit {
       id_cliente: this.idCliente,
       id_persona: representante.idPersona,
       id_tipo_representante: representante.tipoRepresentante,
-      empresa: representante.empresa || null,
+      area: representante.area || null,
       cargo: representante.cargo || null,
       telefono_oficina: representante.telefonoOficina || null,
       es_responsable_pago: representante.responsablePago ? 1 : 0,
@@ -650,7 +650,7 @@ export class CrearRepresentanteComponent implements OnInit {
       ocupacion: "",
       rh: "",
       tipoRepresentante: "",
-      empresa: "",
+      area: "",
       cargo: "",
       telefonoOficina: "",
       responsablePago: false,
@@ -775,7 +775,7 @@ export class CrearRepresentanteComponent implements OnInit {
       id: this.model.idRepresentante,
       id_persona: this.model.idPersona,
       id_tipo_representante: this.model.tipoRepresentante,
-      empresa: this.model.empresa || null,
+      area: this.model.area || null,
       cargo: this.model.cargo || null,
       telefono_oficina: this.model.telefonoOficina || null,
       es_responsable_pago: this.model.responsablePago ? 1 : 0,
