@@ -177,6 +177,14 @@ export const routes: Routes = [
 
   { path: 'operaciones/recordatorio-pagos', loadComponent: () => import('./components/operaciones/recordatorio-pagos/recordatorio-pagos.component').then(m => m.RecordatorioPagosComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.recordatorio_pagos', trackear: true, labelAcceso: 'Recordatorio Pagos', iconoAcceso: '💬' } },
 
+  // ==================================================================
+  // Migración
+  // ==================================================================
+  { path: 'migracion', redirectTo: 'migracion/sesiones', pathMatch: 'full' },
+  { path: 'migracion/sesiones', loadComponent: () => import('./components/migracion/sesiones/sesiones.component').then(m => m.MigracionSesionesComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'migracion.listado', trackear: true, labelAcceso: 'Migración', iconoAcceso: '📦' } },
+  { path: 'migracion/conexiones', loadComponent: () => import('./components/migracion/conexiones/conexiones.component').then(m => m.MigracionConexionesComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'migracion.conexiones', trackear: true, labelAcceso: 'Conexiones Destino', iconoAcceso: '🔌' } },
+  { path: 'migracion/sesion/:id', loadComponent: () => import('./components/migracion/sesion-detalle/sesion-detalle.component').then(m => m.MigracionSesionDetalleComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'migracion.listado' } },
+
   // Ruta comodín
   { path: '**', redirectTo: 'login' }
 ];

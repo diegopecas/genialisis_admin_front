@@ -1,0 +1,254 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [accion]="'ConsultarTodos'"
+    [raiz]="'/migracion/sesiones'"
+    [regresar]="'/migracion/sesiones'"
+  ></app-header>
+
+  <div class="contenedor-detalle" *ngIf="sesion">
+
+  <div class="encabezado">
+    <div class="titulo">
+      <div>
+        <h2>{{ sesion.nombre_cliente }}</h2>
+        <p class="subtitulo">
+          Tenant <strong>{{ sesion.codigo_tenant_destino }}</strong>
+          <span *ngIf="sesion.id_tenant_destino">(id {{ sesion.id_tenant_destino }})</span>
+          <span *ngIf="!sesion.id_tenant_destino" class="pendiente">sin id_tenant todavía</span>
+          · Año {{ sesion.anno }}
+          · Base <strong>{{ sesion.base_datos }}</strong>
+          <span class="ambiente" [class.produccion]="sesion.ambiente === 'produccion'">{{ sesion.ambiente }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="acciones-encabezado">
+      <button class="btn-secundario" (click)="verificarEsquema()">Verificar esquema</button>
+      <button class="btn-secundario" (click)="cambiarDestino()">Cambiar destino</button>
+      <button class="btn-peligro" (click)="purgar()" *ngIf="sesion.estado !== 'purgada'">Validar y purgar</button>
+    </div>
+  </div>
+
+  <div class="aviso" *ngIf="!sesion.id_tenant_destino">
+    Esta sesión todavía no tiene <strong>id_tenant destino</strong>. Sin él no se puede validar el
+    aislamiento de los scripts ni deshacer un bloque. Asígnalo antes de ejecutar nada.
+  </div>
+
+  <div class="bloques">
+    <div class="bloque" *ngFor="let b of sesion.bloques"
+         [ngClass]="claseBloque(b)"
+         [class.activo]="codigoBloqueActivo === b.codigo"
+         (click)="codigoBloqueActivo = b.codigo">
+      <span class="orden">{{ b.orden }}</span>
+      <span class="nombre">{{ b.nombre }}</span>
+      <span class="estado">{{ b.estado }}</span>
+      <button class="btn-validar" *ngIf="b.estado === 'ejecutado'"
+              (click)="validarBloque(b, $event)">Marcar validado</button>
+    </div>
+  </div>
+
+  <div class="preguntas" *ngIf="sesion.preguntas_abiertas?.length">
+    <h4>El asistente necesita confirmar {{ sesion.preguntas_abiertas.length }} cosa(s)</h4>
+    <div class="pregunta" *ngFor="let p of sesion.preguntas_abiertas">
+      <span>{{ p.pregunta }}</span>
+      <button class="btn-mini" (click)="responderPregunta(p)">Responder</button>
+    </div>
+  </div>
+
+  <div class="pestanas">
+    <button [class.activa]="pestana === 'chat'" (click)="pestana = 'chat'">Asistente</button>
+    <button [class.activa]="pestana === 'archivos'" (click)="pestana = 'archivos'">
+      Archivos <span class="contador">{{ archivos.length }}</span>
+    </button>
+    <button [class.activa]="pestana === 'scripts'" (click)="pestana = 'scripts'">
+      Scripts <span class="contador">{{ scripts.length }}</span>
+    </button>
+    <button [class.activa]="pestana === 'bitacora'" (click)="pestana = 'bitacora'">
+      Bitácora <span class="contador">{{ bitacora.length }}</span>
+    </button>
+  </div>
+
+  <div class="panel" *ngIf="pestana === 'chat'">
+    <div class="hilo" #hiloChat>
+      <div class="vacio" *ngIf="mensajes.length === 0">
+        Cuéntale al asistente qué vas a cargar. Ya tiene el esquema de la base destino,
+        los catálogos reales y los archivos que subiste.
+      </div>
+
+      <div class="mensaje" *ngFor="let m of mensajes" [ngClass]="'rol-' + m.rol">
+        <div class="burbuja">
+          <pre>{{ limpiarMensaje(m.mensaje) }}</pre>
+          <div class="meta" *ngIf="m.rol === 'assistant' && m.proveedor">
+            {{ m.proveedor }} · {{ m.modelo }}
+            <span *ngIf="m.tokens_entrada">· {{ m.tokens_entrada }} in / {{ m.tokens_salida }} out</span>
+            <span *ngIf="m.tiempo_ms">· {{ m.tiempo_ms }} ms</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pensando" *ngIf="enviando">El asistente está trabajando...</div>
+    </div>
+
+    <div class="caja-envio">
+      <textarea rows="2" [(ngModel)]="textoMensaje"
+                (keydown.enter)="$event.preventDefault(); enviar()"
+                placeholder="Ej: vamos a cargar los estudiantes de las hojas de matrícula"></textarea>
+      <button class="btn-principal" (click)="enviar()" [disabled]="enviando">Enviar</button>
+    </div>
+
+    <div class="consumo" *ngIf="consumo?.turnos">
+      {{ consumo.turnos }} turnos · {{ consumo.tokens_entrada }} tokens de entrada ·
+      {{ consumo.tokens_salida }} de salida
+    </div>
+  </div>
+
+  <div class="panel" *ngIf="pestana === 'archivos'">
+    <div class="cargar-archivos">
+      <label class="btn-principal">
+        {{ subiendo ? 'Subiendo...' : 'Subir archivos del cliente' }}
+        <input type="file" multiple hidden (change)="seleccionarArchivos($event)" [disabled]="subiendo">
+      </label>
+      <span class="ayuda">PDF con texto, Excel, Word, CSV. Sube todo junto y sin orden.</span>
+    </div>
+
+    <table class="tabla" *ngIf="archivos.length">
+      <thead>
+        <tr>
+          <th>Archivo</th>
+          <th>Tipo</th>
+          <th>Tamaño</th>
+          <th>Texto leído</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of archivos">
+          <td>{{ a.nombre_original }}</td>
+          <td>
+            <select [(ngModel)]="a.tipo_detectado" (change)="cambiarTipo(a)">
+              <option *ngFor="let t of tiposArchivo" [value]="t">{{ t }}</option>
+            </select>
+          </td>
+          <td>{{ (a.tamano / 1024) | number:'1.0-0' }} KB</td>
+          <td>
+            <span *ngIf="a.caracteres_texto > 0">{{ a.caracteres_texto | number }} caracteres</span>
+            <span *ngIf="!a.caracteres_texto" class="sin-texto">sin texto</span>
+          </td>
+          <td>
+            <span class="etiqueta" [class.error]="a.estado === 'error'">{{ a.estado }}</span>
+            <div class="mensaje-error" *ngIf="a.mensaje_error">{{ a.mensaje_error }}</div>
+          </td>
+          <td><button class="btn-borrar" (click)="borrarArchivo(a)">Borrar</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="vacio" *ngIf="!archivos.length">Todavía no hay archivos cargados.</div>
+  </div>
+
+  <div class="panel" *ngIf="pestana === 'scripts'">
+    <div class="vacio" *ngIf="!scripts.length">
+      Todavía no hay scripts. El asistente los propone desde el chat.
+    </div>
+
+    <div class="lista-scripts" *ngIf="scripts.length">
+      <div class="tarjeta-script" *ngFor="let s of scripts"
+           [class.seleccionado]="scriptSeleccionado?.id === s.id">
+        <div class="fila-script">
+          <div>
+            <strong>{{ s.titulo }}</strong>
+            <span class="etiqueta-bloque" *ngIf="s.nombre_bloque">{{ s.nombre_bloque }}</span>
+          </div>
+          <span class="etiqueta" [ngClass]="'estado-' + s.estado">{{ s.estado }}</span>
+        </div>
+
+        <div class="motivo-rechazo" *ngIf="s.motivo_rechazo">
+          Rechazado por el validador: {{ s.motivo_rechazo }}
+        </div>
+
+        <div class="acciones-script">
+          <button class="btn-secundario" (click)="previsualizar(s)">Previsualizar</button>
+          <button class="btn-secundario" (click)="aprobar(s)"
+                  *ngIf="s.estado === 'propuesto' && s.validado">Aprobar</button>
+          <button class="btn-principal" (click)="ejecutar(s)"
+                  *ngIf="s.estado === 'aprobado'">Ejecutar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="previsualizacion" *ngIf="previsualizacion">
+      <h4>Previsualización — {{ previsualizacion.titulo }}</h4>
+
+      <div class="resumen-validacion" [class.invalido]="!previsualizacion.validacion.valido">
+        <div *ngIf="previsualizacion.validacion.valido">Pasa la validación.</div>
+        <div *ngIf="!previsualizacion.validacion.valido">
+          <strong>No pasa la validación:</strong>
+          <ul><li *ngFor="let e of previsualizacion.validacion.errores">{{ e }}</li></ul>
+        </div>
+        <ul class="advertencias" *ngIf="previsualizacion.validacion.advertencias?.length">
+          <li *ngFor="let a of previsualizacion.validacion.advertencias">{{ a }}</li>
+        </ul>
+      </div>
+
+      <table class="tabla">
+        <thead>
+          <tr><th>Operación</th><th>Tabla</th><th>Sentencias</th><th>Filas</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of previsualizacion.resumen">
+            <td>{{ r.operacion }}</td>
+            <td>{{ r.tabla }}</td>
+            <td>{{ r.sentencias }}</td>
+            <td>{{ r.filas }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h5>Muestra de las primeras sentencias</h5>
+      <pre class="muestra-sql">{{ muestraSql }}</pre>
+    </div>
+  </div>
+
+  <div class="panel" *ngIf="pestana === 'bitacora'">
+    <div class="vacio" *ngIf="!bitacora.length">Todavía no se ha ejecutado nada.</div>
+
+    <table class="tabla" *ngIf="bitacora.length">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Bloque</th>
+          <th>Base</th>
+          <th>Filas</th>
+          <th>Tablas</th>
+          <th>Resultado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of bitacora" [class.deshecha]="e.deshecho">
+          <td>{{ e.fecha }}</td>
+          <td>{{ e.codigo_bloque }}</td>
+          <td>{{ e.base_destino }} <span class="ambiente">{{ e.ambiente }}</span></td>
+          <td>{{ e.filas_afectadas }}</td>
+          <td class="celda-tablas">{{ e.tablas_tocadas }}</td>
+          <td>
+            <span class="etiqueta" *ngIf="e.deshecho">deshecho</span>
+            <span class="etiqueta ok" *ngIf="!e.deshecho && e.exito">ok</span>
+            <span class="etiqueta error" *ngIf="!e.exito">falló</span>
+            <div class="mensaje-error" *ngIf="e.mensaje_error">{{ e.mensaje_error }}</div>
+          </td>
+          <td>
+            <button class="btn-borrar" (click)="deshacer(e)"
+                    *ngIf="e.exito && !e.deshecho && e.tablas_tocadas">Deshacer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  </div>
+
+  <div class="cargando" *ngIf="cargando">Cargando...</div>
+</div>

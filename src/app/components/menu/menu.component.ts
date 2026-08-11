@@ -263,6 +263,18 @@ export class MenuComponent implements OnInit {
     }
   }
 
+  /**
+   * Navega desde el nombre del nodo. El stopPropagation es lo que separa los
+   * dos gestos: el nombre lleva a la página y el resto de la fila expande.
+   */
+  irANodo(evento: Event, nodo: MenuNodo): void {
+    if (!nodo.ruta) {
+      return;
+    }
+    evento.stopPropagation();
+    this.selectOption(nodo.ruta);
+  }
+
   trackByNodo(_index: number, nodo: MenuNodo): string {
     return nodo.id;
   }

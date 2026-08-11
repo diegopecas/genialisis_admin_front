@@ -903,12 +903,21 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
   font-weight: 700;
   color: $ivory;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+
+  /* El nombre lleva a la página; el resto de la fila expande. */
+  &.navegable:hover {
+    color: $gold-primary;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 .seccion-chevron {
-  font-size: 16px;
+  font-size: 28px;
+  line-height: 1;
   color: $gold-primary;
   transition: transform 0.25s ease;
+  transform-origin: center;
 
   &.abierto {
     transform: rotate(90deg);
@@ -971,12 +980,20 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
   font-weight: 600;
   color: $gold-text-dark;
   line-height: 1.2;
+
+  &.navegable:hover {
+    color: $gold-primary;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 .nodo-chevron {
-  font-size: 13px;
+  font-size: 20px;
+  line-height: 1;
   color: $gold-text-medium;
   transition: transform 0.25s ease;
+  transform-origin: center;
 
   &.abierto {
     transform: rotate(90deg);

@@ -1,0 +1,230 @@
+// Variables para breakpoints
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;
+
+// El envoltorio del módulo, igual que en el resto de pantallas: sin esto
+// el contenido queda sobre el fondo oscuro del body y no se lee nada.
+.modulo {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f5f7;
+
+  @media (max-width: $tablet) {
+    padding-bottom: 24px;
+  }
+}
+
+.contenedor-conexiones {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.titulo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  h2 { margin: 0; font-size: 22px; }
+
+  .subtitulo {
+    margin: 4px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+  }
+}
+
+.btn-principal {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover { background: #1d4ed8; }
+}
+
+.btn-secundario {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover { background: #f9fafb; }
+}
+
+.tarjeta-formulario {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+
+  h3 { margin: 0 0 16px; font-size: 17px; }
+}
+
+.grilla-formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  input, select {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+
+    &:focus { outline: none; border-color: #2563eb; }
+  }
+
+  &.campo-check {
+    justify-content: flex-end;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 400;
+      font-size: 13px;
+      color: #374151;
+    }
+
+    input[type="checkbox"] { width: auto; }
+
+    .ayuda {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+  }
+}
+
+.acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.cargando, .vacio {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+
+  th {
+    text-align: left;
+    padding: 10px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.etiqueta {
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+
+  &.ambiente-semilla    { background: #f3f4f6; color: #374151; }
+  &.ambiente-pruebas    { background: #e0e7ff; color: #3730a3; }
+  &.ambiente-produccion { background: #fee2e2; color: #991b1b; }
+}
+
+.marca-lectura {
+  display: inline-block;
+  font-size: 10px;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+}
+
+.sin-clave { color: #b45309; }
+
+.acciones {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-mini {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 11px;
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover { background: #1d4ed8; }
+
+  &.secundario {
+    background: #fff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+
+    &:hover { background: #f9fafb; }
+  }
+}
+
+.btn-borrar {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+
+  &:hover { text-decoration: underline; }
+}

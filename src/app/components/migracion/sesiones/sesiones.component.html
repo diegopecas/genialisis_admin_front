@@ -1,0 +1,127 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [accion]="'ConsultarTodos'"
+    [raiz]="'/migracion/sesiones'"
+    [regresar]="'/menu'"
+  ></app-header>
+
+  <div class="contenedor-migracion">
+
+  <div class="encabezado">
+    <div>
+      <p class="subtitulo">Una sesión por cliente en montaje</p>
+    </div>
+    <div class="acciones-encabezado">
+      <button class="btn-secundario" routerLink="/migracion/conexiones">Conexiones</button>
+      <button class="btn-principal" (click)="abrirFormulario()">Nueva sesión</button>
+    </div>
+  </div>
+
+  <div class="tarjeta-formulario" *ngIf="mostrarFormulario">
+    <h3>Nueva sesión de migración</h3>
+
+    <div class="grilla-formulario">
+      <div class="campo">
+        <label>Cliente registrado</label>
+        <select [(ngModel)]="nueva.id_cliente" (change)="alCambiarCliente()">
+          <option [ngValue]="null">-- Sin asociar --</option>
+          <option *ngFor="let c of clientes" [ngValue]="c.id">
+            {{ c.primer_nombre }} {{ c.primer_apellido }}
+          </option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label>Nombre del cliente *</label>
+        <input type="text" [(ngModel)]="nueva.nombre_cliente" placeholder="Jardín Infantil Jugando y Creando">
+      </div>
+
+      <div class="campo">
+        <label>Código del tenant destino *</label>
+        <input type="text" [(ngModel)]="nueva.codigo_tenant_destino" placeholder="jugandoycreando">
+      </div>
+
+      <div class="campo">
+        <label>id_tenant destino</label>
+        <input type="number" [(ngModel)]="nueva.id_tenant_destino" placeholder="Si todavía no existe, déjalo vacío">
+      </div>
+
+      <div class="campo">
+        <label>Año a migrar</label>
+        <input type="number" [(ngModel)]="nueva.anno">
+      </div>
+
+      <div class="campo">
+        <label>Base destino *</label>
+        <select [(ngModel)]="nueva.id_conexion">
+          <option [ngValue]="null">-- Escoger --</option>
+          <option *ngFor="let c of conexionesDestino" [ngValue]="c.id">
+            {{ c.nombre }} ({{ c.ambiente }} · {{ c.base_datos }})
+          </option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label>Base semilla (referencia)</label>
+        <select [(ngModel)]="nueva.id_conexion_semilla">
+          <option [ngValue]="null">-- Ninguna --</option>
+          <option *ngFor="let c of conexionesSemilla" [ngValue]="c.id">{{ c.nombre }}</option>
+        </select>
+      </div>
+
+      <div class="campo campo-ancho">
+        <label>Notas</label>
+        <textarea rows="2" [(ngModel)]="nueva.notas" placeholder="Lo que salió de la reunión con la dirección"></textarea>
+      </div>
+    </div>
+
+    <div class="acciones-formulario">
+      <button class="btn-secundario" (click)="mostrarFormulario = false">Cancelar</button>
+      <button class="btn-principal" (click)="guardar()">Crear sesión</button>
+    </div>
+  </div>
+
+  <div class="cargando" *ngIf="cargando">Cargando...</div>
+
+  <div class="vacio" *ngIf="!cargando && sesiones.length === 0">
+    No hay sesiones de migración todavía.
+  </div>
+
+  <div class="grilla-sesiones">
+    <div class="tarjeta-sesion" *ngFor="let s of sesiones" (click)="abrir(s)">
+
+      <div class="fila-superior">
+        <h4>{{ s.nombre_cliente }}</h4>
+        <span class="etiqueta-estado" [ngClass]="claseEstado(s.estado)">{{ s.estado }}</span>
+      </div>
+
+      <div class="detalle">
+        <span class="dato"><strong>Tenant:</strong> {{ s.codigo_tenant_destino }}
+          <em *ngIf="s.id_tenant_destino">(id {{ s.id_tenant_destino }})</em>
+          <em *ngIf="!s.id_tenant_destino" class="pendiente">sin id todavía</em>
+        </span>
+        <span class="dato"><strong>Año:</strong> {{ s.anno }}</span>
+        <span class="dato" *ngIf="s.nombre_conexion">
+          <strong>Destino:</strong> {{ s.nombre_conexion }}
+          <span class="ambiente" [class.produccion]="s.ambiente === 'produccion'">{{ s.ambiente }}</span>
+        </span>
+        <span class="dato"><strong>Archivos:</strong> {{ s.total_archivos }}</span>
+      </div>
+
+      <div class="barra-avance">
+        <div class="relleno" [style.width.%]="avance(s)"></div>
+        <span class="texto-avance">{{ s.bloques_listos }} de {{ s.total_bloques }} bloques</span>
+      </div>
+
+      <div class="pie">
+        <span class="fecha">{{ s.fecha_creacion }}</span>
+        <button class="btn-borrar" (click)="eliminar(s, $event)"
+                *ngIf="s.estado !== 'validada' && s.estado !== 'purgada'">Borrar</button>
+      </div>
+
+    </div>
+  </div>
+
+  </div>
+</div>

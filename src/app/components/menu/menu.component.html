@@ -143,7 +143,9 @@
           <div class="seccion-header" (click)="seleccionarNodo(seccion)">
             <img *ngIf="seccion.imagen" class="seccion-icono-img" [src]="seccion.imagen" [alt]="seccion.label" loading="lazy" decoding="async" />
             <span class="seccion-icono" *ngIf="!seccion.imagen">{{ seccion.icono }}</span>
-            <span class="seccion-titulo" [innerHTML]="resaltar(seccion.label)"></span>
+            <span class="seccion-titulo" [class.navegable]="seccion.ruta"
+                  (click)="irANodo($event, seccion)"
+                  [innerHTML]="resaltar(seccion.label)"></span>
             <span class="seccion-chevron" *ngIf="esPlan(seccion)" [class.abierto]="estaExpandido(seccion)">▸</span>
           </div>
 
@@ -171,7 +173,9 @@
         >
           <img *ngIf="nodo.imagen" class="nodo-icono-img" [src]="nodo.imagen" [alt]="nodo.label" loading="lazy" decoding="async" />
           <span class="nodo-icono" *ngIf="!nodo.imagen">{{ nodo.icono }}</span>
-          <span class="nodo-label" [innerHTML]="resaltar(nodo.label)"></span>
+          <span class="nodo-label" [class.navegable]="nodo.ruta"
+                (click)="irANodo($event, nodo)"
+                [innerHTML]="resaltar(nodo.label)"></span>
           <span class="nodo-chevron" *ngIf="esPlan(nodo)" [class.abierto]="estaExpandido(nodo)">▸</span>
         </div>
 

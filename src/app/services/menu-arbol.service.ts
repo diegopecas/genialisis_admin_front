@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 
 /**
  * Nodo del árbol de menú.
- * - Si tiene `ruta` es una hoja navegable.
- * - Si tiene `hijos` es un plan expandible.
+ * - Si tiene `ruta` es navegable.
+ * - Si tiene `hijos` es un plan expandible: al hacerle clic abre, no navega.
+ * - Puede tener las dos. En ese caso el clic sigue expandiendo y la página
+ *   propia se abre con el botón "Ir al panel" que pinta el componente.
  * - `permiso` (opcional) gatea la visibilidad; los nodos sin permiso se muestran siempre.
  * - `keywords` (opcional) son términos alternativos para que la búsqueda encuentre el nodo
  *   aunque el usuario escriba una palabra distinta al label.
@@ -36,6 +38,7 @@ export class MenuArbolService {
         label: 'Clientes',
         icono: '🎓',
         imagen: '/assets/images/clientes.png',
+        ruta: '/clientes/gestion',
         permiso: 'clientes.ver',
         keywords: ['alumnos', 'niños', 'implementacion', 'implementación', 'estudiantado', 'parvulos'],
         hijos: [
@@ -57,6 +60,7 @@ export class MenuArbolService {
         label: 'Reportes',
         icono: '📊',
         imagen: '/assets/images/detalle.png',
+        ruta: '/reportes',
         permiso: 'reportes.ver',
         keywords: ['informes', 'reporteria', 'estadisticas', 'tablero'],
         hijos: [
@@ -100,6 +104,7 @@ export class MenuArbolService {
         label: 'Operaciones',
         icono: '⚙️',
         imagen: '/assets/images/operaciones.png',
+        ruta: '/operaciones',
         permiso: 'operaciones.ver',
         keywords: ['operativo', 'dia a dia', 'gestion diaria'],
         hijos: [
@@ -127,6 +132,15 @@ export class MenuArbolService {
               { id: 'operaciones-recordatorio-pagos', label: 'Recordatorio Pagos', icono: '💬', ruta: '/operaciones/recordatorio-pagos', permiso: 'operaciones.recordatorio_pagos', keywords: ['cobro', 'whatsapp'] },
               { id: 'operaciones-recordatorios-generales', label: 'Recordatorios Generales', icono: '📢', ruta: '/operaciones/recordatorios-generales', permiso: 'operaciones.recordatorios_generales', keywords: ['avisos', 'notificaciones', 'whatsapp'] }
             ]
+          },
+          {
+            id: 'operaciones-procesos-tenant',
+            label: 'Procesos Tenant',
+            icono: '🏢',
+            keywords: ['tenant', 'cliente nuevo', 'montaje', 'instancia'],
+            hijos: [
+              { id: 'operaciones-migracion', label: 'Migración', icono: '📦', ruta: '/migracion/sesiones', permiso: 'migracion.listado', keywords: ['migracion', 'migración', 'carga de datos', 'cargue', 'montaje', 'cliente nuevo', 'implementacion', 'implementación', 'tenant', 'sembrar'] }
+            ]
           }
         ]
       },
@@ -135,6 +149,7 @@ export class MenuArbolService {
         label: 'Colaboradores',
         icono: '🧑‍💼',
         imagen: '/assets/images/colaboradores.png',
+        ruta: '/colaboradores/gestion',
         permiso: 'colaboradores.ver',
         keywords: ['empleados', 'personal', 'trabajadores', 'staff'],
         hijos: [
@@ -177,6 +192,7 @@ export class MenuArbolService {
         label: 'Administración',
         icono: '🏛️',
         imagen: '/assets/images/administracion.png',
+        ruta: '/administracion',
         permiso: 'administracion.ver',
         keywords: ['admin', 'configuracion', 'ajustes', 'parametros'],
         hijos: [

@@ -1,0 +1,122 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [accion]="'ConsultarTodos'"
+    [raiz]="'/migracion/conexiones'"
+    [regresar]="'/migracion/sesiones'"
+  ></app-header>
+
+  <div class="contenedor-conexiones">
+
+  <div class="encabezado">
+    <div class="titulo">
+      <div>
+        <p class="subtitulo">Las bases contra las que trabaja la migración</p>
+      </div>
+    </div>
+    <button class="btn-principal" (click)="abrirFormulario()">Nueva conexión</button>
+  </div>
+
+  <div class="tarjeta-formulario" *ngIf="mostrarFormulario">
+    <h3>{{ editando ? 'Editar conexión' : 'Nueva conexión' }}</h3>
+
+    <div class="grilla-formulario">
+      <div class="campo">
+        <label>Nombre *</label>
+        <input type="text" [(ngModel)]="conexion.nombre" placeholder="Genialisis pruebas">
+      </div>
+
+      <div class="campo">
+        <label>Ambiente *</label>
+        <select [(ngModel)]="conexion.ambiente" (change)="alCambiarAmbiente()">
+          <option *ngFor="let a of ambientes" [value]="a">{{ a }}</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label>Host *</label>
+        <input type="text" [(ngModel)]="conexion.host" placeholder="localhost">
+      </div>
+
+      <div class="campo">
+        <label>Puerto</label>
+        <input type="number" [(ngModel)]="conexion.puerto">
+      </div>
+
+      <div class="campo">
+        <label>Base de datos *</label>
+        <input type="text" [(ngModel)]="conexion.base_datos">
+      </div>
+
+      <div class="campo">
+        <label>Usuario *</label>
+        <input type="text" [(ngModel)]="conexion.usuario">
+      </div>
+
+      <div class="campo">
+        <label>Clave {{ editando ? '(déjala vacía para conservar la actual)' : '*' }}</label>
+        <input type="password" [(ngModel)]="conexion.clave" autocomplete="new-password">
+      </div>
+
+      <div class="campo campo-check">
+        <label>
+          <input type="checkbox" [(ngModel)]="conexion.solo_lectura"
+                 [disabled]="conexion.ambiente === 'semilla'"
+                 [value]="1">
+          Solo lectura (nunca se le ejecutan scripts)
+        </label>
+        <span class="ayuda" *ngIf="conexion.ambiente === 'semilla'">
+          La semilla siempre queda en solo lectura.
+        </span>
+      </div>
+    </div>
+
+    <div class="acciones-formulario">
+      <button class="btn-secundario" (click)="mostrarFormulario = false">Cancelar</button>
+      <button class="btn-principal" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+
+  <div class="cargando" *ngIf="cargando">Cargando...</div>
+
+  <div class="vacio" *ngIf="!cargando && conexiones.length === 0">
+    No hay conexiones configuradas. Crea al menos la de pruebas para poder abrir una sesión.
+  </div>
+
+  <table class="tabla" *ngIf="conexiones.length">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Ambiente</th>
+        <th>Host</th>
+        <th>Base de datos</th>
+        <th>Usuario</th>
+        <th>Clave</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of conexiones">
+        <td>
+          {{ c.nombre }}
+          <span class="marca-lectura" *ngIf="c.solo_lectura">solo lectura</span>
+        </td>
+        <td><span class="etiqueta" [ngClass]="claseAmbiente(c.ambiente)">{{ c.ambiente }}</span></td>
+        <td>{{ c.host }}:{{ c.puerto }}</td>
+        <td>{{ c.base_datos }}</td>
+        <td>{{ c.usuario }}</td>
+        <td>
+          <span *ngIf="c.tiene_clave">guardada</span>
+          <span *ngIf="!c.tiene_clave" class="sin-clave">sin clave</span>
+        </td>
+        <td class="acciones">
+          <button class="btn-mini" (click)="probar(c)">Probar</button>
+          <button class="btn-mini secundario" (click)="editar(c)">Editar</button>
+          <button class="btn-borrar" (click)="eliminar(c)">Desactivar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  </div>
+</div>
