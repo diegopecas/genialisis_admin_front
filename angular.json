@@ -92,11 +92,11 @@
               ],
               "outputHashing": "all"
             },
-            "genialisis": {
+            "genialisis_admin": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.genialisis.ts"
+                  "with": "src/environments/environment.genialisis_admin.ts"
                 }
               ],
               "budgets": [
@@ -142,6 +142,12 @@
             },
             "development": {
               "buildTarget": "genialisis_admin:build:development"
+            },
+            "qa": {
+              "buildTarget": "genialisis_admin:build:qa"
+            },
+            "genialisis_admin": {
+              "buildTarget": "genialisis_admin:build:genialisis_admin"
             }
           },
           "defaultConfiguration": "development"

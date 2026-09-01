@@ -152,7 +152,11 @@ export class ClientesComponent implements OnInit {
   private mapearDatos(body: any[]) {
     this.datos = body || [];
     this.datos.forEach((e: any) => {
-      e.nombre_completo = `${e.primer_nombre} ${e.segundo_nombre} ${e.primer_apellido} ${e.segundo_apellido}`;
+      // Los clientes empresa solo tienen razon social: los demas campos llegan
+      // en null y el template literal los pintaba como el texto "null".
+      e.nombre_completo = [e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido]
+        .filter(Boolean)
+        .join(' ');
       e.color = e.activo === 0 ? '#e2e9f3' : '';
       e.estado = e.activo === 0 ? 'Inactivo' : 'Activo';
       e.alimentacion = e.alimentacion === 0 ? 'No' : 'Sí';

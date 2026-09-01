@@ -32,11 +32,10 @@ ng serve --host 192.168.1.105 --port 4500 --disable-host-check
 ## Arbol
 tree /F /A > estructura.txt
 
-## Compilar producción
-ng build --configuration production
-
-## Compilar psyncronia
-ng build --configuration psyncronia
+## Compilar genialisis_admin
+ng build --configuration genialisis_admin
+ng build --configuration genialisis_admin --output-path=dist/prod
+ng build --configuration genialisis_admin_qa --output-path=dist/qa
 
 # Start server 
 ng serve --port 4100

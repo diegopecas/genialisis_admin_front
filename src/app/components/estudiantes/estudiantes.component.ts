@@ -152,7 +152,11 @@ export class EstudiantesComponent implements OnInit {
   private mapearDatos(body: any[]) {
     this.datos = body || [];
     this.datos.forEach((e: any) => {
-      e.nombre_completo = `${e.primer_nombre} ${e.segundo_nombre} ${e.primer_apellido} ${e.segundo_apellido}`;
+      // Se descartan los campos vacios: sin esto un segundo nombre o apellido
+      // nulo salia como el texto "null" y uno vacio dejaba doble espacio.
+      e.nombre_completo = [e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido]
+        .filter(Boolean)
+        .join(' ');
       e.color = e.activo === 0 ? '#e2e9f3' : '';
       e.estado = e.activo === 0 ? 'Inactivo' : 'Activo';
       e.alimentacion = e.alimentacion === 0 ? 'No' : 'Sí';

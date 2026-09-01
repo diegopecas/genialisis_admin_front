@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  api: "https://api.liceolumen.com/",
+  api: "https://api.clientes.genialisis.com/",
   claudeApiUrl: 'https://api.anthropic.com/v1/messages',
   claudeApiKey: 'tu-api-key-aquí', // Reemplaza esto con tu API key real
   // Configuración actualizada para la API de Gemini
