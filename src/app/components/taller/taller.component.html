@@ -1,0 +1,355 @@
+<div class="modulo">
+  <div class="taller">
+
+  <!-- ==================== CARGANDO / ERROR ==================== -->
+  <div class="taller-centro" *ngIf="vista === 'cargando'">
+    <p>Abriendo…</p>
+  </div>
+
+  <div class="taller-centro" *ngIf="vista === 'error'">
+    <h5>No se pudo abrir</h5>
+    <p class="text-muted">{{ mensajeError }}</p>
+  </div>
+
+  <!-- ==================== ENCABEZADO ==================== -->
+  <div class="taller-encabezado" *ngIf="visita && vista !== 'cargando' && vista !== 'error'">
+    <h4 class="mb-0">{{ visita.nombre }}</h4>
+    <small>{{ visita.nombre_cliente }}</small>
+  </div>
+
+  <!-- ==================== IDENTIFICACIÓN POR DOCUMENTO ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'documento'">
+    <h5>Antes de empezar</h5>
+    <p class="text-muted">
+      Escribe tu número de documento. Si ya respondiste antes, así recuperas lo
+      que llevas hecho desde cualquier celular.
+    </p>
+
+    <div class="mb-3">
+      <label class="form-label">Mi número de documento <span class="text-danger">*</span></label>
+      <input
+        class="form-control form-control-lg"
+        type="text"
+        inputmode="numeric"
+        [(ngModel)]="numeroDocumento"
+        (keyup.enter)="identificar()"
+      />
+    </div>
+
+    <button class="btn btn-primary btn-lg w-100 mb-4" (click)="identificar()">
+      Continuar
+    </button>
+  </div>
+
+  <!-- ==================== HOJA DE PRESENTACIÓN ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'presentacion'">
+    <h5>Cuéntanos quién eres</h5>
+    <p class="text-muted">Con esto sabemos de quién es cada respuesta.</p>
+
+    <div class="mb-3">
+      <label class="form-label">Mi número de documento <span class="text-danger">*</span></label>
+      <input class="form-control form-control-lg" type="text" inputmode="numeric"
+             [(ngModel)]="presentacion.numero_documento" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Mi nombre <span class="text-danger">*</span></label>
+      <input class="form-control form-control-lg" type="text" [(ngModel)]="presentacion.nombre" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Y mis amigos me dicen</label>
+      <input class="form-control form-control-lg" type="text" [(ngModel)]="presentacion.sobrenombre"
+             placeholder="Así te decimos hoy" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Mi cargo</label>
+      <input class="form-control form-control-lg" type="text" [(ngModel)]="presentacion.cargo"
+             placeholder="Ej: docente, coordinadora, directora" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">¿Qué haces en el jardín?</label>
+      <select class="form-select form-select-lg" [(ngModel)]="presentacion.rol_encuesta">
+        <option value="docente">Solo doy clase</option>
+        <option value="coordinacion">Doy clase y además coordino</option>
+        <option value="direccion">Doy clase y además dirijo</option>
+      </select>
+      <small class="text-muted">Según esto te mostramos más adelante las preguntas que te tocan.</small>
+    </div>
+
+    <label class="form-label">Con qué grupos trabajo</label>
+    <div class="row g-2 mb-2" *ngFor="let grupo of grupos; let i = index">
+      <div class="col-7">
+        <input class="form-control" type="text" [(ngModel)]="grupo.grupo" placeholder="Ej: Párvulos" />
+      </div>
+      <div class="col-3">
+        <input class="form-control" type="number" [(ngModel)]="grupo.cantidad_ninos" placeholder="Niños" />
+      </div>
+      <div class="col-2">
+        <button class="btn btn-outline-danger w-100" (click)="quitarGrupo(i)">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary mb-4" (click)="agregarGrupo()">
+      <i class="fas fa-plus"></i> Agregar otro grupo
+    </button>
+
+    <button class="btn btn-primary btn-lg w-100 mb-4" (click)="guardarPresentacion()">
+      Continuar
+    </button>
+  </div>
+
+  <!-- ==================== MENÚ DE ACTIVIDADES ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'menu'">
+    <h5 *ngIf="participante">
+      Hola, {{ participante.sobrenombre ? participante.sobrenombre : participante.nombre }}
+    </h5>
+    <p class="text-muted">Estas son las actividades de hoy. Puedes hacerlas en el orden que quieras.</p>
+
+    <div class="tarjeta-actividad" (click)="abrirEncuesta()">
+      <div>
+        <strong>Cómo trabajas hoy</strong>
+        <small class="d-block text-muted">Qué haces en el día y cuánto tiempo te toma</small>
+      </div>
+      <span class="badge" [ngClass]="estado.encuesta ? 'bg-success' : 'bg-secondary'">
+        {{ estado.encuesta ? 'Respondida' : 'Pendiente' }}
+      </span>
+    </div>
+
+    <div class="tarjeta-actividad" (click)="abrirIdeas()">
+      <div>
+        <strong>Una idea para cada uno</strong>
+        <small class="d-block text-muted">Qué mejoraría la vida de cada quien en el jardín</small>
+      </div>
+      <span class="badge" [ngClass]="estado.ideas ? 'bg-success' : 'bg-secondary'">
+        {{ estado.ideas ? 'Respondida' : 'Pendiente' }}
+      </span>
+    </div>
+
+    <div class="tarjeta-actividad" (click)="abrirCaracter()">
+      <div>
+        <strong>Cómo eres tú</strong>
+        <small class="d-block text-muted">Ocho preguntas rápidas de selección</small>
+      </div>
+      <span class="badge" [ngClass]="estado.caracter ? 'bg-success' : 'bg-secondary'">
+        {{ estado.caracter ? 'Respondida' : 'Pendiente' }}
+      </span>
+    </div>
+
+    <div class="tarjeta-actividad" (click)="abrirCalificacion()">
+      <div>
+        <strong>Ahora califícanos tú</strong>
+        <small class="d-block text-muted">Es anónima: no sabemos quién respondió qué</small>
+      </div>
+      <span class="badge bg-secondary">Anónima</span>
+    </div>
+
+    <div class="d-flex flex-column align-items-start mt-3">
+      <button class="btn btn-link" (click)="editarPresentacion()">
+        Corregir mis datos
+      </button>
+      <button class="btn btn-link text-danger" (click)="cambiarDePersona()">
+        No soy yo, soy otra persona
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== ENCUESTA DE TRABAJO ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'encuesta'">
+    <h5>Cómo trabajas hoy</h5>
+    <p class="text-muted">
+      Marca si lo haces y escribe cuánto tiempo te toma, como lo haces ahora.
+      Imagínate un jardín donde además se venden las onces y el almuerzo, y donde
+      también reciben niños por día que no están matriculados.
+    </p>
+
+    <div class="seccion-encuesta" *ngFor="let seccion of seccionesEncuesta">
+      <h6 class="mt-4">{{ seccion.titulo }}</h6>
+
+      <div class="item-encuesta" *ngFor="let item of seccion.items">
+        <div class="item-texto">{{ item.texto }}</div>
+        <div class="item-controles">
+          <div class="btn-group btn-group-sm" *ngIf="item.pregunta_hace">
+            <button
+              class="btn"
+              [ngClass]="respuestasEncuesta[item.id].lo_hace === true ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="marcarHace(item, true)"
+            >Sí</button>
+            <button
+              class="btn"
+              [ngClass]="respuestasEncuesta[item.id].lo_hace === false ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="marcarHace(item, false)"
+            >No</button>
+          </div>
+          <!-- El tiempo solo se pide si lo hace. En los items hipoteticos
+               (pregunta_hace = 0) no hay si/no, asi que se pide siempre. -->
+          <input
+            *ngIf="!item.pregunta_hace || respuestasEncuesta[item.id].lo_hace === true"
+            class="form-control form-control-sm campo-tiempo"
+            type="number"
+            min="0"
+            [(ngModel)]="respuestasEncuesta[item.id].tiempo"
+            [placeholder]="seccion.unidad === 'horas' ? 'horas' : 'min'"
+          />
+        </div>
+      </div>
+
+      <div class="item-encuesta" *ngFor="let extra of extrasEncuesta[seccion.seccion]; let i = index">
+        <div class="item-texto">
+          <input class="form-control form-control-sm" type="text" [(ngModel)]="extra.texto"
+                 placeholder="Lo que no está en la lista y sí haces" />
+        </div>
+        <div class="item-controles">
+          <input class="form-control form-control-sm campo-tiempo" type="number" min="0"
+                 [(ngModel)]="extra.tiempo"
+                 [placeholder]="seccion.unidad === 'horas' ? 'horas' : 'min'" />
+          <button class="btn btn-sm btn-outline-danger" (click)="quitarExtra(seccion.seccion, i)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-sm btn-outline-secondary mt-2" (click)="agregarExtra(seccion.seccion)">
+        <i class="fas fa-plus"></i> Agregar algo que haces y no está
+      </button>
+
+      <div class="subtotal">
+        Subtotal: <strong>{{ subtotalSeccion(seccion) }} {{ seccion.unidad }}</strong>
+      </div>
+    </div>
+
+    <div class="totales mt-4">
+      <div><strong>Total del día:</strong> {{ totalMinutos() }} minutos</div>
+      <div><strong>Semana y corte:</strong> {{ totalHoras() }} horas</div>
+    </div>
+
+    <div class="mt-4">
+      <label class="form-label">¿Crees que hacer todo esto sería bueno para el jardín? ¿Por qué?</label>
+      <textarea class="form-control" rows="4" [(ngModel)]="comentarioFinal"></textarea>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-5">
+      <button class="btn btn-primary btn-lg flex-grow-1" (click)="guardarEncuesta()">Guardar</button>
+      <button class="btn btn-outline-secondary btn-lg" (click)="volverAlMenu()">Volver</button>
+    </div>
+  </div>
+
+  <!-- ==================== IDEAS ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'ideas'">
+    <h5>Una idea para cada uno</h5>
+    <p class="text-muted">
+      Escribe una idea que le mejoraría la vida a cada quien en el jardín.
+      No tiene que ser de tecnología: puede ser de procedimiento, de horarios,
+      de cómo se hacen las cosas.
+    </p>
+
+    <div class="mb-3">
+      <label class="form-label">Para la directora</label>
+      <textarea class="form-control" rows="3" [(ngModel)]="ideas.idea_directora"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Para las docentes</label>
+      <textarea class="form-control" rows="3" [(ngModel)]="ideas.idea_docentes"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Para los estudiantes</label>
+      <textarea class="form-control" rows="3" [(ngModel)]="ideas.idea_estudiantes"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Para los padres</label>
+      <textarea class="form-control" rows="3" [(ngModel)]="ideas.idea_padres"></textarea>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-5">
+      <button class="btn btn-primary btn-lg flex-grow-1" (click)="guardarIdeas()">Guardar</button>
+      <button class="btn btn-outline-secondary btn-lg" (click)="volverAlMenu()">Volver</button>
+    </div>
+  </div>
+
+  <!-- ==================== CARÁCTER ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'caracter'">
+    <h5>Cómo eres tú</h5>
+    <p class="text-muted">Escoge la que más se parezca a ti. No hay respuestas buenas ni malas.</p>
+
+    <div class="pregunta-caracter" *ngFor="let item of itemsCaracter; let i = index">
+      <div class="pregunta-texto">{{ i + 1 }}. {{ item.texto }}</div>
+      <div class="opcion-caracter" *ngFor="let opcion of item.opciones">
+        <label>
+          <input type="radio" [name]="'caracter-' + item.id" [value]="opcion.id"
+                 [(ngModel)]="respuestasCaracter[item.id]" />
+          <span>{{ opcion.texto }}</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-5">
+      <button class="btn btn-primary btn-lg flex-grow-1" (click)="guardarCaracter()">Guardar</button>
+      <button class="btn btn-outline-secondary btn-lg" (click)="volverAlMenu()">Volver</button>
+    </div>
+  </div>
+
+  <!-- ==================== CALIFICACIÓN ==================== -->
+  <div class="taller-cuerpo" *ngIf="vista === 'calificacion'">
+    <h5>Ahora califícanos tú</h5>
+    <p class="text-muted">
+      No pongas tu nombre: esta no queda ligada a ti. Califica de 1 a 5, donde
+      1 es muy malo y 5 es excelente.
+    </p>
+
+    <div class="bloque-calificacion" *ngFor="let bloque of bloquesCalificacion">
+      <h6 class="mt-4">{{ bloque.titulo }}</h6>
+
+      <div class="item-calificacion" *ngFor="let item of bloque.items">
+        <div class="item-texto">{{ item.texto }}</div>
+
+        <div class="escala" *ngIf="item.tipo === 'escala'">
+          <button
+            *ngFor="let valor of escala"
+            class="btn btn-sm"
+            [ngClass]="respuestasCalificacion[item.id] === valor ? 'btn-primary' : 'btn-outline-primary'"
+            (click)="marcarPuntaje(item.id, valor)"
+          >{{ valor }}</button>
+        </div>
+
+        <textarea
+          *ngIf="item.tipo === 'texto'"
+          class="form-control"
+          rows="3"
+          [(ngModel)]="respuestasCalificacion[item.id]"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="bloque-calificacion" *ngIf="colaboradores.length > 0">
+      <h6 class="mt-4">Uno por uno</h6>
+      <p class="text-muted small">Qué tan claro explicó y qué tan cómoda te hizo sentir.</p>
+
+      <div class="item-calificacion" *ngFor="let colaborador of colaboradores">
+        <div class="item-texto">
+          {{ colaborador.sobrenombre ? colaborador.sobrenombre : colaborador.nombre_completo }}
+        </div>
+        <div class="escala">
+          <button
+            *ngFor="let valor of escala"
+            class="btn btn-sm"
+            [ngClass]="puntajesColaboradores[colaborador.id_colaborador] === valor ? 'btn-primary' : 'btn-outline-primary'"
+            (click)="marcarPuntajeColaborador(colaborador.id_colaborador, valor)"
+          >{{ valor }}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-5">
+      <button class="btn btn-primary btn-lg flex-grow-1" (click)="guardarCalificacion()">Enviar</button>
+      <button class="btn btn-outline-secondary btn-lg" (click)="volverAlMenu()">Volver</button>
+    </div>
+  </div>
+
+  </div>
+</div>

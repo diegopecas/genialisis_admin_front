@@ -54,6 +54,9 @@ export class OperacionesComponent {
       case 'recordatorio-pagos':
         this.router.navigate(['/operaciones/recordatorio-pagos']);
         break;
+      case 'visitas':
+        this.router.navigate(['/operaciones/visitas']);
+        break;
       default:
         console.log('Opción no reconocida:', opcion);
         break;

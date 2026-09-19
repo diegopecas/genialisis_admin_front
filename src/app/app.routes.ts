@@ -10,6 +10,10 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'configuracion', loadComponent: () => import('./components/configuracion/configuracion.component').then(m => m.ConfiguracionComponent), canActivate: [AuthGuard] },
   { path: 'login', loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent) },
+  // Taller de visitas: pantalla publica. Sin AuthGuard a proposito: la abre
+  // el equipo del jardin desde el celular y no tiene usuario. El tenant viaja
+  // en la ruta porque sin sesion no hay institucion configurada.
+  { path: 'taller/:tenant/:token', loadComponent: () => import('./components/taller/taller.component').then(m => m.TallerComponent) },
   { path: 'menu', loadComponent: () => import('./components/menu/menu.component').then(m => m.MenuComponent), canActivate: [AuthGuard] },
   { path: 'mi-perfil', loadComponent: () => import('./components/mi-perfil/mi-perfil.component').then(m => m.MiPerfilComponent), canActivate: [AuthGuard] },
   { path: 'registro', loadComponent: () => import('./components/registro/registro.component').then(m => m.RegistroComponent), canActivate: [AuthGuard] },
@@ -174,6 +178,10 @@ export const routes: Routes = [
   { path: 'administracion/operaciones', loadComponent: () => import('./components/administracion/administracion-operaciones/administracion-operaciones.component').then(m => m.AdministracionOperacionesComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'administracion.operaciones', trackear: true, labelAcceso: 'Operaciones', iconoAcceso: '⚙️' } },
 
   { path: 'operaciones', loadComponent: () => import('./components/operaciones/operaciones.component').then(m => m.OperacionesComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.ver', trackear: true, labelAcceso: 'Operaciones', iconoAcceso: '⚙️' } },
+  { path: 'operaciones/visitas', loadComponent: () => import('./components/operaciones/visitas/visitas.component').then(m => m.VisitasComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.visitas', trackear: true, labelAcceso: 'Visitas a Clientes', iconoAcceso: '🏫' } },
+  // resultados va antes que :accion/:id: si no, ':accion' se come 'resultados'.
+  { path: 'operaciones/visitas/resultados/:id', loadComponent: () => import('./components/operaciones/visitas/resultados-visita/resultados-visita.component').then(m => m.ResultadosVisitaComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.visitas.resultados' } },
+  { path: 'operaciones/visitas/:accion/:id', loadComponent: () => import('./components/operaciones/visitas/crear-visita/crear-visita.component').then(m => m.CrearVisitaComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.visitas.administrar' } },
 
   { path: 'operaciones/recordatorio-pagos', loadComponent: () => import('./components/operaciones/recordatorio-pagos/recordatorio-pagos.component').then(m => m.RecordatorioPagosComponent), canActivate: [AuthGuard, PermisosGuard], data: { permiso: 'operaciones.recordatorio_pagos', trackear: true, labelAcceso: 'Recordatorio Pagos', iconoAcceso: '💬' } },
 

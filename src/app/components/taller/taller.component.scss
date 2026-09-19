@@ -1,0 +1,146 @@
+// Pantalla pensada para el celular: una columna, controles grandes y nada que
+// obligue a hacer zoom. En pantallas grandes se centra con ancho máximo.
+//
+// Va dentro de .modulo, que es quien pone el fondo del sistema. El contenido
+// se monta sobre una tarjeta blanca: sin ella el texto queda sobre el fondo
+// oscuro del body y no se lee.
+.taller {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 0 2rem;
+  background: #ffffff;
+  color: #212529;
+  min-height: 100vh;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+// En pantallas grandes la tarjeta se despega del borde; en el celular ocupa
+// todo el ancho, que es como se va a usar.
+@media (min-width: 768px) {
+  .taller {
+    margin: 1.5rem auto;
+    min-height: calc(100vh - 3rem);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}
+
+.taller-centro {
+  padding: 3rem 1.25rem;
+  text-align: center;
+}
+
+.taller-encabezado {
+  padding: 1.25rem;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+
+  small {
+    color: #666;
+  }
+}
+
+.taller-cuerpo {
+  padding: 1.25rem;
+}
+
+// Menú de actividades
+.tarjeta-actividad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:active {
+    background: #f5f5f5;
+  }
+}
+
+// Encuesta de trabajo
+.item-encuesta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+
+  .item-texto {
+    flex: 1 1 100%;
+  }
+
+  .item-controles {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+// El campo de tiempo no puede estirarse: al lado del sí/no dejaría los botones
+// sin espacio en pantallas angostas.
+.campo-tiempo {
+  width: 90px;
+}
+
+.subtotal {
+  padding: 0.75rem 0;
+  text-align: right;
+  border-top: 2px solid #e0e0e0;
+}
+
+.totales {
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+// Carácter
+.pregunta-caracter {
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+
+  .pregunta-texto {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+}
+
+.opcion-caracter {
+  padding: 0.35rem 0;
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  input {
+    margin-top: 0.25rem;
+  }
+}
+
+// Calificación
+.item-calificacion {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+
+  .item-texto {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.escala {
+  display: flex;
+  gap: 0.35rem;
+
+  .btn {
+    flex: 1;
+  }
+}

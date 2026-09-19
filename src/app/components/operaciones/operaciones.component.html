@@ -187,6 +187,32 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Visitas a Clientes -->
+            <div class="col-lg-3 col-md-6 mb-4" *ngIf="tieneAlguno(['operaciones.visitas'])">
+                <div class="card-maestro menu-principal" [class.active]="menuActivo === 'visitas'" (click)="toggleMenu('visitas', $event)">
+                    <div class="card-maestro-content">
+                        <div class="icono-container visitas">
+                            <img src="assets/images/visitas.png" alt="Visitas a Clientes" />
+                        </div>
+                        <h3 class="card-titulo">Visitas a Clientes</h3>
+                        <p class="card-descripcion">Talleres en el jardín y cuestionarios del equipo</p>
+                        <div class="card-footer-custom">
+                            <span class="link-accion">Ver opciones <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                    <div class="submenu-container">
+                        <div class="row g-2">
+                            <div class="col-12" *ngIf="permisosService.tienePermiso('operaciones.visitas')">
+                                <div class="submenu-item" (click)="seleccionarOpcion('visitas')">
+                                    <img src="assets/images/visitas.png" alt="Visitas a Clientes" />
+                                    <span>Visitas a Clientes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

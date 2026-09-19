@@ -134,6 +134,15 @@ export class MenuArbolService {
             ]
           },
           {
+            id: 'operaciones-visitas',
+            label: 'Visitas a Clientes',
+            icono: '🏫',
+            keywords: ['visita', 'taller', 'jardin', 'jardín', 'encuesta', 'cuestionario'],
+            hijos: [
+              { id: 'operaciones-visitas-listado', label: 'Visitas a Clientes', icono: '🏫', ruta: '/operaciones/visitas', permiso: 'operaciones.visitas', keywords: ['visita', 'taller', 'enlace', 'encuesta', 'cuestionario', 'jardin', 'jardín'] }
+            ]
+          },
+          {
             id: 'operaciones-procesos-tenant',
             label: 'Procesos Tenant',
             icono: '🏢',

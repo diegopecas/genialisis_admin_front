@@ -1,0 +1,247 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [mostrarCrear]="false"
+    [accion]="'Consultar'"
+    [raiz]="'/operaciones/visitas'"
+    [regresar]="'/operaciones/visitas'"
+    [iconoTitulo]="'/assets/images/visitas.png'"
+  ></app-header>
+
+  <div class="container-fluid mt-3">
+
+    <div class="mb-3" *ngIf="visita">
+      <h5 class="mb-0">{{ visita.nombre }}</h5>
+      <small class="text-muted">{{ visita.fecha }}</small>
+    </div>
+
+    <!-- Pestañas: scroll horizontal para que quepan en el celular -->
+    <ul class="nav nav-tabs flex-nowrap overflow-auto mb-3">
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="seccionActiva === 'participantes'" (click)="cambiarSeccion('participantes')">
+          Participantes ({{ participantes.length }})
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="seccionActiva === 'encuesta'" (click)="cambiarSeccion('encuesta')">
+          Encuesta ({{ encuestas.length }})
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="seccionActiva === 'ideas'" (click)="cambiarSeccion('ideas')">
+          Ideas ({{ ideas.length }})
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="seccionActiva === 'caracter'" (click)="cambiarSeccion('caracter')">
+          Carácter
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="seccionActiva === 'calificacion'" (click)="cambiarSeccion('calificacion')">
+          Calificación
+        </a>
+      </li>
+    </ul>
+
+    <!-- ==================== PARTICIPANTES ==================== -->
+    <div *ngIf="seccionActiva === 'participantes'">
+      <p class="text-muted" *ngIf="participantes.length === 0">Todavía no se ha registrado nadie.</p>
+
+      <div class="table-responsive" *ngIf="participantes.length > 0">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombre</th>
+              <th>Le dicen</th>
+              <th>Cargo</th>
+              <th>Respondió como</th>
+              <th>Grupos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let participante of participantes">
+              <td>{{ participante.numero_documento }}</td>
+              <td>{{ participante.nombre }}</td>
+              <td>{{ participante.sobrenombre }}</td>
+              <td>{{ participante.cargo }}</td>
+              <td>{{ nombreRol(participante.rol_encuesta) }}</td>
+              <td>
+                <span *ngFor="let grupo of participante.grupos" class="badge bg-secondary me-1">
+                  {{ grupo.grupo }}<span *ngIf="grupo.cantidad_ninos"> · {{ grupo.cantidad_ninos }}</span>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== ENCUESTA DE TRABAJO ==================== -->
+    <div *ngIf="seccionActiva === 'encuesta'">
+      <p class="text-muted" *ngIf="encuestas.length === 0">Todavía nadie ha respondido la encuesta.</p>
+
+      <div class="card mb-2" *ngFor="let encuesta of encuestas">
+        <div class="card-header d-flex justify-content-between align-items-center" (click)="alternarEncuesta(encuesta.id_encuesta)">
+          <div>
+            <strong>{{ encuesta.sobrenombre ? encuesta.sobrenombre : encuesta.nombre }}</strong>
+            <span class="text-muted small ms-2">{{ nombreRol(encuesta.rol_encuesta) }}</span>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-primary">{{ encuesta.total_minutos }} min/día</span>
+            <span class="badge bg-info ms-1">{{ encuesta.total_horas }} h</span>
+            <i class="fas ms-2" [ngClass]="encuestaAbierta === encuesta.id_encuesta ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </div>
+        </div>
+
+        <div class="card-body" *ngIf="encuestaAbierta === encuesta.id_encuesta">
+          <div *ngFor="let seccion of seccionesDe(encuesta)" class="mb-3">
+            <h6 class="mb-2">{{ seccion }}</h6>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Tarea</th>
+                    <th class="text-center">¿Lo hace?</th>
+                    <th class="text-center">Tiempo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let respuesta of respuestasDe(encuesta, seccion)">
+                    <td>{{ respuesta.texto }}</td>
+                    <td class="text-center">
+                      <span *ngIf="respuesta.pregunta_hace">
+                        {{ respuesta.lo_hace ? 'Sí' : 'No' }}
+                      </span>
+                      <span class="text-muted" *ngIf="!respuesta.pregunta_hace">—</span>
+                    </td>
+                    <td class="text-center">{{ respuesta.tiempo }}</td>
+                  </tr>
+                  <tr *ngFor="let extra of extrasDe(encuesta, seccion)">
+                    <td><em>{{ extra.texto }}</em></td>
+                    <td class="text-center text-muted">Agregado</td>
+                    <td class="text-center">{{ extra.tiempo }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-end"><strong>Subtotal</strong></td>
+                    <td></td>
+                    <td class="text-center">
+                      <strong>{{ subtotal(encuesta, seccion) }} {{ unidadDe(encuesta, seccion) }}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div *ngIf="encuesta.comentario_final">
+            <h6>¿Sería bueno para el jardín?</h6>
+            <p class="mb-0">{{ encuesta.comentario_final }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== IDEAS ==================== -->
+    <div *ngIf="seccionActiva === 'ideas'">
+      <p class="text-muted" *ngIf="ideas.length === 0">Todavía nadie ha propuesto ideas.</p>
+
+      <div class="card mb-2" *ngFor="let fila of ideas">
+        <div class="card-header">
+          <strong>{{ fila.sobrenombre ? fila.sobrenombre : fila.nombre }}</strong>
+          <span class="text-muted small ms-2">{{ fila.cargo }}</span>
+        </div>
+        <div class="card-body">
+          <p class="mb-2"><strong>Directora:</strong> {{ fila.idea_directora }}</p>
+          <p class="mb-2"><strong>Docentes:</strong> {{ fila.idea_docentes }}</p>
+          <p class="mb-2"><strong>Estudiantes:</strong> {{ fila.idea_estudiantes }}</p>
+          <p class="mb-0"><strong>Padres:</strong> {{ fila.idea_padres }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CARÁCTER ==================== -->
+    <div *ngIf="seccionActiva === 'caracter'">
+      <p class="text-muted" *ngIf="caracter.length === 0">Todavía nadie ha respondido estas preguntas.</p>
+
+      <div class="mb-4" *ngFor="let pregunta of preguntasCaracter()">
+        <h6>{{ pregunta }}</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <tbody>
+              <tr *ngFor="let fila of respuestasCaracter(pregunta)">
+                <td style="width: 35%">{{ fila.sobrenombre ? fila.sobrenombre : fila.nombre }}</td>
+                <td>{{ fila.respuesta }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CALIFICACIÓN ==================== -->
+    <div *ngIf="seccionActiva === 'calificacion'">
+      <p class="text-muted" *ngIf="!calificacion || calificacion.total_respuestas === 0">
+        Todavía nadie ha calificado el taller.
+      </p>
+
+      <div *ngIf="calificacion && calificacion.total_respuestas > 0">
+        <p class="text-muted">
+          {{ calificacion.total_respuestas }} respuesta(s). Es anónima: no se sabe quién respondió qué.
+        </p>
+
+        <div class="mb-4" *ngFor="let bloque of bloquesCalificacion()">
+          <h6>{{ bloque }}</h6>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <tbody>
+                <tr *ngFor="let item of itemsCalificacion(bloque)">
+                  <td>{{ item.texto }}</td>
+                  <td class="text-center" style="width: 20%">
+                    <strong>{{ item.promedio ? item.promedio : '—' }}</strong>
+                    <small class="text-muted d-block">{{ item.respuestas }} resp.</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mb-4" *ngIf="calificacion.colaboradores?.length">
+          <h6>Uno por uno</h6>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <tbody>
+                <tr *ngFor="let colaborador of calificacion.colaboradores">
+                  <td>{{ colaborador.sobrenombre ? colaborador.sobrenombre : colaborador.nombre_completo }}</td>
+                  <td class="text-center" style="width: 20%">
+                    <strong>{{ colaborador.promedio ? colaborador.promedio : '—' }}</strong>
+                    <small class="text-muted d-block">{{ colaborador.respuestas }} resp.</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mb-4" *ngIf="calificacion.abiertas?.length">
+          <h6>Respuestas abiertas</h6>
+          <div class="mb-2" *ngFor="let abierta of calificacion.abiertas">
+            <small class="text-muted d-block">{{ abierta.pregunta }}</small>
+            <span>{{ abierta.respuesta }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4 mb-5">
+      <div class="col-12">
+        <button class="btn-cancel" (click)="volver()">
+          <i class="fas fa-times-circle"></i> Volver
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

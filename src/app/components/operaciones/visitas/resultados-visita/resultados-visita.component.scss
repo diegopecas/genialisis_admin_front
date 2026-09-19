@@ -1,0 +1,12 @@
+// Las pestañas se desbordan en el celular: scroll horizontal en vez de salto
+// de línea, que parte el listado en dos filas y descuadra la pantalla.
+.nav-tabs {
+  .nav-link {
+    cursor: pointer;
+    white-space: nowrap;
+  }
+}
+
+.card-header {
+  cursor: pointer;
+}

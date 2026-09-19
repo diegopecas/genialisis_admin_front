@@ -1,0 +1,169 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [mostrarCrear]="false"
+    [accion]="accion"
+    [raiz]="'/operaciones/visitas'"
+    [regresar]="'/operaciones/visitas'"
+    [iconoTitulo]="'/assets/images/visitas.png'"
+  ></app-header>
+
+  <div class="container-fluid mt-3">
+
+    <!-- ==================== DATOS DE LA VISITA ==================== -->
+    <div class="row">
+      <div class="col-sm-12 col-md-6">
+        <label for="cliente" class="form-label">Cliente <span class="text-danger">*</span></label>
+        <select
+          class="form-select form-select-lg"
+          id="cliente"
+          [(ngModel)]="model.id_cliente"
+          required
+          [ngClass]="{ 'is-invalid': !model.id_cliente && submitted }"
+          [disabled]="!editable"
+        >
+          <option value="">Seleccionar</option>
+          <ng-container *ngFor="let cliente of listas.clientes">
+            <option [value]="cliente.id">{{ cliente.nombre_cliente }}</option>
+          </ng-container>
+        </select>
+      </div>
+      <div class="col-sm-12 col-md-6">
+        <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
+        <input
+          class="form-control form-control-lg"
+          type="date"
+          id="fecha"
+          [(ngModel)]="model.fecha"
+          required
+          [ngClass]="{ 'is-invalid': !model.fecha && submitted }"
+          [disabled]="!editable"
+        />
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-sm-12 col-md-6">
+        <label for="vencimiento" class="form-label">El enlace vence</label>
+        <input
+          class="form-control form-control-lg"
+          type="datetime-local"
+          id="vencimiento"
+          [(ngModel)]="model.fecha_vencimiento"
+          [disabled]="!editable"
+        />
+        <small class="text-muted">Déjalo vacío si no quieres que venza.</small>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-sm-12">
+        <label for="nombre" class="form-label">Nombre de la visita <span class="text-danger">*</span></label>
+        <input
+          class="form-control form-control-lg"
+          type="text"
+          id="nombre"
+          [(ngModel)]="model.nombre"
+          required
+          placeholder="Ej: Primer taller Genialisis"
+          [ngClass]="{ 'is-invalid': !model.nombre && submitted }"
+          [disabled]="!editable"
+        />
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-sm-12">
+        <label for="observaciones" class="form-label">Observaciones</label>
+        <textarea
+          class="form-control form-control-lg"
+          id="observaciones"
+          rows="3"
+          [(ngModel)]="model.observaciones"
+          [disabled]="!editable"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="row mt-3" *ngIf="!nuevo">
+      <div class="col-sm-12">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="activo"
+            [(ngModel)]="model.activo"
+            [disabled]="!editable"
+          />
+          <label class="form-check-label" for="activo">
+            Visita activa — al apagarla el enlace deja de funcionar, sin borrar lo ya respondido
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <hr class="mt-4" />
+
+    <!-- ==================== COLABORADORES QUE ASISTEN ==================== -->
+    <h5 class="mb-1">Colaboradores de Genialisis que asisten</h5>
+    <p class="text-muted small">
+      Son los que aparecen uno por uno en el cuestionario de calificación del taller.
+    </p>
+
+    <div class="row">
+      <div class="col-sm-12 col-md-6 col-lg-4 mb-2" *ngFor="let colaborador of listas.colaboradores">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [id]="'colab-' + colaborador.id"
+            [checked]="estaSeleccionado(colaborador.id)"
+            (change)="alternarColaborador(colaborador.id)"
+            [disabled]="!editable"
+          />
+          <label class="form-check-label" [for]="'colab-' + colaborador.id">
+            {{ colaborador.sobrenombre ? colaborador.sobrenombre : colaborador.nombre_completo }}
+            <span class="text-muted small d-block" *ngIf="colaborador.sobrenombre">
+              {{ colaborador.nombre_completo }}
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="col-12" *ngIf="listas.colaboradores.length === 0">
+        <p class="text-muted">No hay colaboradores activos para asociar.</p>
+      </div>
+    </div>
+
+    <!-- ==================== ENLACE PÚBLICO ==================== -->
+    <div class="row mt-4" *ngIf="!nuevo && enlace">
+      <div class="col-sm-12">
+        <label class="form-label">Enlace para el jardín</label>
+        <div class="input-group input-group-lg">
+          <input class="form-control" type="text" [value]="enlace" readonly />
+          <button class="btn btn-outline-secondary" type="button" (click)="copiarEnlace()">
+            <i class="fas fa-copy"></i> Copiar
+          </button>
+        </div>
+        <small class="text-muted">
+          Cualquiera con este enlace puede registrarse y responder. No lo publiques.
+        </small>
+      </div>
+    </div>
+
+    <!-- ==================== BOTONES ==================== -->
+    <div class="row mt-4 mb-5">
+      <div class="col-12 d-flex gap-2 flex-wrap">
+        <button class="btn-save" (click)="guardar()" *ngIf="editable">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+        <button class="btn btn-outline-primary" (click)="verResultados()" *ngIf="!nuevo && model.id">
+          <i class="fas fa-chart-bar"></i> Resultados
+        </button>
+        <button class="btn-cancel" (click)="volver()">
+          <i class="fas fa-times-circle"></i> {{ editable ? 'Cancelar' : 'Volver' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
