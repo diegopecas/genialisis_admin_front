@@ -122,8 +122,8 @@ export class ClienteDatosComponent implements OnInit {
           // Fusionar datos de persona con cliente
           this.cliente = { ...this.cliente, ...persona };
 
-          // Crear nombre completo para el título
-          this.nombreCompleto = [
+          // Crear nombre completo para el título (razón social si es empresa)
+          this.nombreCompleto = (persona.razon_social || '').trim() || [
             persona.primer_nombre,
             persona.segundo_nombre,
             persona.primer_apellido,

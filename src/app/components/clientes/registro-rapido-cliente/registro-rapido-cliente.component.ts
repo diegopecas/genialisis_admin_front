@@ -15,13 +15,13 @@ import { UsuariosService } from '../../../services/usuarios.service';
 import { DocumentosPersonasService } from '../../../services/documentos-personas.service';
 import { TiposDocumentosService } from '../../../services/tipos-documentos.service';
 import { PlanesService } from '../../../services/planes.service';
-import { DiasSemanaService } from '../../../services/dias-semana.service';
 import { TiposIdentificacionService } from '../../../services/tipos-identificacion.service';
 import { GenerosService } from '../../../services/generos.service';
+import { CiudadesService } from '../../../services/ciudades.service';
 import { TiposRepresentanteService } from '../../../services/tipos-representante.service';
 import { UtilService } from '../../../common/constantes/util.service';
 
-// Datos de una persona dentro del asistente (niño o representante).
+// Datos de una persona dentro del asistente (cliente o representante).
 interface PersonaForm {
   id_tipo_identificacion: any;
   numero_identificacion: string;
@@ -31,9 +31,16 @@ interface PersonaForm {
   segundo_apellido: string;
 }
 
-interface NinoForm extends PersonaForm {
+// Cliente: empresa (NIT + razón social) o persona natural (nombres).
+interface ClienteForm extends PersonaForm {
+  digito_verificacion: string;
+  razon_social: string;
   fecha_nacimiento: string;
   id_genero: any;
+  direccion: string;
+  id_ciudad: any;
+  telefono: string;
+  correo_electronico: string;
   fecha_ingreso: string;
 }
 
@@ -47,12 +54,6 @@ interface RepresentanteForm extends PersonaForm {
   incluir: boolean; // si false, no se registra este representante
 }
 
-interface DiaHorario {
-  id_dia_semana: number;
-  nombre_dia: string;
-  seleccionado: boolean;
-}
-
 @Component({
   selector: 'app-registro-rapido-cliente',
   standalone: true,
@@ -64,13 +65,13 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
   titulo = 'Registro rápido de cliente';
   regresar = '/clientes/gestion';
 
-  // Pasos del asistente: 1=captura+IA, 2=revisión de datos.
+  // Pasos del asistente: 1=captura del RUT + IA, 2=revisión de datos.
   public paso = 1;
   public analizando = false;
   public guardando = false;
 
-  // Archivo del registro civil: sirve tanto para la IA como para subirlo luego.
-  public archivoRegistroCivil?: File;
+  // Archivo del RUT: sirve tanto para la IA como para subirlo luego como documento.
+  public archivoRut?: File;
   public previewUrl?: string;
 
   // Cámara (mismo patrón que documentos-persona: trasera por defecto, voltear, repetir).
@@ -92,24 +93,19 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     generos: [] as any[],
     tiposRepresentante: [] as any[],
     planes: [] as any[],
+    ciudades: [] as any[],
   };
 
-  // Modelo del niño.
-  public nino: NinoForm = this.ninoVacio();
+  // Modelo del cliente.
+  public cliente: ClienteForm = this.clienteVacio();
 
   // Plan / año.
   public id_plan: any = '';
   public anno: number = new Date().getFullYear();
 
-  // Horario simple: dos horas (entrada/salida) que aplican a los días marcados.
-  // Se preseleccionan lunes a viernes.
-  public horaEntrada = '08:00';
-  public horaSalida = '18:00';
-  public dias: DiaHorario[] = [];
-  private diasSemana: any[] = [];
-
-  // Representantes: se arranca con dos (padre y madre); el usuario puede desmarcar uno.
-  public representantes: RepresentanteForm[] = [this.representanteVacio(), this.representanteVacio()];
+  // Representantes: se arranca con uno (el representante legal que trae el RUT);
+  // el usuario puede agregar más.
+  public representantes: RepresentanteForm[] = [this.representanteVacio()];
 
   constructor(
     private router: Router,
@@ -118,9 +114,9 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     private documentosService: DocumentosPersonasService,
     private tiposDocumentosService: TiposDocumentosService,
     private planesService: PlanesService,
-    private diasSemanaService: DiasSemanaService,
     private tiposIdentificacionService: TiposIdentificacionService,
     private generosService: GenerosService,
+    private ciudadesService: CiudadesService,
     private tiposRepresentanteService: TiposRepresentanteService,
     private utilService: UtilService,
   ) {
@@ -129,7 +125,6 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarListas();
-    this.inicializarHorarios();
   }
 
   ngOnDestroy(): void {
@@ -160,51 +155,11 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
       next: (r: any) => (this.listas.planes = r.body || r),
       error: (e) => console.error('Error cargando planes:', e),
     });
-  }
 
-  // ============================================================
-  // HORARIOS (grilla desde dias_semana)
-  // ============================================================
-
-  inicializarHorarios() {
-    this.diasSemanaService.obtenerTodos().subscribe({
-      next: (response: any) => {
-        this.diasSemana = response.body || response || [];
-        if (this.diasSemana.length > 0) {
-          this.armarDiasDesdeDiasSemana();
-        } else {
-          this.armarDiasFallback();
-        }
-      },
-      error: (error: any) => {
-        console.error('Error al obtener días de la semana:', error);
-        this.armarDiasFallback();
-      },
+    this.ciudadesService.obtenerTodos().subscribe({
+      next: (r: any) => (this.listas.ciudades = r.body || r),
+      error: (e) => console.error('Error cargando ciudades:', e),
     });
-  }
-
-  private armarDiasDesdeDiasSemana() {
-    this.dias = this.diasSemana.map((d: any) => ({
-      id_dia_semana: d.id,
-      nombre_dia: d.nombre,
-      // Preselecciona los días entre semana (lunes a viernes) por nombre.
-      seleccionado: this.esEntreSemana(d.nombre),
-    }));
-  }
-
-  // Fallback mínimo si dias_semana falla por completo; no es la fuente de verdad.
-  private armarDiasFallback() {
-    const nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-    this.dias = nombres.map((nombre, i) => ({
-      id_dia_semana: i + 1,
-      nombre_dia: nombre,
-      seleccionado: this.esEntreSemana(nombre),
-    }));
-  }
-
-  private esEntreSemana(nombre: string): boolean {
-    const n = this.normalizar(nombre);
-    return ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'].includes(n);
   }
 
   // ============================================================
@@ -213,7 +168,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
 
   activarCamara() {
     this.modoCamara = true;
-    this.archivoRegistroCivil = undefined;
+    this.archivoRut = undefined;
     this.previewUrl = undefined;
 
     const constraints = {
@@ -333,7 +288,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
       u8arr[n] = bstr.charCodeAt(n);
     }
     const blob = new Blob([u8arr], { type: mime });
-    this.archivoRegistroCivil = new File([blob], `registro_civil_${Date.now()}.jpg`, {
+    this.archivoRut = new File([blob], `rut_${Date.now()}.jpg`, {
       type: 'image/jpeg',
     });
 
@@ -343,7 +298,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
 
   // Descartar la foto tomada y volver a abrir la cámara.
   repetirToma() {
-    this.archivoRegistroCivil = undefined;
+    this.archivoRut = undefined;
     this.previewUrl = undefined;
     this.activarCamara();
   }
@@ -368,7 +323,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
 
     this.detenerCamara();
     this.modoCamara = false;
-    this.archivoRegistroCivil = file;
+    this.archivoRut = file;
     // Solo previsualizamos imágenes; el PDF no se previsualiza.
     if (extension === 'pdf') {
       this.previewUrl = undefined;
@@ -383,27 +338,29 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
   // ANÁLISIS CON IA
   // ============================================================
 
-  analizarRegistroCivil() {
-    if (!this.archivoRegistroCivil) {
-      Swal.fire('Atención', 'Toma o selecciona la foto del registro civil primero', 'warning');
+  analizarRut() {
+    if (!this.archivoRut) {
+      Swal.fire('Atención', 'Toma o selecciona la foto del RUT primero', 'warning');
       return;
     }
 
     this.analizando = true;
-    this.clientesService.analizarRegistroCivil(this.archivoRegistroCivil).subscribe({
+    this.clientesService.analizarRut(this.archivoRut).subscribe({
       next: (respuesta: any) => {
         this.analizando = false;
         if (respuesta && respuesta.datos) {
           this.prellenarDesdeIA(respuesta.datos);
           this.paso = 2;
+          this.avisarDiferenciaDv(respuesta.datos);
         } else {
           Swal.fire('Atención', 'No se pudieron leer datos del documento. Continúa llenando manualmente.', 'info');
+          this.prepararManual();
           this.paso = 2;
         }
       },
       error: (error: any) => {
         this.analizando = false;
-        console.error('Error al analizar el registro civil:', error);
+        console.error('Error al analizar el RUT:', error);
         Swal.fire({
           title: 'No se pudo leer el documento',
           text: 'Puedes continuar y llenar los datos manualmente.',
@@ -413,6 +370,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
           cancelButtonText: 'Reintentar',
         }).then((result) => {
           if (result.isConfirmed) {
+            this.prepararManual();
             this.paso = 2;
           }
         });
@@ -422,52 +380,105 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
 
   // Continuar al paso 2 sin usar IA (llenado 100% manual).
   continuarManual() {
+    this.prepararManual();
     this.paso = 2;
   }
 
-  private prellenarDesdeIA(datos: any) {
-    // Niño
-    if (datos.nino) {
-      this.nino.primer_nombre = datos.nino.primer_nombre || '';
-      this.nino.segundo_nombre = datos.nino.segundo_nombre || '';
-      this.nino.primer_apellido = datos.nino.primer_apellido || '';
-      this.nino.segundo_apellido = datos.nino.segundo_apellido || '';
-      this.nino.numero_identificacion = datos.nino.numero_identificacion || '';
-      this.nino.fecha_nacimiento = datos.nino.fecha_nacimiento || '';
-      // Tipo de identificación del niño: NUIP (por nombre).
-      this.nino.id_tipo_identificacion = this.idTipoIdentificacionPorNombre('nuip');
-      // Género por nombre (sexo del registro civil).
-      this.nino.id_genero = this.idGeneroPorNombre(datos.nino.sexo);
+  // En llenado manual el cliente arranca como empresa (NIT) y el representante
+  // como representante legal con cédula; el usuario puede cambiarlos.
+  private prepararManual() {
+    if (!this.cliente.id_tipo_identificacion) {
+      this.cliente.id_tipo_identificacion = this.idTipoIdentificacionPorNombre('nit');
     }
-
-    // Padre -> representante 0
-    this.prellenarRepresentanteDesdeIA(0, datos.padre, 'padre');
-    // Madre -> representante 1
-    this.prellenarRepresentanteDesdeIA(1, datos.madre, 'madre');
+    const rep = this.representantes[0];
+    if (rep && !rep.id_tipo_representante) {
+      rep.id_tipo_representante = this.idTipoRepresentantePorNombre('representante legal');
+    }
+    if (rep && !rep.id_tipo_identificacion) {
+      rep.id_tipo_identificacion = this.idTipoIdentificacionPorNombre('cedula');
+    }
   }
 
-  private prellenarRepresentanteDesdeIA(indice: number, datosAcud: any, tipoNombre: string) {
-    if (!datosAcud) {
-      // Sin datos: se deja el representante desmarcado para no obligar a registrarlo.
-      this.representantes[indice].incluir = false;
+  private prellenarDesdeIA(datos: any) {
+    // Cliente: el RUT siempre trae NIT (también en persona natural).
+    this.cliente.id_tipo_identificacion = this.idTipoIdentificacionPorNombre('nit');
+    this.cliente.numero_identificacion = (datos.nit || '').toString().replace(/\D/g, '');
+    // Se toma el DV del RUT; si no viene, el calculado.
+    this.cliente.digito_verificacion =
+      datos.digito_verificacion != null && /^\d$/.test(String(datos.digito_verificacion).trim())
+        ? String(datos.digito_verificacion).trim()
+        : this.utilService.calcularDigitoVerificacion(this.cliente.numero_identificacion);
+
+    // Todo cliente con NIT se identifica por razón social; en persona natural
+    // se arma con sus nombres.
+    const nombresNatural = [datos.primer_nombre, datos.segundo_nombre, datos.primer_apellido, datos.segundo_apellido]
+      .filter(Boolean)
+      .join(' ');
+    this.cliente.razon_social = datos.razon_social || nombresNatural || '';
+
+    this.cliente.direccion = datos.direccion || '';
+    this.cliente.id_ciudad = this.buscarIdPorNombre(this.listas.ciudades, datos.ciudad);
+    this.cliente.telefono = datos.telefono || '';
+    this.cliente.correo_electronico = datos.correo_electronico || '';
+
+    // Representante legal principal -> representante 0
+    this.prellenarRepresentanteDesdeIA(0, datos.representante_legal);
+  }
+
+  private prellenarRepresentanteDesdeIA(indice: number, datosRep: any) {
+    const rep = this.representantes[indice];
+    // Tipo de representante: representante legal (por nombre); el usuario confirma.
+    rep.id_tipo_representante = this.idTipoRepresentantePorNombre('representante legal');
+    if (!datosRep) {
+      rep.id_tipo_identificacion = this.idTipoIdentificacionPorNombre('cedula');
       return;
     }
-    const tienesDatos =
-      datosAcud.primer_nombre ||
-      datosAcud.primer_apellido ||
-      datosAcud.numero_identificacion;
+    rep.primer_nombre = datosRep.primer_nombre || '';
+    rep.segundo_nombre = datosRep.segundo_nombre || '';
+    rep.primer_apellido = datosRep.primer_apellido || '';
+    rep.segundo_apellido = datosRep.segundo_apellido || '';
+    rep.numero_identificacion = (datosRep.numero_identificacion || '').toString().replace(/\D/g, '');
+    // Documento del representante: el que trae el RUT si existe en la lista, si no cédula.
+    rep.id_tipo_identificacion =
+      this.idTipoIdentificacionPorNombre(datosRep.tipo_documento || '') ||
+      this.idTipoIdentificacionPorNombre('cedula');
+  }
 
-    const ac = this.representantes[indice];
-    ac.primer_nombre = datosAcud.primer_nombre || '';
-    ac.segundo_nombre = datosAcud.segundo_nombre || '';
-    ac.primer_apellido = datosAcud.primer_apellido || '';
-    ac.segundo_apellido = datosAcud.segundo_apellido || '';
-    ac.numero_identificacion = datosAcud.numero_identificacion || '';
-    // Documento del representante: por defecto cédula (por nombre); el usuario puede cambiarlo.
-    ac.id_tipo_identificacion = this.idTipoIdentificacionPorNombre('cedula');
-    // Tipo de representante (padre/madre) por nombre; el usuario confirma.
-    ac.id_tipo_representante = this.idTipoRepresentantePorNombre(tipoNombre);
-    ac.incluir = !!tienesDatos;
+  // Se toma el DV del RUT, pero si no coincide con el calculado casi siempre es
+  // porque la IA leyó mal un dígito del NIT: se avisa para que lo revisen.
+  private avisarDiferenciaDv(datos: any) {
+    const leido = (datos.digito_verificacion ?? '').toString().trim();
+    const calculado = (datos.digito_verificacion_calculado ?? '').toString().trim();
+    if (leido && calculado && leido !== calculado) {
+      Swal.fire({
+        title: 'Revisa el NIT',
+        text: `El DV del RUT (${leido}) no coincide con el calculado para el NIT leído (${calculado}). Verifica que el número del NIT esté bien.`,
+        icon: 'warning',
+        confirmButtonText: 'Entendido',
+      });
+    }
+  }
+
+  // Indica si el tipo de identificación seleccionado para el cliente es NIT.
+  get clienteEsNit(): boolean {
+    const tipo = (this.listas.tiposIdentificacion || []).find(
+      (t: any) => String(t.id) === String(this.cliente.id_tipo_identificacion),
+    );
+    return !!tipo && this.normalizar(tipo.nombre) === 'nit';
+  }
+
+  // Si el usuario corrige el NIT a mano, el DV se recalcula.
+  onNumeroClienteChange(valor: string) {
+    this.cliente.numero_identificacion = valor;
+    if (this.clienteEsNit) {
+      this.cliente.digito_verificacion = this.utilService.calcularDigitoVerificacion(valor);
+    }
+  }
+
+  onTipoClienteChange() {
+    this.cliente.digito_verificacion = this.clienteEsNit
+      ? this.utilService.calcularDigitoVerificacion(this.cliente.numero_identificacion)
+      : '';
   }
 
   // Resuelve el id del tipo de identificación buscando por nombre (case-insensitive,
@@ -476,18 +487,11 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     return this.buscarIdPorNombre(this.listas.tiposIdentificacion, nombre);
   }
 
-  private idGeneroPorNombre(nombre: string | null): any {
-    if (!nombre) {
-      return '';
-    }
-    return this.buscarIdPorNombre(this.listas.generos, nombre);
-  }
-
   private idTipoRepresentantePorNombre(nombre: string): any {
     return this.buscarIdPorNombre(this.listas.tiposRepresentante, nombre);
   }
 
-  private buscarIdPorNombre(lista: any[], nombre: string): any {
+  private buscarIdPorNombre(lista: any[], nombre: string | null | undefined): any {
     if (!lista || !nombre) {
       return '';
     }
@@ -496,7 +500,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     return encontrado ? encontrado.id : '';
   }
 
-  private normalizar(texto: string): string {
+  private normalizar(texto: string | null | undefined): string {
     return (texto || '')
       .toString()
       .trim()
@@ -514,12 +518,17 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
   }
 
   private validar(): boolean {
-    if (!this.nino.primer_nombre || !this.nino.primer_apellido) {
-      Swal.fire('Campos incompletos', 'El niño debe tener al menos primer nombre y primer apellido', 'warning');
+    if (!this.cliente.id_tipo_identificacion || !this.cliente.numero_identificacion) {
+      Swal.fire('Campos incompletos', 'El cliente debe tener tipo y número de identificación', 'warning');
       return false;
     }
-    if (!this.nino.id_tipo_identificacion || !this.nino.numero_identificacion) {
-      Swal.fire('Campos incompletos', 'El niño debe tener tipo y número de identificación', 'warning');
+    if (this.clienteEsNit) {
+      if (!this.cliente.razon_social || !this.cliente.razon_social.trim()) {
+        Swal.fire('Campos incompletos', 'El cliente debe tener razón social', 'warning');
+        return false;
+      }
+    } else if (!this.cliente.primer_nombre || !this.cliente.primer_apellido) {
+      Swal.fire('Campos incompletos', 'El cliente debe tener al menos primer nombre y primer apellido', 'warning');
       return false;
     }
     if (!this.id_plan) {
@@ -541,8 +550,20 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
         return false;
       }
       if (!ac.id_tipo_representante) {
-        Swal.fire('Campos incompletos', 'Selecciona el tipo de representante (padre, madre, etc.)', 'warning');
+        Swal.fire('Campos incompletos', 'Selecciona el tipo de representante', 'warning');
         return false;
+      }
+      // Con acceso al portal se le crea usuario, y usuarios.correo_electronico es obligatorio.
+      if (ac.autorizado_sistema) {
+        const correo = (ac.correo_electronico || '').trim();
+        if (!correo) {
+          Swal.fire('Campos incompletos', 'El representante con acceso al portal debe tener correo electrónico', 'warning');
+          return false;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+          Swal.fire('Correo inválido', `El correo ${correo} no es válido`, 'warning');
+          return false;
+        }
       }
     }
     return true;
@@ -556,27 +577,28 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     this.guardando = true;
 
     const incluidos = this.representantesIncluidos();
+    const esNit = this.clienteEsNit;
+    // El back conserva la llave 'nino' del payload por compatibilidad.
     const payload = {
       nino: {
-        id_tipo_identificacion: this.nino.id_tipo_identificacion,
-        numero_identificacion: this.nino.numero_identificacion,
-        primer_nombre: this.nino.primer_nombre,
-        segundo_nombre: this.nino.segundo_nombre || null,
-        primer_apellido: this.nino.primer_apellido,
-        segundo_apellido: this.nino.segundo_apellido || null,
-        fecha_nacimiento: this.nino.fecha_nacimiento || null,
-        id_genero: this.nino.id_genero || null,
-        fecha_ingreso: this.nino.fecha_ingreso || new Date().toISOString().substring(0, 10),
+        id_tipo_identificacion: this.cliente.id_tipo_identificacion,
+        numero_identificacion: this.cliente.numero_identificacion,
+        digito_verificacion: esNit ? this.cliente.digito_verificacion || null : null,
+        razon_social: esNit ? this.cliente.razon_social.trim() : null,
+        primer_nombre: esNit ? null : this.cliente.primer_nombre,
+        segundo_nombre: esNit ? null : this.cliente.segundo_nombre || null,
+        primer_apellido: esNit ? null : this.cliente.primer_apellido,
+        segundo_apellido: esNit ? null : this.cliente.segundo_apellido || null,
+        fecha_nacimiento: esNit ? null : this.cliente.fecha_nacimiento || null,
+        id_genero: esNit ? null : this.cliente.id_genero || null,
+        direccion: this.cliente.direccion || null,
+        id_ciudad: this.cliente.id_ciudad || null,
+        telefono: this.cliente.telefono || null,
+        correo_electronico: this.cliente.correo_electronico || null,
+        fecha_ingreso: this.cliente.fecha_ingreso || new Date().toISOString().substring(0, 10),
       },
       id_plan: this.id_plan,
       anno: this.anno || new Date().getFullYear(),
-      horarios: this.dias
-        .filter((d) => d.seleccionado)
-        .map((d) => ({
-          id_dia_semana: d.id_dia_semana,
-          hora_entrada: this.horaEntrada + ':00',
-          hora_salida: this.horaSalida + ':00',
-        })),
       representantes: incluidos.map((a) => ({
         id_tipo_identificacion: a.id_tipo_identificacion,
         numero_identificacion: a.numero_identificacion,
@@ -595,10 +617,15 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
 
     this.clientesService.registroRapidoCompleto(payload).subscribe({
       next: (respuesta: any) => {
-        // 1) Crear usuarios de los representantes (usuario y clave = número de identificación).
-        this.crearUsuariosRepresentantes(respuesta.representantes || []);
-        // 2) Subir la foto del registro civil como documento del niño.
-        this.subirFotoRegistroCivil(respuesta.id_persona_nino);
+        // 1) Crear usuarios de los representantes con acceso al portal (usuario y
+        //    clave = número de identificación). El back devuelve los representantes
+        //    en el mismo orden en que se enviaron.
+        const conAcceso = (respuesta.representantes || []).filter(
+          (_: any, i: number) => incluidos[i] && incluidos[i].autorizado_sistema,
+        );
+        this.crearUsuariosRepresentantes(conAcceso);
+        // 2) Subir el RUT como documento del cliente.
+        this.subirRut(respuesta.id_persona_nino);
       },
       error: (error: any) => {
         this.guardando = false;
@@ -632,10 +659,10 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Sube el archivo del registro civil como documento del niño, resolviendo el
-  // tipo de documento "registro civil" por nombre. Cierra el flujo al terminar.
-  private subirFotoRegistroCivil(idPersonaNino: string) {
-    if (!this.archivoRegistroCivil || !idPersonaNino) {
+  // Sube el archivo del RUT como documento del cliente, resolviendo el tipo de
+  // documento "RUT" por código o nombre. Cierra el flujo al terminar.
+  private subirRut(idPersonaCliente: string) {
+    if (!this.archivoRut || !idPersonaCliente) {
       this.finalizar();
       return;
     }
@@ -643,23 +670,22 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     this.tiposDocumentosService.obtenerPorTipoPersona('cliente').subscribe({
       next: (response: any) => {
         const tipos = response.body || response || [];
-        const tipoRC = tipos.find(
-          (t: any) => this.normalizar(t.nombre).includes('registro civil') ||
-                      this.normalizar(t.codigo || '').includes('registro_civil'),
+        const tipoRut = tipos.find(
+          (t: any) => this.normalizar(t.codigo || '') === 'rut' || this.normalizar(t.nombre) === 'rut',
         );
 
-        if (!tipoRC) {
-          // No hay tipo de documento "registro civil": el cliente quedó creado,
+        if (!tipoRut) {
+          // No hay tipo de documento "RUT" para clientes: el cliente quedó creado,
           // solo no se adjunta el archivo. Se informa sin bloquear.
-          console.warn('No se encontró el tipo de documento "registro civil"; no se adjunta el archivo.');
+          console.warn('No se encontró el tipo de documento "RUT"; no se adjunta el archivo.');
           this.finalizar();
           return;
         }
 
         const formData = new FormData();
-        formData.append('archivo', this.archivoRegistroCivil as File);
-        formData.append('id_persona', idPersonaNino);
-        formData.append('id_tipo_documento', tipoRC.id.toString());
+        formData.append('archivo', this.archivoRut as File);
+        formData.append('id_persona', idPersonaCliente);
+        formData.append('id_tipo_documento', tipoRut.id.toString());
         const idUsuario = this.utilService.obtenerIdUsuarioActual();
         if (idUsuario) {
           formData.append('id_usuario_subio', idUsuario.toString());
@@ -668,7 +694,7 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
         this.documentosService.subirDocumento(formData).subscribe({
           next: () => this.finalizar(),
           error: (error: any) => {
-            console.error('Error al subir el registro civil como documento:', error);
+            console.error('Error al subir el RUT como documento:', error);
             // El cliente ya está creado; se cierra igual informando.
             this.finalizar();
           },
@@ -705,16 +731,22 @@ export class RegistroRapidoClienteComponent implements OnInit, OnDestroy {
     this.paso = 1;
   }
 
-  private ninoVacio(): NinoForm {
+  private clienteVacio(): ClienteForm {
     return {
       id_tipo_identificacion: '',
       numero_identificacion: '',
+      digito_verificacion: '',
+      razon_social: '',
       primer_nombre: '',
       segundo_nombre: '',
       primer_apellido: '',
       segundo_apellido: '',
       fecha_nacimiento: '',
       id_genero: '',
+      direccion: '',
+      id_ciudad: '',
+      telefono: '',
+      correo_electronico: '',
       fecha_ingreso: new Date().toISOString().substring(0, 10),
     };
   }

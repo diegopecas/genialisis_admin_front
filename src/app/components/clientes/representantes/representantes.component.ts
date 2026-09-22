@@ -142,7 +142,7 @@ export class RepresentantesComponent {
     this.clientesService.obtenerById(id_cliente).subscribe((response: any) => {
       const body = response.body as any[];
       this.cliente = body[0];
-      this.nombre_cliente = [
+      this.nombre_cliente = (this.cliente.razon_social || '').trim() || [
         this.cliente.primer_nombre,
         this.cliente.segundo_nombre,
         this.cliente.primer_apellido,

@@ -134,6 +134,7 @@ export class OpcionesClienteComponent implements OnInit {
 
   private aplicarContexto(registro: any) {
     this.nombreCliente =
+      (registro.razon_social || '').trim() ||
       registro.nombre_completo ||
       `${registro.primer_nombre || ''} ${registro.segundo_nombre || ''} ${registro.primer_apellido || ''} ${registro.segundo_apellido || ''}`
         .replace(/\s+/g, ' ')

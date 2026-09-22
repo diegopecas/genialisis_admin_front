@@ -268,13 +268,13 @@ export class ClientesService {
     );
   }
 
-  // Lee la foto/archivo del registro civil con IA y devuelve los datos del niño y
-  // sus padres para prellenar el asistente. No crea nada en la BD.
-  analizarRegistroCivil(archivo: File) {
+  // Lee la foto/archivo del RUT con IA y devuelve los datos del cliente y de su
+  // representante legal para prellenar el asistente. No crea nada en la BD.
+  analizarRut(archivo: File) {
     const formData = new FormData();
-    formData.append('registro_civil', archivo);
+    formData.append('rut', archivo);
 
-    return this.http.post<any>(this.servicio + '/analizar-registro-civil', formData).pipe(
+    return this.http.post<any>(this.servicio + '/analizar-rut', formData).pipe(
       tap((respuesta: any) => {
         if (respuesta.error) throw respuesta.error;
         return respuesta;
@@ -283,7 +283,7 @@ export class ClientesService {
     );
   }
 
-  // Crea en una sola transacción el niño (persona + cliente), su plan/grado,
+  // Crea en una sola transacción el cliente (persona + cliente), su plan/grado,
   // horarios y los representantes (persona + representante). Los usuarios del portal se
   // crean aparte con Usuarios.crear a partir de los id_persona que devuelve.
   registroRapidoCompleto(data: any) {

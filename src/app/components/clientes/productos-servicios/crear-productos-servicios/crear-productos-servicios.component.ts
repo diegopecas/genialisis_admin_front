@@ -655,7 +655,7 @@ export class CrearProductosServiciosComponent implements OnInit {
       const body = response.body as any[];
       this.cliente = body[0];
       this.model.id_persona = this.cliente.id_persona;
-      this.nombre_cliente = [
+      this.nombre_cliente = (this.cliente.razon_social || '').trim() || [
         this.cliente.primer_nombre,
         this.cliente.segundo_nombre,
         this.cliente.primer_apellido,

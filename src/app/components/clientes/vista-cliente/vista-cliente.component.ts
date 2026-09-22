@@ -110,12 +110,14 @@ export class VistaClienteComponent implements OnInit {
             next: (personaResponse: any) => {
               if (personaResponse.body && personaResponse.body.length > 0) {
                 const persona = personaResponse.body[0];
-                this.nombreCompleto = [
+                // Cliente empresa: su nombre es la razón social.
+                const razonSocial = (persona.razon_social || '').trim();
+                this.nombreCompleto = razonSocial || [
                   persona.primer_nombre, persona.segundo_nombre,
                   persona.primer_apellido, persona.segundo_apellido,
                 ].filter(Boolean).join(' ');
 
-                if (this.isMobile && this.nombreCompleto.length > 20) {
+                if (!razonSocial && this.isMobile && this.nombreCompleto.length > 20) {
                   this.nombreCompleto = `${persona.primer_nombre} ${persona.primer_apellido}`;
                 }
               }

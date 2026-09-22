@@ -206,7 +206,7 @@ export class CrearContratoComponent implements OnInit {
         this.model.id_cliente = this.idCliente;
         this.model.id_plan = this.cliente.id_plan;
 
-        this.nombre_cliente = [
+        this.nombre_cliente = (this.cliente.razon_social || '').trim() || [
           this.cliente.primer_nombre,
           this.cliente.segundo_nombre,
           this.cliente.primer_apellido,

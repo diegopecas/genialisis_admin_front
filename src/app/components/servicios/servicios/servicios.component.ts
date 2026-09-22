@@ -50,7 +50,8 @@ export class ServiciosComponent {
       this.datos.forEach((e: any) => {
         // Se descartan los campos vacios: sin esto un segundo nombre o apellido
         // nulo salia como el texto "null" y uno vacio dejaba doble espacio.
-        e.nombre_completo = [e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido]
+        // Cliente empresa: su nombre es la razón social.
+        e.nombre_completo = (e.razon_social || '').trim() || [e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido]
           .filter(Boolean)
           .join(' ');
         e.color = e.activo === 0 ? "#e2e9f3" : "";

@@ -48,8 +48,8 @@ export class MenuArbolService {
             icono: '🎓',
             keywords: ['alumnos', 'niños', 'implementacion'],
             hijos: [
-              { id: 'clientes-gestion-clientes', label: 'Gestión Clientes', icono: '🎓', ruta: '/clientes/gestion', permiso: 'clientes.gestion', keywords: ['alumnos', 'niños', 'implementacion', 'registro rapido', 'registro civil'] },
-              { id: 'clientes-registro-rapido', label: 'Registro Rápido', icono: '⚡', ruta: '/clientes/registro-rapido', permiso: 'clientes.administrar', keywords: ['registro rapido', 'registro civil', 'implementacion', 'nuip', 'foto'] },
+              { id: 'clientes-gestion-clientes', label: 'Gestión Clientes', icono: '🎓', ruta: '/clientes/gestion', permiso: 'clientes.gestion', keywords: ['empresas', 'implementacion', 'registro rapido', 'rut', 'nit', 'razon social'] },
+              { id: 'clientes-registro-rapido', label: 'Registro Rápido', icono: '⚡', ruta: '/clientes/registro-rapido', permiso: 'clientes.administrar', keywords: ['registro rapido', 'rut', 'nit', 'razon social', 'implementacion', 'foto'] },
               { id: 'clientes-listado', label: 'Clientes', icono: '🎓', ruta: '/clientes', permiso: 'clientes.listado', keywords: ['alumnos', 'niños', 'estudiantado', 'parvulos'] }
             ]
           }

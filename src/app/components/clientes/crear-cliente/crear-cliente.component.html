@@ -15,7 +15,7 @@
       </div>
       <nav class="sidebar-nav">
         <a class="sidebar-link" [class.active]="seccionActiva === 'datos-personales'" (click)="cambiarSeccion('datos-personales')"><i class="fas fa-user-circle"></i> <span>Datos Personales</span></a>
-        <a class="sidebar-link" [class.active]="seccionActiva === 'datos-academicos'" (click)="cambiarSeccion('datos-academicos')"><i class="fas fa-graduation-cap"></i> <span>Datos Académicos</span></a>
+        <a class="sidebar-link" [class.active]="seccionActiva === 'datos-servicio'" (click)="cambiarSeccion('datos-servicio')"><i class="fas fa-briefcase"></i> <span>Datos del servicio</span></a>
 
 
 
@@ -43,7 +43,7 @@
       <div class="sidebar-mobile-header"><h6><i class="fas fa-th-list me-2"></i>Secciones</h6><button class="btn-cerrar-sidebar" (click)="cerrarSidebar()"><i class="fas fa-times"></i></button></div>
       <nav class="sidebar-nav">
         <a class="sidebar-link" [class.active]="seccionActiva === 'datos-personales'" (click)="cambiarSeccion('datos-personales')"><i class="fas fa-user-circle"></i> <span>Datos Personales</span></a>
-        <a class="sidebar-link" [class.active]="seccionActiva === 'datos-academicos'" (click)="cambiarSeccion('datos-academicos')"><i class="fas fa-graduation-cap"></i> <span>Datos Académicos</span></a>
+        <a class="sidebar-link" [class.active]="seccionActiva === 'datos-servicio'" (click)="cambiarSeccion('datos-servicio')"><i class="fas fa-briefcase"></i> <span>Datos del servicio</span></a>
 
 
 
@@ -64,7 +64,7 @@
           <div class="row mb-4">
             <div class="col-sm-12 col-md-6">
               <label for="tipoDocumento" class="form-label">Tipo de documento <span class="text-danger">*</span></label>
-              <select class="form-select form-select-lg" id="tipoDocumento" [(ngModel)]="model.tipoIdentificacion" required
+              <select class="form-select form-select-lg" id="tipoDocumento" [(ngModel)]="model.tipoIdentificacion" (ngModelChange)="onTipoIdentificacionChange()" required
                 [ngClass]="{'is-invalid': !model.tipoIdentificacion && submitted}"
                 [disabled]="documentoEncontrado || !editable">
                 <option value="">Seleccionar</option>
@@ -75,10 +75,17 @@
             </div>
             <div class="col-sm-12 col-md-6">
               <label for="numeroDocumento" class="form-label">Número de documento <span class="text-danger">*</span></label>
-              <input class="form-control form-control-lg" type="text" id="numeroDocumento"
-                [(ngModel)]="model.numeroIdentificacion" required
-                [ngClass]="{'is-invalid': !model.numeroIdentificacion && submitted}"
-                [disabled]="documentoEncontrado || !editable">
+              <div class="input-group input-group-lg">
+                <input class="form-control form-control-lg" type="text" id="numeroDocumento"
+                  [ngModel]="model.numeroIdentificacion" (ngModelChange)="onNumeroIdentificacionChange($event)" required
+                  [ngClass]="{'is-invalid': !model.numeroIdentificacion && submitted}"
+                  [disabled]="documentoEncontrado || !editable">
+                <!-- DV del NIT: calculado por el sistema (o el del RUT), solo lectura -->
+                <ng-container *ngIf="esNit">
+                  <span class="input-group-text">DV</span>
+                  <input class="form-control form-control-lg input-dv" type="text" [value]="model.digitoVerificacion" readonly tabindex="-1">
+                </ng-container>
+              </div>
             </div>
           </div>
           <div class="row mt-1 mb-3" *ngIf="editable && !documentoEncontrado">
@@ -90,7 +97,16 @@
           </div>
           <hr />
           <div [ngClass]="{ 'disabled-container': !camposHabilitados && editable }">
-            <div class="row">
+            <!-- Cliente empresa (NIT): solo razón social -->
+            <div class="row" *ngIf="esNit">
+              <div class="col-sm-12">
+                <label for="razonSocial" class="form-label">Razón social <span class="text-danger">*</span></label>
+                <input class="form-control form-control-lg" type="text" id="razonSocial" [(ngModel)]="model.razonSocial"
+                  required [ngClass]="{'is-invalid': !model.razonSocial && submitted}"
+                  [disabled]="!camposHabilitados && editable">
+              </div>
+            </div>
+            <div class="row" *ngIf="!esNit">
               <div class="col-sm-12 col-md-6">
                 <label for="primerNombre" class="form-label">Primer nombre <span class="text-danger">*</span></label>
                 <input class="form-control form-control-lg" type="text" id="primerNombre" [(ngModel)]="model.primerNombre"
@@ -103,7 +119,7 @@
                   [disabled]="!camposHabilitados && editable">
               </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-3" *ngIf="!esNit">
               <div class="col-sm-12 col-md-6">
                 <label for="primerApellido" class="form-label">Primer apellido <span class="text-danger">*</span></label>
                 <input class="form-control form-control-lg" type="text" id="primerApellido" [(ngModel)]="model.primerApellido"
@@ -123,14 +139,14 @@
                   [disabled]="!camposHabilitados && editable">
                 <small class="form-text text-muted">Predeterminado: Colombiana</small>
               </div>
-              <div class="col-sm-12 col-md-6">
+              <div class="col-sm-12 col-md-6" *ngIf="!esNit">
                 <label for="fechaNacimiento" class="form-label">Fecha de nacimiento <span class="text-danger">*</span></label>
                 <input class="form-control form-control-lg" type="date" id="fechaNacimiento" [(ngModel)]="model.fechaNacimiento"
                   required [ngClass]="{'is-invalid': !model.fechaNacimiento && submitted}"
                   [disabled]="!camposHabilitados && editable">
               </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-3" *ngIf="!esNit">
               <div class="col-sm-12 col-md-6">
                 <label for="genero" class="form-label">Género <span class="text-danger">*</span></label>
                 <select class="form-select form-select-lg" id="genero" [(ngModel)]="model.genero"
@@ -187,7 +203,7 @@
           </div>
         </div>
 
-        <!-- DATOS ACADÉMICOS (crear) -->
+        <!-- DATOS DEL SERVICIO (crear) -->
         <div>
           <hr />
           <div [ngClass]="{ 'disabled-container': !camposHabilitados && editable }">
@@ -212,7 +228,7 @@
                   [disabled]="!camposHabilitados && editable">
               </div>
               <div class="col-sm-12 col-md-6">
-                <label for="annoCrear" class="form-label">Año escolar</label>
+                <label for="annoCrear" class="form-label">Año</label>
                 <select class="form-select form-select-lg" id="annoCrear" [(ngModel)]="model.anno"
                   [disabled]="!camposHabilitados && editable">
                   <option value="">Seleccionar</option>
@@ -220,35 +236,6 @@
                     <option [value]="a.id">{{ a.nombre }}</option>
                   </ng-container>
                 </select>
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col-sm-12 col-md-6">
-                <label for="telefonoEmergenciaCrear" class="form-label">Teléfono de emergencia</label>
-                <input class="form-control form-control-lg" type="tel" id="telefonoEmergenciaCrear"
-                  [(ngModel)]="model.telefonoEmergencia" placeholder="Ej: 3001234567"
-                  [disabled]="!camposHabilitados && editable">
-              </div>
-              <div class="col-sm-12 col-md-6">
-                <label for="epsCrear" class="form-label">EPS</label>
-                <input class="form-control form-control-lg" type="text" id="epsCrear" [(ngModel)]="model.eps"
-                  [disabled]="!camposHabilitados && editable">
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col-sm-12 col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="alimentacionCrear" [(ngModel)]="model.alimentacion"
-                    [disabled]="!camposHabilitados && editable">
-                  <label class="form-check-label" for="alimentacionCrear">Toma alimentación en la institución</label>
-                </div>
-              </div>
-              <div class="col-sm-12 col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="permanenteCrear" [(ngModel)]="model.permanente"
-                    [disabled]="!camposHabilitados && editable">
-                  <label class="form-check-label" for="permanenteCrear">Cliente permanente</label>
-                </div>
               </div>
             </div>
             <div class="row">
@@ -270,7 +257,7 @@
           <div class="row mb-4">
             <div class="col-sm-12 col-md-6">
               <label for="tipoDocumentoEdit" class="form-label">Tipo de documento <span class="text-danger">*</span></label>
-              <select class="form-select form-select-lg" id="tipoDocumentoEdit" [(ngModel)]="model.tipoIdentificacion" required
+              <select class="form-select form-select-lg" id="tipoDocumentoEdit" [(ngModel)]="model.tipoIdentificacion" (ngModelChange)="onTipoIdentificacionChange()" required
                 [ngClass]="{'is-invalid': !model.tipoIdentificacion && submitted}"
                 [disabled]="documentoEncontrado || !editable">
                 <option value="">Seleccionar</option>
@@ -281,15 +268,31 @@
             </div>
             <div class="col-sm-12 col-md-6">
               <label for="numeroDocumentoEdit" class="form-label">Número de documento <span class="text-danger">*</span></label>
-              <input class="form-control form-control-lg" type="text" id="numeroDocumentoEdit"
-                [(ngModel)]="model.numeroIdentificacion" required
-                [ngClass]="{'is-invalid': !model.numeroIdentificacion && submitted}"
-                [disabled]="documentoEncontrado || !editable">
+              <div class="input-group input-group-lg">
+                <input class="form-control form-control-lg" type="text" id="numeroDocumentoEdit"
+                  [ngModel]="model.numeroIdentificacion" (ngModelChange)="onNumeroIdentificacionChange($event)" required
+                  [ngClass]="{'is-invalid': !model.numeroIdentificacion && submitted}"
+                  [disabled]="documentoEncontrado || !editable">
+                <!-- DV del NIT: calculado por el sistema (o el del RUT), solo lectura -->
+                <ng-container *ngIf="esNit">
+                  <span class="input-group-text">DV</span>
+                  <input class="form-control form-control-lg input-dv" type="text" [value]="model.digitoVerificacion" readonly tabindex="-1">
+                </ng-container>
+              </div>
             </div>
           </div>
           <hr />
           <div [ngClass]="{ 'disabled-container': !camposHabilitados && editable }">
-            <div class="row">
+            <!-- Cliente empresa (NIT): solo razón social -->
+            <div class="row" *ngIf="esNit">
+              <div class="col-sm-12">
+                <label for="razonSocialEdit" class="form-label">Razón social <span class="text-danger">*</span></label>
+                <input class="form-control form-control-lg" type="text" id="razonSocialEdit" [(ngModel)]="model.razonSocial"
+                  required [ngClass]="{'is-invalid': !model.razonSocial && submitted}"
+                  [disabled]="!camposHabilitados && editable">
+              </div>
+            </div>
+            <div class="row" *ngIf="!esNit">
               <div class="col-sm-12 col-md-6">
                 <label for="primerNombreEdit" class="form-label">Primer nombre <span class="text-danger">*</span></label>
                 <input class="form-control form-control-lg" type="text" id="primerNombreEdit" [(ngModel)]="model.primerNombre"
@@ -302,7 +305,7 @@
                   [disabled]="!camposHabilitados && editable">
               </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-3" *ngIf="!esNit">
               <div class="col-sm-12 col-md-6">
                 <label for="primerApellidoEdit" class="form-label">Primer apellido <span class="text-danger">*</span></label>
                 <input class="form-control form-control-lg" type="text" id="primerApellidoEdit" [(ngModel)]="model.primerApellido"
@@ -322,14 +325,14 @@
                   [disabled]="!camposHabilitados && editable">
                 <small class="form-text text-muted">Predeterminado: Colombiana</small>
               </div>
-              <div class="col-sm-12 col-md-6">
+              <div class="col-sm-12 col-md-6" *ngIf="!esNit">
                 <label for="fechaNacimientoEdit" class="form-label">Fecha de nacimiento <span class="text-danger">*</span></label>
                 <input class="form-control form-control-lg" type="date" id="fechaNacimientoEdit" [(ngModel)]="model.fechaNacimiento"
                   required [ngClass]="{'is-invalid': !model.fechaNacimiento && submitted}"
                   [disabled]="!camposHabilitados && editable">
               </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-3" *ngIf="!esNit">
               <div class="col-sm-12 col-md-6">
                 <label for="generoEdit" class="form-label">Género <span class="text-danger">*</span></label>
                 <select class="form-select form-select-lg" id="generoEdit" [(ngModel)]="model.genero"
@@ -386,8 +389,8 @@
           </div>
         </div>
 
-        <!-- DATOS ACADÉMICOS (editar/consultar) -->
-        <div [hidden]="seccionActiva !== 'datos-academicos'">
+        <!-- DATOS DEL SERVICIO (editar/consultar) -->
+        <div [hidden]="seccionActiva !== 'datos-servicio'">
           <div [ngClass]="{ 'disabled-container': !camposHabilitados && editable }">
             <div class="row">
               <div class="col-sm-12 col-md-6">
@@ -410,7 +413,7 @@
                   [disabled]="!camposHabilitados && editable">
               </div>
               <div class="col-sm-12 col-md-6">
-                <label for="annoEdit" class="form-label">Año escolar</label>
+                <label for="annoEdit" class="form-label">Año</label>
                 <select class="form-select form-select-lg" id="annoEdit" [(ngModel)]="model.anno"
                   [disabled]="!camposHabilitados && editable">
                   <option value="">Seleccionar</option>
@@ -422,41 +425,12 @@
             </div>
             <div class="row mt-3">
               <div class="col-sm-12 col-md-6">
-                <label for="telefonoEmergenciaEdit" class="form-label">Teléfono de emergencia</label>
-                <input class="form-control form-control-lg" type="tel" id="telefonoEmergenciaEdit"
-                  [(ngModel)]="model.telefonoEmergencia" placeholder="Ej: 3001234567"
-                  [disabled]="!camposHabilitados && editable">
-              </div>
-              <div class="col-sm-12 col-md-6">
-                <label for="epsEdit" class="form-label">EPS</label>
-                <input class="form-control form-control-lg" type="text" id="epsEdit" [(ngModel)]="model.eps"
-                  [disabled]="!camposHabilitados && editable">
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col-sm-12 col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="alimentacionEdit" [(ngModel)]="model.alimentacion"
-                    [disabled]="!camposHabilitados && editable">
-                  <label class="form-check-label" for="alimentacionEdit">Toma alimentación en la institución</label>
-                </div>
-              </div>
-              <div class="col-sm-12 col-md-6">
                 <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox" id="clienteActivoEdit" [(ngModel)]="clienteActivoSwitch"
                     (change)="cambiarEstadoCliente()" [disabled]="accion === 'consultar'">
                   <label class="form-check-label" for="clienteActivoEdit">
                     <strong>{{ clienteActivoSwitch ? 'Cliente Activo' : 'Cliente Inactivo' }}</strong>
                   </label>
-                </div>
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col-sm-12 col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="permanenteEdit" [(ngModel)]="model.permanente"
-                    [disabled]="!camposHabilitados && editable">
-                  <label class="form-check-label" for="permanenteEdit">Cliente permanente</label>
                 </div>
               </div>
             </div>

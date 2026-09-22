@@ -674,7 +674,7 @@ export class CrearRepresentanteComponent implements OnInit {
         const body = response.body as any[];
         if (body && body.length > 0) {
           this.cliente = body[0];
-          this.nombre_cliente = [
+          this.nombre_cliente = (this.cliente.razon_social || '').trim() || [
             this.cliente.primer_nombre,
             this.cliente.segundo_nombre,
             this.cliente.primer_apellido,

@@ -19,6 +19,8 @@ interface ClienteModel {
   idPersona: string;
   tipoIdentificacion: number | string;
   numeroIdentificacion: number | string;
+  digitoVerificacion: string;
+  razonSocial: string;
   primerNombre: string;
   segundoNombre: string;
   primerApellido: string;
@@ -122,7 +124,7 @@ export class CrearClienteComponent implements OnInit {
 
   // Sidebar y navegación por secciones
   public nuevo = false;
-  public seccionActiva: 'datos-personales' | 'datos-academicos' | 'documentos' = 'datos-personales';
+  public seccionActiva: 'datos-personales' | 'datos-servicio' | 'documentos' = 'datos-personales';
   public sidebarAbierto = false;
 
   public listas = {
@@ -179,6 +181,8 @@ export class CrearClienteComponent implements OnInit {
     idPersona: '',
     tipoIdentificacion: '',
     numeroIdentificacion: '',
+    digitoVerificacion: '',
+    razonSocial: '',
     primerNombre: '',
     segundoNombre: '',
     primerApellido: '',
@@ -267,7 +271,7 @@ export class CrearClienteComponent implements OnInit {
 
   // ============ SIDEBAR Y NAVEGACIÓN POR SECCIONES ============
 
-  cambiarSeccion(seccion: 'datos-personales' | 'datos-academicos' | 'documentos'): void {
+  cambiarSeccion(seccion: 'datos-personales' | 'datos-servicio' | 'documentos'): void {
     this.seccionActiva = seccion;
     this.cerrarSidebar();
   }
@@ -288,7 +292,7 @@ export class CrearClienteComponent implements OnInit {
   obtenerNombreSeccion(): string {
     const nombres: Record<string, string> = {
       'datos-personales': 'Datos Personales',
-      'datos-academicos': 'Datos Académicos',
+      'datos-servicio': 'Datos del servicio',
       'documentos': 'Documentos',
     };
     return nombres[this.seccionActiva] || '';
@@ -297,7 +301,7 @@ export class CrearClienteComponent implements OnInit {
   obtenerIconoSeccion(): string {
     const iconos: Record<string, string> = {
       'datos-personales': 'fas fa-user-circle',
-      'datos-academicos': 'fas fa-graduation-cap',
+      'datos-servicio': 'fas fa-briefcase',
       'documentos': 'fas fa-file-alt',
     };
     return iconos[this.seccionActiva] || 'fas fa-circle';
@@ -310,7 +314,35 @@ export class CrearClienteComponent implements OnInit {
       .obtenerTodos()
       .subscribe((response: any) => {
         this.listas.tiposIdentificacion = response.body;
+        // Al crear, el cliente arranca como empresa (NIT), resuelto por nombre.
+        if (this.nuevo && !this.model.tipoIdentificacion) {
+          const nit = (this.listas.tiposIdentificacion || []).find(
+            (t: any) => (t.nombre || '').toString().trim().toUpperCase() === 'NIT',
+          );
+          this.model.tipoIdentificacion = nit ? nit.id : '';
+        }
       });
+  }
+
+  // Indica si el tipo de identificación seleccionado es NIT (cliente empresa).
+  get esNit(): boolean {
+    const tipo = (this.listas.tiposIdentificacion || []).find(
+      (t: any) => String(t.id) === String(this.model.tipoIdentificacion),
+    );
+    return !!tipo && (tipo.nombre || '').toString().trim().toUpperCase() === 'NIT';
+  }
+
+  // DV mostrado junto al NIT: el guardado (puede venir del RUT) o, al crear, el
+  // calculado en vivo. El back lo recalcula al guardar si no llega.
+  onNumeroIdentificacionChange(valor: any) {
+    this.model.numeroIdentificacion = valor;
+    this.model.digitoVerificacion = this.esNit ? this.utilService.calcularDigitoVerificacion(valor) : '';
+  }
+
+  onTipoIdentificacionChange() {
+    this.model.digitoVerificacion = this.esNit
+      ? this.utilService.calcularDigitoVerificacion(this.model.numeroIdentificacion)
+      : '';
   }
 
   consultarGeneros() {
@@ -336,6 +368,11 @@ export class CrearClienteComponent implements OnInit {
   }
 
   consultaPersona(tipoIdentificacion: any, numeroIdentificacion: any) {
+    // El NIT se guarda solo con dígitos (sin puntos ni DV).
+    if (this.esNit && numeroIdentificacion) {
+      numeroIdentificacion = String(numeroIdentificacion).replace(/\D/g, '');
+      this.onNumeroIdentificacionChange(numeroIdentificacion);
+    }
     if (!tipoIdentificacion || !numeroIdentificacion) {
       Swal.fire({
         title: 'Campos incompletos',
@@ -411,6 +448,8 @@ export class CrearClienteComponent implements OnInit {
     this.model.idPersona = persona.id;
     this.model.tipoIdentificacion = persona.id_tipo_identificacion;
     this.model.numeroIdentificacion = persona.numero_identificacion;
+    this.model.digitoVerificacion = persona.digito_verificacion || this.model.digitoVerificacion || '';
+    this.model.razonSocial = persona.razon_social || '';
     this.model.primerNombre = persona.primer_nombre;
     this.model.segundoNombre = persona.segundo_nombre;
     this.model.primerApellido = persona.primer_apellido;
@@ -439,6 +478,8 @@ export class CrearClienteComponent implements OnInit {
                   this.model.idPersona = persona.id;
                   this.model.tipoIdentificacion = persona.id_tipo_identificacion;
                   this.model.numeroIdentificacion = persona.numero_identificacion;
+                  this.model.digitoVerificacion = persona.digito_verificacion || '';
+                  this.model.razonSocial = persona.razon_social || '';
                   this.model.primerNombre = persona.primer_nombre;
                   this.model.segundoNombre = persona.segundo_nombre;
                   this.model.primerApellido = persona.primer_apellido;
@@ -488,6 +529,10 @@ export class CrearClienteComponent implements OnInit {
   }
 
   construirNombreCompleto(persona: any): string {
+    // Cliente empresa: su nombre es la razón social.
+    if (persona.razon_social && persona.razon_social.trim()) {
+      return persona.razon_social.trim();
+    }
     const partes = [];
     if (persona.primer_nombre) partes.push(persona.primer_nombre);
     if (persona.segundo_nombre) partes.push(persona.segundo_nombre);
@@ -591,22 +636,30 @@ export class CrearClienteComponent implements OnInit {
     }
     persona.ocupacion = 'Cliente';
 
+    // Cliente empresa (NIT): el nombre va solo en razon_social; nombres, fecha de
+    // nacimiento, género y RH no aplican.
+    const esNit = this.esNit;
+
     return {
       id: persona.idPersona || 0,
-      primer_nombre: persona.primerNombre,
-      segundo_nombre: persona.segundoNombre,
-      primer_apellido: persona.primerApellido,
-      segundo_apellido: persona.segundoApellido,
+      primer_nombre: esNit ? null : persona.primerNombre,
+      segundo_nombre: esNit ? null : persona.segundoNombre,
+      primer_apellido: esNit ? null : persona.primerApellido,
+      segundo_apellido: esNit ? null : persona.segundoApellido,
+      razon_social: esNit ? (persona.razonSocial || '').trim() : null,
       id_tipo_identificacion: persona.tipoIdentificacion,
-      numero_identificacion: persona.numeroIdentificacion,
-      fecha_nacimiento: persona.fechaNacimiento,
-      id_genero: persona.genero === '' ? null : persona.genero,
+      numero_identificacion: esNit
+        ? String(persona.numeroIdentificacion || '').replace(/\D/g, '')
+        : persona.numeroIdentificacion,
+      digito_verificacion: esNit ? persona.digitoVerificacion || null : null,
+      fecha_nacimiento: esNit ? null : persona.fechaNacimiento,
+      id_genero: esNit || persona.genero === '' ? null : persona.genero,
       direccion: persona.direccion,
       correo_electronico: persona.correoElectronico,
       nacionalidad: persona.nacionalidad,
       telefono: persona.telefono,
       id_ciudad: persona.ciudad === '' ? null : persona.ciudad,
-      rh: persona.rh,
+      rh: esNit ? null : persona.rh,
       ocupacion: persona.ocupacion,
     };
   }
@@ -702,15 +755,20 @@ export class CrearClienteComponent implements OnInit {
   }
 
   formularioValido(): boolean {
-    return Boolean(
+    const comunes = Boolean(
       this.model.tipoIdentificacion &&
       this.model.numeroIdentificacion &&
+      this.model.plan &&
+      this.model.fechaIngreso,
+    );
+    if (this.esNit) {
+      return comunes && Boolean(this.model.razonSocial && this.model.razonSocial.trim());
+    }
+    return comunes && Boolean(
       this.model.primerNombre &&
       this.model.primerApellido &&
       this.model.fechaNacimiento &&
-      this.model.genero &&
-      this.model.plan &&
-      this.model.fechaIngreso,
+      this.model.genero,
     );
   }
 
@@ -729,6 +787,8 @@ export class CrearClienteComponent implements OnInit {
       idPersona: '',
       tipoIdentificacion: '',
       numeroIdentificacion: '',
+      digitoVerificacion: '',
+      razonSocial: '',
       primerNombre: '',
       segundoNombre: '',
       primerApellido: '',
@@ -787,7 +847,7 @@ export class CrearClienteComponent implements OnInit {
   establecerValoresPorDefecto(): void {
     this.model.nacionalidad = 'Colombiana';
     this.model.ocupacion = 'Cliente';
-    this.model.tipoIdentificacion = 2;
+    // El tipo por defecto (NIT) se resuelve por nombre al cargar los tipos de identificación.
     const hoy = new Date();
     const año = hoy.getFullYear();
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
@@ -803,6 +863,9 @@ export class CrearClienteComponent implements OnInit {
   }
 
   obtenerNombreCompleto(): string {
+    if (this.esNit && this.model.razonSocial) {
+      return this.model.razonSocial.trim();
+    }
     return [
       this.model.primerNombre,
       this.model.segundoNombre,

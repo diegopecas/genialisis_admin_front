@@ -66,15 +66,18 @@
         <div class="mobile-card-body">
           <!-- Información destacada -->
           <div class="info-destacada mb-3">
-            <h4 class="text-center mb-1">{{ cliente.primer_nombre }} {{ cliente.segundo_nombre }}</h4>
-            <h5 class="text-center text-muted">{{ cliente.primer_apellido }} {{ cliente.segundo_apellido }}</h5>
+            <h4 class="text-center mb-1" *ngIf="cliente.razon_social">{{ cliente.razon_social }}</h4>
+            <ng-container *ngIf="!cliente.razon_social">
+              <h4 class="text-center mb-1">{{ cliente.primer_nombre }} {{ cliente.segundo_nombre }}</h4>
+              <h5 class="text-center text-muted">{{ cliente.primer_apellido }} {{ cliente.segundo_apellido }}</h5>
+            </ng-container>
           </div>
 
           <!-- Datos en formato lista móvil -->
           <div class="mobile-info-list">
             <div class="info-item">
               <span class="info-label">Identificación</span>
-              <span class="info-value">{{ obtenerTipoDocumento(cliente.id_tipo_identificacion) }} {{ cliente.numero_identificacion }}</span>
+              <span class="info-value">{{ obtenerTipoDocumento(cliente.id_tipo_identificacion) }} {{ cliente.numero_identificacion }}<ng-container *ngIf="cliente.digito_verificacion">-{{ cliente.digito_verificacion }}</ng-container></span>
             </div>
             <div class="info-item">
               <span class="info-label">Fecha de Nacimiento</span>
@@ -269,15 +272,19 @@
           <div class="row mb-3">
             <div class="col-md-4">
               <h6 class="text-muted mb-1">Identificación:</h6>
-              <p class="mb-0 fs-6">{{ obtenerTipoDocumento(cliente.id_tipo_identificacion) }} {{ cliente.numero_identificacion }}</p>
+              <p class="mb-0 fs-6">{{ obtenerTipoDocumento(cliente.id_tipo_identificacion) }} {{ cliente.numero_identificacion }}<ng-container *ngIf="cliente.digito_verificacion">-{{ cliente.digito_verificacion }}</ng-container></p>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-8" *ngIf="cliente.razon_social">
+              <h6 class="text-muted mb-1">Razón social:</h6>
+              <p class="mb-0 fs-6">{{ cliente.razon_social }}</p>
+            </div>
+            <div class="col-md-8" *ngIf="!cliente.razon_social">
               <h6 class="text-muted mb-1">Nombres:</h6>
               <p class="mb-0 fs-6">{{ cliente.primer_nombre }} {{ cliente.segundo_nombre }}</p>
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col-md-4">
+            <div class="col-md-4" *ngIf="!cliente.razon_social">
               <h6 class="text-muted mb-1">Apellidos:</h6>
               <p class="mb-0 fs-6">{{ cliente.primer_apellido }} {{ cliente.segundo_apellido }}</p>
             </div>

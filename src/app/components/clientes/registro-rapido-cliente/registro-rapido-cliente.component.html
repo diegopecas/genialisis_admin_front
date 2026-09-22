@@ -7,8 +7,8 @@
     <div *ngIf="paso === 1" class="paso-captura">
       <div class="card tarjeta">
         <div class="card-body text-center">
-          <h4 class="titulo-paso">Foto del registro civil</h4>
-          <p class="descripcion">Toma o selecciona la foto del registro civil. La leeremos automáticamente para prellenar los datos del niño y sus padres.</p>
+          <h4 class="titulo-paso">RUT del cliente</h4>
+          <p class="descripcion">Toma la foto o sube el PDF del RUT. Lo leeremos automáticamente para prellenar los datos del cliente y de su representante legal.</p>
 
           <!-- Vista de cámara -->
           <div *ngIf="modoCamara" class="camara-container">
@@ -27,11 +27,11 @@
           </div>
 
           <!-- Preview de la foto tomada / seleccionada -->
-          <div *ngIf="!modoCamara && (previewUrl || archivoRegistroCivil)" class="preview-container">
-            <img *ngIf="previewUrl" [src]="previewUrl" alt="Registro civil" class="preview-img" />
-            <div *ngIf="!previewUrl && archivoRegistroCivil" class="preview-archivo">
+          <div *ngIf="!modoCamara && (previewUrl || archivoRut)" class="preview-container">
+            <img *ngIf="previewUrl" [src]="previewUrl" alt="RUT" class="preview-img" />
+            <div *ngIf="!previewUrl && archivoRut" class="preview-archivo">
               <i class="fas fa-file-pdf"></i>
-              <span>{{ archivoRegistroCivil.name }}</span>
+              <span>{{ archivoRut.name }}</span>
             </div>
             <div class="preview-acciones">
               <button type="button" class="btn btn-outline-secondary" (click)="repetirToma()" *ngIf="camaraDisponible">
@@ -41,7 +41,7 @@
           </div>
 
           <!-- Botones iniciales (sin cámara abierta ni archivo) -->
-          <div *ngIf="!modoCamara && !archivoRegistroCivil" class="opciones-captura">
+          <div *ngIf="!modoCamara && !archivoRut" class="opciones-captura">
             <button type="button" class="btn btn-primary btn-lg" (click)="activarCamara()" *ngIf="camaraDisponible">
               <i class="fas fa-camera"></i> Tomar foto
             </button>
@@ -56,7 +56,7 @@
 
           <!-- Acciones del paso 1 -->
           <div class="acciones-paso mt-4" *ngIf="!modoCamara">
-            <button type="button" class="btn btn-success btn-lg" (click)="analizarRegistroCivil()" [disabled]="!archivoRegistroCivil || analizando">
+            <button type="button" class="btn btn-success btn-lg" (click)="analizarRut()" [disabled]="!archivoRut || analizando">
               <span *ngIf="!analizando"><i class="fas fa-robot"></i> Leer con IA y continuar</span>
               <span *ngIf="analizando"><i class="fas fa-spinner fa-spin"></i> Analizando...</span>
             </button>
@@ -71,56 +71,91 @@
     <!-- ================= PASO 2: REVISIÓN DE DATOS ================= -->
     <div *ngIf="paso === 2" class="paso-datos">
 
-      <!-- Datos del niño -->
+      <!-- Datos del cliente -->
       <div class="card tarjeta mb-3">
         <div class="card-header seccion-header">
-          <i class="fas fa-child"></i> Datos del cliente
+          <i class="fas fa-building"></i> Datos del cliente
         </div>
         <div class="card-body">
           <div class="row g-3">
             <div class="col-md-3">
               <label class="form-label">Tipo de identificación <span class="req">*</span></label>
-              <select class="form-select" [(ngModel)]="nino.id_tipo_identificacion" name="nino_tipo_id">
+              <select class="form-select" [(ngModel)]="cliente.id_tipo_identificacion" (ngModelChange)="onTipoClienteChange()" name="cliente_tipo_id">
                 <option value="">Seleccione...</option>
                 <option *ngFor="let t of listas.tiposIdentificacion" [value]="t.id">{{ t.nombre }}</option>
               </select>
             </div>
             <div class="col-md-3">
               <label class="form-label">Número de identificación <span class="req">*</span></label>
-              <input type="text" class="form-control" [(ngModel)]="nino.numero_identificacion" name="nino_num_id" />
+              <div class="input-group">
+                <input type="text" class="form-control" [ngModel]="cliente.numero_identificacion" (ngModelChange)="onNumeroClienteChange($event)" name="cliente_num_id" />
+                <ng-container *ngIf="clienteEsNit">
+                  <span class="input-group-text">DV</span>
+                  <input type="text" class="form-control input-dv" [value]="cliente.digito_verificacion" readonly tabindex="-1" />
+                </ng-container>
+              </div>
+            </div>
+
+            <!-- Empresa (NIT): razón social -->
+            <div class="col-md-6" *ngIf="clienteEsNit">
+              <label class="form-label">Razón social <span class="req">*</span></label>
+              <input type="text" class="form-control" [(ngModel)]="cliente.razon_social" name="cliente_razon_social" />
+            </div>
+
+            <!-- Persona natural: nombres, fecha de nacimiento y género -->
+            <ng-container *ngIf="!clienteEsNit">
+              <div class="col-md-3">
+                <label class="form-label">Fecha de nacimiento</label>
+                <input type="date" class="form-control" [(ngModel)]="cliente.fecha_nacimiento" name="cliente_fnac" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Género</label>
+                <select class="form-select" [(ngModel)]="cliente.id_genero" name="cliente_genero">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let g of listas.generos" [value]="g.id">{{ g.nombre }}</option>
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Primer nombre <span class="req">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="cliente.primer_nombre" name="cliente_pnom" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Segundo nombre</label>
+                <input type="text" class="form-control" [(ngModel)]="cliente.segundo_nombre" name="cliente_snom" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Primer apellido <span class="req">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="cliente.primer_apellido" name="cliente_pape" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Segundo apellido</label>
+                <input type="text" class="form-control" [(ngModel)]="cliente.segundo_apellido" name="cliente_sape" />
+              </div>
+            </ng-container>
+
+            <div class="col-md-6">
+              <label class="form-label">Dirección</label>
+              <input type="text" class="form-control" [(ngModel)]="cliente.direccion" name="cliente_direccion" />
             </div>
             <div class="col-md-3">
-              <label class="form-label">Fecha de nacimiento</label>
-              <input type="date" class="form-control" [(ngModel)]="nino.fecha_nacimiento" name="nino_fnac" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Género</label>
-              <select class="form-select" [(ngModel)]="nino.id_genero" name="nino_genero">
+              <label class="form-label">Ciudad</label>
+              <select class="form-select" [(ngModel)]="cliente.id_ciudad" name="cliente_ciudad">
                 <option value="">Seleccione...</option>
-                <option *ngFor="let g of listas.generos" [value]="g.id">{{ g.nombre }}</option>
+                <option *ngFor="let c of listas.ciudades" [value]="c.id">{{ c.nombre }}</option>
               </select>
             </div>
-
             <div class="col-md-3">
-              <label class="form-label">Primer nombre <span class="req">*</span></label>
-              <input type="text" class="form-control" [(ngModel)]="nino.primer_nombre" name="nino_pnom" />
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-control" [(ngModel)]="cliente.telefono" name="cliente_telefono" />
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Segundo nombre</label>
-              <input type="text" class="form-control" [(ngModel)]="nino.segundo_nombre" name="nino_snom" />
+            <div class="col-md-6">
+              <label class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" [(ngModel)]="cliente.correo_electronico" name="cliente_correo" />
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Primer apellido <span class="req">*</span></label>
-              <input type="text" class="form-control" [(ngModel)]="nino.primer_apellido" name="nino_pape" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Segundo apellido</label>
-              <input type="text" class="form-control" [(ngModel)]="nino.segundo_apellido" name="nino_sape" />
-            </div>
-
             <div class="col-md-3">
               <label class="form-label">Fecha de ingreso</label>
-              <input type="date" class="form-control" [(ngModel)]="nino.fecha_ingreso" name="nino_fing" />
+              <input type="date" class="form-control" [(ngModel)]="cliente.fecha_ingreso" name="cliente_fing" />
             </div>
           </div>
         </div>
@@ -143,34 +178,6 @@
             <div class="col-md-4">
               <label class="form-label">Año</label>
               <input type="number" class="form-control" [(ngModel)]="anno" name="anno" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Horario -->
-      <div class="card tarjeta mb-3">
-        <div class="card-header seccion-header">
-          <i class="fas fa-clock"></i> Horario
-        </div>
-        <div class="card-body">
-          <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-              <label class="form-label">Hora de entrada</label>
-              <input type="time" class="form-control" [(ngModel)]="horaEntrada" name="hora_entrada" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Hora de salida</label>
-              <input type="time" class="form-control" [(ngModel)]="horaSalida" name="hora_salida" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Días</label>
-              <div class="dias-chips">
-                <label *ngFor="let d of dias" class="dia-chip" [class.activo]="d.seleccionado">
-                  <input type="checkbox" [(ngModel)]="d.seleccionado" [name]="'dia_' + d.id_dia_semana" />
-                  <span>{{ d.nombre_dia || ('Día ' + d.id_dia_semana) }}</span>
-                </label>
-              </div>
             </div>
           </div>
         </div>
@@ -214,7 +221,7 @@
               <div class="col-md-3">
                 <label class="form-label">Número de identificación <span class="req">*</span></label>
                 <input type="text" class="form-control" [(ngModel)]="ac.numero_identificacion" [name]="'ac_num_' + i" />
-                <small class="ayuda">Será su usuario y clave del portal de padres.</small>
+                <small class="ayuda">Será su usuario y clave del portal.</small>
               </div>
               <div class="col-md-3">
                 <label class="form-label">Teléfono</label>
@@ -239,8 +246,9 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Correo electrónico</label>
+                <label class="form-label">Correo electrónico <span class="req" *ngIf="ac.autorizado_sistema">*</span></label>
                 <input type="email" class="form-control" [(ngModel)]="ac.correo_electronico" [name]="'ac_correo_' + i" />
+                <small class="ayuda" *ngIf="ac.autorizado_sistema">Obligatorio para el acceso al portal.</small>
               </div>
 
               <div class="col-md-6 d-flex align-items-end">
@@ -263,7 +271,7 @@
       <!-- Acciones del paso 2 -->
       <div class="acciones-finales">
         <button type="button" class="btn btn-light" (click)="volverAlPaso1()" [disabled]="guardando">
-          <i class="fas fa-arrow-left"></i> Volver a la foto
+          <i class="fas fa-arrow-left"></i> Volver al RUT
         </button>
         <button type="button" class="btn btn-success btn-lg" (click)="guardar()" [disabled]="guardando">
           <span *ngIf="!guardando"><i class="fas fa-save"></i> Registrar cliente</span>

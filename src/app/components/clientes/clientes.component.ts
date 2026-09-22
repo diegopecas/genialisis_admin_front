@@ -154,7 +154,7 @@ export class ClientesComponent implements OnInit {
     this.datos.forEach((e: any) => {
       // Los clientes empresa solo tienen razon social: los demas campos llegan
       // en null y el template literal los pintaba como el texto "null".
-      e.nombre_completo = [e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido]
+      e.nombre_completo = (e.razon_social || '').trim() || [e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido]
         .filter(Boolean)
         .join(' ');
       e.color = e.activo === 0 ? '#e2e9f3' : '';

@@ -108,4 +108,42 @@ export class UtilService {
 
         return `${año}-${mes}-${dia}`;
     }
+
+    /**
+     * Calcula el dígito de verificación (DV) de un NIT con el algoritmo de la DIAN
+     * (módulo 11 con pesos primos). Es el mismo cálculo de Personas::calcularDigitoVerificacion
+     * en el back, que es la fuente de verdad al guardar; aquí solo se usa para mostrarlo en vivo.
+     * @returns {string} DV de un dígito, o '' si el NIT no tiene dígitos.
+     */
+    calcularDigitoVerificacion(nit: string | number | null | undefined): string {
+        const digitos = String(nit ?? '').replace(/\D/g, '');
+        if (!digitos) {
+            return '';
+        }
+        const pesos = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+        const invertido = digitos.split('').reverse();
+        let suma = 0;
+        for (let i = 0; i < invertido.length && i < pesos.length; i++) {
+            suma += Number(invertido[i]) * pesos[i];
+        }
+        const residuo = suma % 11;
+        return String(residuo > 1 ? 11 - residuo : residuo);
+    }
+
+    /**
+     * Nombre para mostrar de una persona: la razón social si es empresa, si no
+     * los nombres y apellidos que tenga (sin dejar 'null' ni espacios dobles).
+     */
+    nombrePersona(persona: any): string {
+        if (!persona) {
+            return '';
+        }
+        const razonSocial = (persona.razon_social || '').toString().trim();
+        if (razonSocial) {
+            return razonSocial;
+        }
+        return [persona.primer_nombre, persona.segundo_nombre, persona.primer_apellido, persona.segundo_apellido]
+            .filter(Boolean)
+            .join(' ');
+    }
 }
