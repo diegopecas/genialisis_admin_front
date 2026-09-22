@@ -39,3 +39,22 @@ ng build --configuration genialisis_admin_qa --output-path=dist/qa
 
 # Start server 
 ng serve --port 4100
+
+
+## Ambientes — genialisis_admin (puerto 4100)
+
+### Servidor local
+```
+ng serve genialisis_admin --port 4100                                   # development
+ng serve genialisis_admin --configuration qa --port 4100
+ng serve genialisis_admin --configuration genialisis_admin --port 4100
+ng serve genialisis_admin --configuration production --port 4100
+```
+
+### Compilación
+```
+ng build genialisis_admin --configuration qa                 # dist/qa/browser
+ng build genialisis_admin --configuration genialisis_admin   # dist/genialisis_admin/browser
+ng build genialisis_admin --configuration production         # dist/prod/browser
+ng build genialisis_admin                                    # dist/dev/browser
+```

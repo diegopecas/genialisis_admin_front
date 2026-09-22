@@ -51,6 +51,7 @@
           },
           "configurations": {
             "production": {
+              "outputPath": "dist/prod",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -72,6 +73,7 @@
               "outputHashing": "all"
             },
             "qa": {
+              "outputPath": "dist/qa",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -93,6 +95,7 @@
               "outputHashing": "all"
             },
             "genialisis_admin": {
+              "outputPath": "dist/genialisis_admin",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -114,6 +117,7 @@
               "outputHashing": "all"
             },
             "development": {
+              "outputPath": "dist/dev",
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
