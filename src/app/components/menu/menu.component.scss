@@ -831,6 +831,47 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
   }
 }
 
+// Refresco de la lista de personas: discreto, no compite con el buscador
+.buscador-refrescar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-left: 6px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.35);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.06);
+    color: $gold-text-medium;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.girando {
+    color: $gold-text-medium;
+    animation: girarRefresco 0.8s linear infinite;
+  }
+}
+
+@keyframes girarRefresco {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .menu-sin-resultados {
   text-align: center;
   color: $ivory;
@@ -838,6 +879,284 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
   font-weight: 500;
   padding: 32px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+// ============================================
+// RESULTADOS DE PERSONAS
+// ============================================
+.personas-resultados {
+  max-width: 640px;
+  margin: 0 auto 28px auto;
+}
+
+.personas-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.personas-titulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: $ivory;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.personas-conteo {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(250, 248, 243, 0.75);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.persona-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 193, 7, 0.25);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: rgba(255, 193, 7, 0.5);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  }
+}
+
+.persona-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.85);
+  transition: $transition-base;
+
+  &:hover {
+    background: $white;
+  }
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+.persona-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.persona-nombre {
+  font-size: 15px;
+  font-weight: 700;
+  color: $gold-text-dark;
+  line-height: 1.2;
+}
+
+.persona-documento {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.persona-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// La insignia es un botón: lleva directo a la opción de ese rol
+.persona-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255, 193, 7, 0.25);
+  border: 1px solid rgba(255, 193, 7, 0.5);
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 700;
+  color: $gold-text-dark;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background: $gold-primary;
+    border-color: $gold-primary;
+    color: $black-primary;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(255, 193, 7, 0.4);
+  }
+
+  // Inactivo: en gris, sin el dorado de la marca
+  &.inactivo {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: rgba(0, 0, 0, 0.45);
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.12);
+      border-color: rgba(0, 0, 0, 0.25);
+      color: rgba(0, 0, 0, 0.6);
+      box-shadow: none;
+    }
+  }
+}
+
+.persona-chevron {
+  font-size: 13px;
+  color: $gold-text-medium;
+  transition: transform 0.25s ease;
+
+  &.abierto {
+    transform: rotate(90deg);
+  }
+}
+
+.persona-destinos {
+  padding: 8px 12px 12px 12px;
+}
+
+// Aviso de que lo buscado es una opción de la ficha, no del menú
+.aviso-opcion-ficha {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 900px;
+  margin: 0 auto 14px auto;
+  padding: 11px 15px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 193, 7, 0.45);
+  font-size: 0.88rem;
+  color: rgba(0, 0, 0, 0.72);
+  line-height: 1.4;
+
+  .aviso-icono {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.82rem;
+    padding: 10px 12px;
+  }
+}
+
+.persona-destino-bloque {
+  margin: 4px 0;
+}
+
+// Chevron para desplegar las opciones de la ficha del cliente o del colaborador
+.destino-chevron {
+  margin-left: auto;
+  padding: 0 4px;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.45);
+  transition: transform 0.25s ease;
+
+  &.abierto {
+    transform: rotate(90deg);
+  }
+}
+
+// Opciones de la ficha, bajo el destino
+.destino-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 6px 4px 14px;
+}
+
+.destino-opcion {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: rgba(0, 0, 0, 0.75);
+  transition: $transition-base;
+
+  &:hover {
+    background: $white;
+    box-shadow: 0 3px 10px rgba(255, 193, 7, 0.28);
+  }
+}
+
+.destino-opcion-icono {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.persona-destino {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  margin: 4px 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background: $white;
+    transform: translateX(3px);
+    box-shadow: 0 3px 12px rgba(255, 193, 7, 0.25);
+  }
+
+  // Inactivo: apagado, pero se puede abrir igual
+  &.inactivo {
+    background: rgba(255, 255, 255, 0.55);
+
+    .destino-tipo,
+    .destino-detalle {
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+.destino-tipo {
+  font-size: 13px;
+  font-weight: 700;
+  color: $gold-text-dark;
+  white-space: nowrap;
+}
+
+.destino-detalle {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+}
+
+.destino-estado {
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
 }
 
 // ---- Grilla de secciones raíz ----
@@ -903,21 +1222,12 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
   font-weight: 700;
   color: $ivory;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
-
-  /* El nombre lleva a la página; el resto de la fila expande. */
-  &.navegable:hover {
-    color: $gold-primary;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
 }
 
 .seccion-chevron {
-  font-size: 28px;
-  line-height: 1;
+  font-size: 16px;
   color: $gold-primary;
   transition: transform 0.25s ease;
-  transform-origin: center;
 
   &.abierto {
     transform: rotate(90deg);
@@ -956,7 +1266,7 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
     box-shadow: 0 3px 12px rgba(255, 193, 7, 0.25);
   }
 
-  &.es-plan {
+  &.es-grupo {
     background: rgba(255, 255, 255, 0.55);
     font-weight: 700;
   }
@@ -980,20 +1290,12 @@ $confetti-colors: #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #FF6BD6, #FF8C42, #A66CFF,
   font-weight: 600;
   color: $gold-text-dark;
   line-height: 1.2;
-
-  &.navegable:hover {
-    color: $gold-primary;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
 }
 
 .nodo-chevron {
-  font-size: 20px;
-  line-height: 1;
+  font-size: 13px;
   color: $gold-text-medium;
   transition: transform 0.25s ease;
-  transform-origin: center;
 
   &.abierto {
     transform: rotate(90deg);

@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { GrupoMenuModulo, MenuModulosService, ModuloMenu, OpcionMenuModulo } from './menu-modulos.service';
 
 /**
  * Nodo del árbol de menú.
- * - Si tiene `ruta` es navegable.
- * - Si tiene `hijos` es un plan expandible: al hacerle clic abre, no navega.
- * - Puede tener las dos. En ese caso el clic sigue expandiendo y la página
- *   propia se abre con el botón "Ir al panel" que pinta el componente.
+ * - Si tiene `ruta` es una hoja navegable.
+ * - Si tiene `hijos` es un grupo expandible.
  * - `permiso` (opcional) gatea la visibilidad; los nodos sin permiso se muestran siempre.
  * - `keywords` (opcional) son términos alternativos para que la búsqueda encuentre el nodo
  *   aunque el usuario escriba una palabra distinta al label.
@@ -26,256 +25,149 @@ export interface MenuNodo {
 })
 export class MenuArbolService {
 
+  private menuModulosService = inject(MenuModulosService);
+
   /**
    * Devuelve el árbol completo del menú.
-   * Por ahora está declarado en código; más adelante se reemplaza por una
-   * consulta a la tabla del menú sin cambiar la firma de este método.
+   * Ya no declara datos: los arma desde el catálogo de menu-modulos.service.ts,
+   * que es el mismo que pintan las tarjetas de cada módulo. Así el árbol y las
+   * pantallas no se pueden desincronizar.
    */
   getArbol(): MenuNodo[] {
-    return [
-      {
-        id: 'clientes',
-        label: 'Clientes',
-        icono: '🎓',
-        imagen: '/assets/images/clientes.png',
-        ruta: '/clientes/gestion',
-        permiso: 'clientes.ver',
-        keywords: ['alumnos', 'niños', 'implementacion', 'implementación', 'estudiantado', 'parvulos'],
-        hijos: [
-          {
-            id: 'clientes-gestion',
-            label: 'Gestión',
-            icono: '🎓',
-            keywords: ['alumnos', 'niños', 'implementacion'],
-            hijos: [
-              { id: 'clientes-gestion-clientes', label: 'Gestión Clientes', icono: '🎓', ruta: '/clientes/gestion', permiso: 'clientes.gestion', keywords: ['empresas', 'implementacion', 'registro rapido', 'rut', 'nit', 'razon social'] },
-              { id: 'clientes-registro-rapido', label: 'Registro Rápido', icono: '⚡', ruta: '/clientes/registro-rapido', permiso: 'clientes.administrar', keywords: ['registro rapido', 'rut', 'nit', 'razon social', 'implementacion', 'foto'] },
-              { id: 'clientes-listado', label: 'Clientes', icono: '🎓', ruta: '/clientes', permiso: 'clientes.listado', keywords: ['alumnos', 'niños', 'estudiantado', 'parvulos'] }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'reportes',
-        label: 'Reportes',
-        icono: '📊',
-        imagen: '/assets/images/detalle.png',
-        ruta: '/reportes',
-        permiso: 'reportes.ver',
-        keywords: ['informes', 'reporteria', 'estadisticas', 'tablero'],
-        hijos: [
-          { id: 'reportes-inicio', label: 'Reportes', icono: '📊', ruta: '/reportes', permiso: 'reportes.ver' },
-          {
-            id: 'reportes-financieros',
-            label: 'Financieros',
-            icono: '💵',
-            keywords: ['dinero', 'plata', 'finanzas'],
-            hijos: [
-              { id: 'reportes-cartera', label: 'Reporte Cartera', icono: '💰', ruta: '/reportes/cartera', permiso: 'reportes.cartera', keywords: ['deudas', 'cuentas por cobrar', 'morosos', 'cobranza'] },
-              { id: 'reportes-mov-financieros', label: 'Ingresos y Egresos', icono: '💹', ruta: '/reportes/movimientos-financieros', permiso: 'reportes.movimientos_financieros', keywords: ['movimientos financieros', 'gastos', 'flujo', 'plata'] },
-              { id: 'reportes-pagos', label: 'Reporte Pagos', icono: '💳', ruta: '/reportes/pagos-recibidos', permiso: 'reportes.pagos_recibidos', keywords: ['pagos recibidos', 'recaudo'] },
-              { id: 'reportes-cobros', label: 'Cobros Realizados', icono: '🧾', ruta: '/reportes/cobros-realizados', permiso: 'reportes.cobros_realizados', keywords: ['cobros', 'recaudo'] },
-              { id: 'reportes-reportes-pago', label: 'Reportes de Pago', icono: '📑', ruta: '/reportes/reportes-pago', permiso: 'reportes.reportes_pago' },
-              { id: 'reportes-dashboard-gerencial', label: 'Dashboard Gerencial', icono: '📊', ruta: '/reportes/dashboard-gerencial', permiso: 'dashboard.gerencial.listado', keywords: ['indicadores', 'gerencia', 'tablero'] }
-            ]
-          },
-          {
-            id: 'reportes-colaboradores',
-            label: 'Colaboradores',
-            icono: '🧑‍💼',
-            keywords: ['empleados', 'personal'],
-            hijos: [
-              { id: 'reportes-colab-contabilizaciones', label: 'Reporte Contabilizaciones', icono: '🧾', ruta: '/reportes/reporte-contabilizaciones', permiso: 'reportes.contabilizaciones' },
-              { id: 'reportes-colab-historial', label: 'Historial Actividades', icono: '📜', ruta: '/reportes/historial-actividades', permiso: 'reportes.historial_actividades' }
-            ]
-          },
-          {
-            id: 'reportes-operativos',
-            label: 'Operativos',
-            icono: '📋',
-            hijos: [
-              { id: 'reportes-clientes-general', label: 'Reporte Clientes', icono: '📋', ruta: '/reportes/clientes-general', permiso: 'reportes.clientes_general', keywords: ['listado clientes', 'alumnos'] }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'operaciones',
-        label: 'Operaciones',
-        icono: '⚙️',
-        imagen: '/assets/images/operaciones.png',
-        ruta: '/operaciones',
-        permiso: 'operaciones.ver',
-        keywords: ['operativo', 'dia a dia', 'gestion diaria'],
-        hijos: [
-          {
-            id: 'operaciones-productos',
-            label: 'Productos',
-            icono: '📦',
-            keywords: ['inventario', 'stock', 'bodega'],
-            hijos: [
-              { id: 'operaciones-mov-productos', label: 'Movimientos Productos', icono: '📦', ruta: '/operaciones/movimientos-productos', permiso: 'operaciones.movimientos_productos', keywords: ['inventario', 'stock', 'bodega'] },
-              { id: 'operaciones-registros-limpieza', label: 'Registros Limpieza', icono: '🧼', ruta: '/operaciones/registros-limpieza', permiso: 'operaciones.registros_limpieza', keywords: ['aseo', 'limpieza'] },
-              { id: 'operaciones-registro-rapido-limpieza', label: 'Registro Rápido de Aseo', icono: '⚡', ruta: '/operaciones/registro-rapido-limpieza', permiso: 'operaciones.registro_rapido_limpieza', keywords: ['aseo', 'limpieza', 'rapido', 'express'] },
-              { id: 'operaciones-registro-masivo-limpieza', label: 'Registro Masivo de Aseo', icono: '📅', ruta: '/operaciones/registro-masivo-limpieza', permiso: 'operaciones.registro_masivo_limpieza', keywords: ['aseo', 'limpieza', 'masivo', 'rango', 'fechas', 'varios dias', 'lote'] },
-              { id: 'operaciones-edicion-masiva-limpieza', label: 'Edición Masiva de Aseo', icono: '✏️', ruta: '/operaciones/edicion-masiva-limpieza', permiso: 'operaciones.edicion_masiva_limpieza', keywords: ['aseo', 'limpieza', 'editar', 'edicion', 'masiva', 'lote', 'corregir', 'eliminar', 'borrar'] },
-              { id: 'operaciones-supervision-limpieza', label: 'Supervisión de Aseo', icono: '✅', ruta: '/operaciones/supervision-limpieza', permiso: 'operaciones.supervision_limpieza', keywords: ['aseo', 'limpieza', 'supervisar', 'supervision', 'aprobar'] },
-              { id: 'operaciones-reporte-aseo', label: 'Reporte de Aseo', icono: '📄', ruta: '/operaciones/reporte-aseo', permiso: 'operaciones.reporte_aseo', keywords: ['aseo', 'limpieza', 'reporte', 'informe', 'pdf'] }
-            ]
-          },
-          {
-            id: 'operaciones-comunicaciones',
-            label: 'Comunicaciones y Seguimiento',
-            icono: '📢',
-            keywords: ['whatsapp', 'avisos', 'notificaciones'],
-            hijos: [
-              { id: 'operaciones-recordatorio-pagos', label: 'Recordatorio Pagos', icono: '💬', ruta: '/operaciones/recordatorio-pagos', permiso: 'operaciones.recordatorio_pagos', keywords: ['cobro', 'whatsapp'] },
-              { id: 'operaciones-recordatorios-generales', label: 'Recordatorios Generales', icono: '📢', ruta: '/operaciones/recordatorios-generales', permiso: 'operaciones.recordatorios_generales', keywords: ['avisos', 'notificaciones', 'whatsapp'] }
-            ]
-          },
-          {
-            id: 'operaciones-visitas',
-            label: 'Visitas a Clientes',
-            icono: '🏫',
-            keywords: ['visita', 'taller', 'jardin', 'jardín', 'encuesta', 'cuestionario'],
-            hijos: [
-              { id: 'operaciones-visitas-listado', label: 'Visitas a Clientes', icono: '🏫', ruta: '/operaciones/visitas', permiso: 'operaciones.visitas', keywords: ['visita', 'taller', 'enlace', 'encuesta', 'cuestionario', 'jardin', 'jardín'] }
-            ]
-          },
-          {
-            id: 'operaciones-procesos-tenant',
-            label: 'Procesos Tenant',
-            icono: '🏢',
-            keywords: ['tenant', 'cliente nuevo', 'montaje', 'instancia'],
-            hijos: [
-              { id: 'operaciones-migracion', label: 'Migración', icono: '📦', ruta: '/migracion/sesiones', permiso: 'migracion.listado', keywords: ['migracion', 'migración', 'carga de datos', 'cargue', 'montaje', 'cliente nuevo', 'implementacion', 'implementación', 'tenant', 'sembrar'] }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'colaboradores',
-        label: 'Colaboradores',
-        icono: '🧑‍💼',
-        imagen: '/assets/images/colaboradores.png',
-        ruta: '/colaboradores/gestion',
-        permiso: 'colaboradores.ver',
-        keywords: ['empleados', 'personal', 'trabajadores', 'staff'],
-        hijos: [
-          {
-            id: 'colaboradores-gestion',
-            label: 'Gestión',
-            icono: '👥',
-            keywords: ['empleados', 'personal'],
-            hijos: [
-              { id: 'colaboradores-gestion-colab', label: 'Gestión Colaboradores', icono: '👥', ruta: '/colaboradores/gestion', permiso: 'colaboradores.gestion', keywords: ['empleados', 'personal', 'staff'] },
-              { id: 'colaboradores-listado', label: 'Colaboradores', icono: '🧑‍💼', ruta: '/colaboradores', permiso: 'colaboradores.listado', keywords: ['empleados', 'personal'] },
-              { id: 'colaboradores-registro-ingreso-salida', label: 'Registro Ingreso / Salida', icono: '⏱️', ruta: '/registro-ingreso-salida', keywords: ['marcacion', 'entrada', 'salida', 'huella'] }
-            ]
-          },
-          {
-            id: 'colaboradores-actividades',
-            label: 'Actividades',
-            icono: '📋',
-            keywords: ['tareas', 'agenda'],
-            hijos: [
-              { id: 'colaboradores-act-colab', label: 'Actividades Colaboradores', icono: '📋', ruta: '/colaboradores/actividades', permiso: 'colaboradores.actividades', keywords: ['tareas'] },
-              { id: 'colaboradores-calendario', label: 'Calendario Colaboradores', icono: '📅', ruta: '/colaboradores/actividades/calendario', permiso: 'colaboradores.calendario', keywords: ['agenda'] },
-              { id: 'colaboradores-aprobacion-act', label: 'Aprobación Actividades', icono: '✅', ruta: '/colaboradores/actividades/aprobacion', permiso: 'colaboradores.aprobacion_actividades', keywords: ['aprobar'] },
-              { id: 'colaboradores-contab-act', label: 'Contabilización Actividades', icono: '🧮', ruta: '/colaboradores/actividades/contabilizacion', permiso: 'colaboradores.contabilizacion_actividades', keywords: ['contabilizar'] }
-            ]
-          },
-          {
-            id: 'colaboradores-nomina',
-            label: 'Nómina',
-            icono: '💰',
-            keywords: ['sueldos', 'salarios'],
-            hijos: [
-              { id: 'colaboradores-nominas', label: 'Nóminas', icono: '💰', ruta: '/colaboradores/nominas', permiso: 'colaboradores.nominas', keywords: ['sueldos', 'salarios', 'pago empleados'] }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'administracion',
-        label: 'Administración',
-        icono: '🏛️',
-        imagen: '/assets/images/administracion.png',
-        ruta: '/administracion',
-        permiso: 'administracion.ver',
-        keywords: ['admin', 'configuracion', 'ajustes', 'parametros'],
-        hijos: [
-          { id: 'administracion-inicio', label: 'Administración', icono: '🏛️', ruta: '/administracion', permiso: 'administracion.ver' },
-          { id: 'administracion-datos-maestros', label: 'Datos Maestros', icono: '🗃️', ruta: '/administracion/datos-maestros', permiso: 'administracion.datos_maestros', keywords: ['catalogos', 'parametros'] },
-          {
-            id: 'administracion-operaciones',
-            label: 'Operaciones',
-            icono: '⚙️',
-            keywords: ['operaciones', 'entes', 'control'],
-            hijos: [
-              { id: 'administracion-oper-inicio', label: 'Operaciones', icono: '⚙️', ruta: '/administracion/operaciones', permiso: 'administracion.operaciones' },
-              { id: 'administracion-entes-control', label: 'Entes de Control', icono: '🏛️', ruta: '/administracion/operaciones/entes-control', permiso: 'admin.entes_control', keywords: ['entes', 'control', 'vigilancia', 'secretaria', 'icbf'] },
-              { id: 'administracion-consulta-entes-control', label: 'Consulta Entes de Control', icono: '🔎', ruta: '/administracion/operaciones/consulta-entes-control', permiso: 'admin.consulta_entes_control', keywords: ['consulta', 'entes', 'control', 'visita', 'documentos', 'reportes'] }
-            ]
-          },
-          {
-            id: 'administracion-financiero',
-            label: 'Financiero',
-            icono: '💵',
-            keywords: ['dinero', 'plata', 'finanzas'],
-            hijos: [
-              { id: 'administracion-fin-inicio', label: 'Financiero', icono: '💵', ruta: '/administracion/financiero', permiso: 'administracion.financiero' },
-              { id: 'administracion-fin-movimientos', label: 'Movimientos Financieros', icono: '💸', ruta: '/administracion/financiero/movimientos-financieros', permiso: 'admin.movimientos_financieros', keywords: ['ingresos', 'egresos', 'gastos'] },
-              { id: 'administracion-fin-aprobacion', label: 'Aprobación Múltiple', icono: '✅', ruta: '/administracion/financiero/aprobacion-multiple', permiso: 'admin.aprobacion_multiple', keywords: ['aprobar'] },
-              { id: 'administracion-fin-registro-pagos', label: 'Registro Pagos Rápido', icono: '⚡', ruta: '/administracion/financiero/registro-pagos-rapido', permiso: 'admin.registro_pagos_rapido', keywords: ['recaudo', 'pagos'] },
-              { id: 'administracion-fin-contab-multiple', label: 'Contabilización Múltiple', icono: '🧮', ruta: '/administracion/financiero/contabilizacion-multiple', permiso: 'admin.contabilizacion_multiple', keywords: ['contabilizar'] }
-            ]
-          },
-          {
-            id: 'administracion-productos',
-            label: 'Productos e Inventario',
-            icono: '📦',
-            keywords: ['inventario', 'stock', 'bodega'],
-            hijos: [
-              { id: 'administracion-prod', label: 'Productos', icono: '📦', ruta: '/administracion/datos-maestros/productos', permiso: 'admin.productos', keywords: ['inventario', 'articulos'] },
-              { id: 'administracion-prod-servicios', label: 'Productos y Servicios', icono: '🛒', ruta: '/administracion/datos-maestros/productos-servicios', permiso: 'admin.productos_servicios', keywords: ['servicios', 'tarifas', 'precios'] },
-              { id: 'administracion-prod-mobiliario', label: 'Productos Mobiliario', icono: '🪑', ruta: '/administracion/datos-maestros/productos-mobiliario', permiso: 'admin.productos_mobiliario', keywords: ['muebles'] },
-              { id: 'administracion-prod-limpieza', label: 'Productos Limpieza', icono: '🧹', ruta: '/administracion/datos-maestros/productos-limpieza', permiso: 'admin.productos_limpieza', keywords: ['aseo'] },
-              { id: 'administracion-proveedores', label: 'Proveedores', icono: '🚚', ruta: '/administracion/datos-maestros/proveedores', permiso: 'admin.proveedores', keywords: ['compras'] },
-              { id: 'administracion-areas-fisicas', label: 'Áreas Físicas', icono: '🏗️', ruta: '/administracion/datos-maestros/areas-fisicas', permiso: 'admin.areas_fisicas', keywords: ['espacios', 'salones'] },
-              { id: 'administracion-elementos-fisicos', label: 'Elementos Físicos', icono: '🔧', ruta: '/administracion/datos-maestros/elementos-fisicos', permiso: 'admin.elementos_fisicos', keywords: ['activos'] },
-              { id: 'administracion-config-aseo', label: 'Configuración de Aseo', icono: '🧹', ruta: '/administracion/datos-maestros/config-aseo', permiso: 'admin.config_aseo', keywords: ['aseo', 'limpieza', 'procesos', 'configurar', 'masiva', 'tiempos', 'dias'] }
-            ]
-          },
-          {
-            id: 'administracion-configuracion',
-            label: 'Configuración',
-            icono: '⚙️',
-            keywords: ['ajustes', 'parametros'],
-            hijos: [
-              { id: 'administracion-config-global', label: 'Configuración Global', icono: '⚙️', ruta: '/administracion/datos-maestros/configuracion-global', permiso: 'admin.configuracion_global', keywords: ['ajustes'] },
-              { id: 'administracion-config-plantillas', label: 'Plantillas', icono: '📃', ruta: '/administracion/datos-maestros/plantillas', permiso: 'admin.plantillas' },
-              { id: 'administracion-config-ia', label: 'Configuración IA', icono: '🤖', ruta: '/administracion/datos-maestros/configuracion-ia', permiso: 'admin.configuracion_ia', keywords: ['ia', 'inteligencia artificial'] },
-              { id: 'administracion-cargos', label: 'Cargos', icono: '💼', ruta: '/administracion/datos-maestros/cargos', permiso: 'admin.cargos', keywords: ['puestos', 'roles'] },
-              { id: 'administracion-tipos-documentos', label: 'Tipos Documentos', icono: '📄', ruta: '/administracion/datos-maestros/tipos-documentos', permiso: 'admin.tipos_documentos', keywords: ['documentos'] },
-              { id: 'administracion-institucion', label: 'Institución', icono: '🏫', ruta: '/administracion/datos-maestros/institucion', permiso: 'admin.institucion', keywords: ['institucion', 'documentos institucionales', 'plan de emergencia'] }
-            ]
-          },
-          {
-            id: 'administracion-seguridad',
-            label: 'Seguridad',
-            icono: '🔐',
-            keywords: ['roles', 'permisos', 'accesos'],
-            hijos: [
-              { id: 'administracion-permisos', label: 'Permisos por Rol', icono: '🔐', ruta: '/administracion/datos-maestros/permisos', permiso: 'admin.permisos_rol', keywords: ['roles', 'permisos', 'accesos'] },
-              { id: 'administracion-usuarios', label: 'Usuarios', icono: '👤', ruta: '/administracion/datos-maestros/usuarios', permiso: 'admin.usuarios', keywords: ['cuentas', 'accesos', 'login', 'claves'] },
-              { id: 'administracion-roles', label: 'Roles', icono: '🎭', ruta: '/administracion/datos-maestros/roles', permiso: 'admin.roles', keywords: ['perfiles', 'cargos de sistema'] },
-              { id: 'administracion-usuarios-x-rol', label: 'Usuarios por Rol', icono: '👥', ruta: '/administracion/datos-maestros/usuarios-x-rol', permiso: 'admin.usuarios_x_rol', keywords: ['asignar usuarios', 'asignacion masiva'] }
-            ]
-          },
-          { id: 'administracion-documentacion', label: 'Documentación', icono: '📖', ruta: '/administracion/datos-maestros/documentacion-sistema', permiso: 'admin.documentacion', keywords: ['ayuda', 'manual'] }
-        ]
+    return this.menuModulosService.getModulos()
+      .filter((modulo) => modulo.raiz !== false)
+      .map((modulo) => this.nodoModulo(modulo));
+  }
+
+  /**
+   * Un módulo se vuelve un nodo raíz. Debajo van, en este orden:
+   * el acceso a su propia pantalla, sus tarjetas, sus opciones sueltas y
+   * los módulos que cuelgan de él. Si no tiene nada debajo, queda como hoja.
+   */
+  private nodoModulo(modulo: ModuloMenu): MenuNodo {
+    const hijos: MenuNodo[] = [];
+
+    const tieneContenido =
+      modulo.grupos.length > 0 ||
+      (modulo.opciones?.length ?? 0) > 0 ||
+      (modulo.submodulos?.length ?? 0) > 0;
+
+    const esRaiz = modulo.raiz !== false;
+
+    // En las raíces la pantalla del módulo queda como primer hijo, porque la
+    // cabecera de la tarjeta es la que abre y cierra la sección. En los módulos
+    // anidados la ruta va en el nodo mismo y se entra haciendo clic en su nombre.
+    if (modulo.ruta && tieneContenido && esRaiz) {
+      hijos.push({
+        id: `${modulo.id}-inicio`,
+        label: modulo.rutaLabel || modulo.label,
+        icono: modulo.iconoArbol,
+        ruta: modulo.ruta,
+        permiso: modulo.rutaPermiso || modulo.permiso
+      });
+    }
+
+    // Los submódulos van antes que las tarjetas, que es el orden en el que
+    // aparecen en la pantalla del módulo.
+    for (const idSubmodulo of modulo.submodulos ?? []) {
+      const submodulo = this.menuModulosService.getModulo(idSubmodulo);
+      if (submodulo) {
+        hijos.push(this.nodoModulo(submodulo));
       }
-    ];
+    }
+
+    for (const grupo of modulo.grupos) {
+      const nodo = this.nodoGrupo(grupo, modulo.id);
+      if (nodo) {
+        hijos.push(nodo);
+      }
+    }
+
+    for (const opcion of modulo.opciones ?? []) {
+      hijos.push(this.nodoOpcion(opcion, modulo.id));
+    }
+
+    if (hijos.length === 0) {
+      return {
+        id: modulo.id,
+        label: modulo.label,
+        icono: modulo.iconoArbol,
+        imagen: modulo.imagen,
+        ruta: modulo.ruta,
+        permiso: modulo.permiso,
+        keywords: modulo.keywords
+      };
+    }
+
+    return {
+      id: modulo.id,
+      label: modulo.label,
+      icono: modulo.iconoArbol,
+      // La imagen es solo para las tarjetas raíz; los módulos anidados van con su emoji
+      imagen: esRaiz ? modulo.imagen : undefined,
+      ruta: esRaiz ? undefined : modulo.ruta,
+      permiso: esRaiz ? modulo.permiso : (modulo.rutaPermiso || modulo.permiso),
+      keywords: modulo.keywords,
+      hijos
+    };
+  }
+
+  /**
+   * Una tarjeta se vuelve un grupo del árbol con sus mismas opciones.
+   * La descripción de la tarjeta entra como keyword para que también se pueda buscar por ahí.
+   * Si la tarjeta no tiene opciones no se genera nodo, para no dejar grupos vacíos.
+   */
+  private nodoGrupo(grupo: GrupoMenuModulo, prefijo: string): MenuNodo | null {
+    if (grupo.opciones.length === 0) {
+      return null;
+    }
+
+    const id = `${prefijo}-${grupo.id}`;
+
+    return {
+      id,
+      label: grupo.titulo,
+      icono: grupo.iconoArbol || '📁',
+      keywords: [...(grupo.keywords ?? []), grupo.descripcion],
+      hijos: grupo.opciones.map((opcion) => this.nodoOpcion(opcion, id))
+    };
+  }
+
+  /**
+   * Una opción se vuelve hoja navegable. Si abre otra pantalla con más opciones,
+   * conserva su ruta y suma esas pantallas como hijos: el clic en el nombre entra
+   * a la opción y la flechita despliega lo que hay debajo.
+   */
+  private nodoOpcion(opcion: OpcionMenuModulo, prefijo: string): MenuNodo {
+    const id = `${prefijo}-${opcion.id}`;
+    const icono = opcion.iconoArbol || '▫️';
+    const keywords = this.keywordsOpcion(opcion);
+
+    const nodo: MenuNodo = {
+      id,
+      label: opcion.label,
+      icono,
+      ruta: opcion.ruta,
+      permiso: opcion.permiso,
+      keywords
+    };
+
+    if (opcion.hijos && opcion.hijos.length > 0) {
+      nodo.hijos = opcion.hijos.map((hijo) => this.nodoOpcion(hijo, id));
+    }
+
+    return nodo;
+  }
+
+  /**
+   * El `alt` de la tarjeta sirve como término de búsqueda cuando dice algo distinto
+   * al label (por ejemplo la opción "Informes", cuyo alt es "Observaciones para Informe").
+   */
+  private keywordsOpcion(opcion: OpcionMenuModulo): string[] {
+    const keywords = [...(opcion.keywords ?? [])];
+    if (opcion.alt && opcion.alt !== opcion.label) {
+      keywords.push(opcion.alt);
+    }
+    return keywords;
   }
 }

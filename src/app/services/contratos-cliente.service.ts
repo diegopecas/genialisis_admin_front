@@ -16,6 +16,9 @@ export interface ContratoImplementacion {
   id_plan: string;
   valor_implementacion: number;
   valor_suscripcion: number;
+  // Total de los productos que no son implementación ni suscripción.
+  // Es derivado: lo recalcula el back a partir de las líneas del contrato.
+  valor_otros?: number;
   valor_primera_cuota?: number;
   numero_cuotas: number;
   valor_total: number;

@@ -115,7 +115,7 @@
       <input
         type="text"
         class="buscador-input"
-        placeholder="Buscar una opción del menú..."
+        placeholder="Buscar una opción o una persona..."
         [value]="terminoBusqueda"
         (input)="onBuscar($event)"
         autocomplete="off"
@@ -127,30 +127,108 @@
         (click)="limpiarBusqueda()"
         title="Limpiar"
       >✕</button>
+      <!-- Refresco de la lista de personas (el menú no se refresca, va en código) -->
+      <button
+        class="buscador-refrescar"
+        [class.girando]="refrescandoPersonas"
+        [disabled]="refrescandoPersonas"
+        (click)="refrescarPersonas($event)"
+        [title]="tituloRefrescoPersonas"
+      >⟳</button>
     </div>
 
+    <!-- Aviso: lo buscado es una opción de la ficha, no del menú -->
+    <div class="aviso-opcion-ficha" *ngIf="avisoOpcionDeFicha">
+      <span class="aviso-icono">💡</span>
+      <span>{{ avisoOpcionDeFicha }}</span>
+    </div>
+
+    <!-- ====== RESULTADOS DE PERSONAS ====== -->
+    <section class="personas-resultados" *ngIf="personasVisibles.length > 0">
+      <div class="personas-header">
+        <span class="personas-titulo">👤 Personas</span>
+        <span class="personas-conteo" *ngIf="totalPersonasCoincidencias > personasVisibles.length">
+          Mostrando {{ personasVisibles.length }} de {{ totalPersonasCoincidencias }}
+        </span>
+      </div>
+
+      <div class="persona-card" *ngFor="let persona of personasVisibles; trackBy: trackByPersona">
+
+        <div class="persona-header" (click)="seleccionarPersona(persona)">
+          <div class="persona-datos">
+            <span class="persona-nombre" [innerHTML]="resaltar(persona.nombre_completo)"></span>
+            <span class="persona-documento" [innerHTML]="resaltar(persona.numero_identificacion)"></span>
+          </div>
+          <!-- La insignia lleva directo a la opción de ese rol -->
+          <div class="persona-badges">
+            <button
+              type="button"
+              class="persona-badge"
+              *ngFor="let etiqueta of persona.resumen"
+              [class.inactivo]="!etiqueta.activo"
+              (click)="clicEnEtiqueta($event, persona, etiqueta)"
+              [title]="etiqueta.destinos.length > 1 ? 'Ver los ' + etiqueta.destinos.length + ' registros' : 'Ir a ' + etiqueta.etiqueta"
+            >{{ etiqueta.etiqueta }}</button>
+          </div>
+          <span
+            class="persona-chevron"
+            *ngIf="persona.destinos.length > 1"
+            [class.abierto]="esPersonaExpandida(persona)"
+          >▸</span>
+        </div>
+
+        <!-- Con un solo destino el clic navega directo; con varios se escoge aquí -->
+        <div class="persona-destinos" *ngIf="(persona.destinos.length > 1 && esPersonaExpandida(persona)) || personaTieneOpciones(persona)">
+          <div class="persona-destino-bloque" *ngFor="let destino of persona.destinosMostrados">
+            <div
+              class="persona-destino"
+              [class.inactivo]="!destino.activo"
+              (click)="irADestino(destino)"
+            >
+              <span class="destino-tipo">{{ destino.etiqueta }}</span>
+              <span class="destino-detalle" *ngIf="destino.detalle">{{ destino.detalle }}</span>
+              <span class="destino-estado" *ngIf="!destino.activo">Inactivo</span>
+            </div>
+
+            <!-- Opciones de la ficha, a la vista: es lo que se busca al encontrar a la persona -->
+            <div class="destino-opciones" *ngIf="destino.opciones.length > 0">
+              <button
+                type="button"
+                class="destino-opcion"
+                *ngFor="let opcion of destino.opciones"
+                (click)="irAOpcion($event, opcion)"
+              >
+                <img class="destino-opcion-icono" [src]="opcion.icono" [alt]="opcion.label" loading="lazy" decoding="async" />
+                <span [innerHTML]="resaltar(opcion.label)"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <!-- ====== FIN RESULTADOS DE PERSONAS ====== -->
+
     <!-- Mensaje sin resultados -->
-    <div class="menu-sin-resultados" *ngIf="enBusqueda && arbolVisible.length === 0">
-      No se encontraron opciones para "{{ terminoBusqueda }}"
+    <div class="menu-sin-resultados" *ngIf="enBusqueda && arbolVisible.length === 0 && personasVisibles.length === 0 && !avisoOpcionDeFicha">
+      No se encontraron opciones ni personas para "{{ terminoBusqueda }}"
     </div>
 
     <!-- Grilla de secciones raíz (tarjetas de vidrio) -->
     <div class="menu-secciones">
       <ng-container *ngFor="let seccion of arbolVisible; trackBy: trackByNodo">
-        <div class="menu-seccion-card" [class.es-link]="!esPlan(seccion)">
+        <div class="menu-seccion-card" [class.es-link]="!esGrupo(seccion)">
 
           <!-- Cabecera de la sección -->
           <div class="seccion-header" (click)="seleccionarNodo(seccion)">
             <img *ngIf="seccion.imagen" class="seccion-icono-img" [src]="seccion.imagen" [alt]="seccion.label" loading="lazy" decoding="async" />
             <span class="seccion-icono" *ngIf="!seccion.imagen">{{ seccion.icono }}</span>
-            <span class="seccion-titulo" [class.navegable]="seccion.ruta"
-                  (click)="irANodo($event, seccion)"
-                  [innerHTML]="resaltar(seccion.label)"></span>
-            <span class="seccion-chevron" *ngIf="esPlan(seccion)" [class.abierto]="estaExpandido(seccion)">▸</span>
+            <span class="seccion-titulo" [innerHTML]="resaltar(seccion.label)"></span>
+            <span class="seccion-chevron" *ngIf="esGrupo(seccion)" [class.abierto]="estaExpandido(seccion)" (click)="clicEnChevron($event, seccion)">▸</span>
           </div>
 
           <!-- Hijos de la sección -->
-          <div class="seccion-hijos" *ngIf="esPlan(seccion) && estaExpandido(seccion)">
+          <div class="seccion-hijos" *ngIf="esGrupo(seccion) && estaExpandido(seccion)">
             <ng-container *ngTemplateOutlet="nodoTpl; context: { $implicit: seccion.hijos, nivel: 1 }"></ng-container>
           </div>
 
@@ -168,18 +246,16 @@
 
         <div
           class="arbol-nodo"
-          [class.es-plan]="esPlan(nodo)"
+          [class.es-grupo]="esGrupo(nodo)"
           (click)="seleccionarNodo(nodo)"
         >
           <img *ngIf="nodo.imagen" class="nodo-icono-img" [src]="nodo.imagen" [alt]="nodo.label" loading="lazy" decoding="async" />
           <span class="nodo-icono" *ngIf="!nodo.imagen">{{ nodo.icono }}</span>
-          <span class="nodo-label" [class.navegable]="nodo.ruta"
-                (click)="irANodo($event, nodo)"
-                [innerHTML]="resaltar(nodo.label)"></span>
-          <span class="nodo-chevron" *ngIf="esPlan(nodo)" [class.abierto]="estaExpandido(nodo)">▸</span>
+          <span class="nodo-label" [innerHTML]="resaltar(nodo.label)"></span>
+          <span class="nodo-chevron" *ngIf="esGrupo(nodo)" [class.abierto]="estaExpandido(nodo)" (click)="clicEnChevron($event, nodo)">▸</span>
         </div>
 
-        <div class="arbol-subnivel" *ngIf="esPlan(nodo) && estaExpandido(nodo)">
+        <div class="arbol-subnivel" *ngIf="esGrupo(nodo) && estaExpandido(nodo)">
           <ng-container *ngTemplateOutlet="nodoTpl; context: { $implicit: nodo.hijos, nivel: nivel + 1 }"></ng-container>
         </div>
 
@@ -187,6 +263,6 @@
     </ul>
   </ng-template>
 
-
+  <!-- <app-daily-message></app-daily-message> -->
 
 </div>

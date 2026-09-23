@@ -108,7 +108,15 @@ export class ExportarPdfContratoService {
     const representantesNombres = representantes
       .map((a) => a.nombre_completo)
       .join(' y ');
-    const representantesDomicilio = representantes[0]?.ciudad || this.institucionConfigService.getDireccionInstitucion();
+    // Domicilio de LA INSTITUCION: la direccion y la ciudad del cliente. Si el
+    // cliente no las tiene, la ciudad del primer representante. Nunca se usa la
+    // direccion de la organizacion, porque dejaria al cliente con el domicilio
+    // del proveedor.
+    const domicilioCliente = [cliente?.direccion, cliente?.ciudad]
+      .map((v: any) => (v || '').toString().trim())
+      .filter((v: string) => v.length > 0)
+      .join(', ');
+    const representantesDomicilio = domicilioCliente || representantes[0]?.ciudad || 'Por definir';
 
     let textoPrimeraCuota = '';
     let numeroCuotasRestantes = contrato.numero_cuotas;
@@ -155,6 +163,8 @@ export class ExportarPdfContratoService {
           ? Math.round(contrato.valor_suscripcion / contrato.numero_cuotas) 
           : contrato.valor_suscripcion
       ),
+      '{{valor_otros_formateado}}': this.formatearMoneda(contrato.valor_otros || 0),
+      '{{detalle_productos}}': this.armarDetalleProductos((datos as any).productos || []),
       '{{numero_cuotas}}': contrato.numero_cuotas.toString(),
       '{{texto_primera_cuota}}': textoPrimeraCuota,
       '{{numero_cuotas_restantes}}': numeroCuotasRestantes.toString(),
@@ -1880,6 +1890,25 @@ export class ExportarPdfContratoService {
   }
 
   // Métodos de utilidad
+  /**
+   * Detalle de los productos del contrato (sus líneas), un renglón por
+   * producto con su valor final. Los de cobro mensual (suscripción o
+   * periodicidad mensual) se marcan como mensuales. Alimenta el marcador
+   * {{detalle_productos}} de la cláusula de valor.
+   */
+  private armarDetalleProductos(productos: any[]): string {
+    if (!productos || productos.length === 0) {
+      return '';
+    }
+    return productos
+      .map((p: any) => {
+        const valor = parseFloat(p.valor_final) || 0;
+        const esMensual = p.codigo_tipo_cobro === 'SUSCRIPCION' || Number(p.id_periodicidad_cobro) === 2;
+        return `- ${p.nombre_producto}: ${this.formatearMoneda(valor)}${esMensual ? ' mensuales' : ''}`;
+      })
+      .join('\n');
+  }
+
   private formatearMoneda(valor: number): string {
     return valor?.toLocaleString('es-CO') || '0';
   }
@@ -1944,6 +1973,11 @@ export class ExportarPdfContratoService {
       'VIGESIMA OCTAVA',
       'VIGESIMA NOVENA',
       'TRIGESIMA',
+      'TRIGESIMA PRIMERA',
+      'TRIGESIMA SEGUNDA',
+      'TRIGESIMA TERCERA',
+      'TRIGESIMA CUARTA',
+      'TRIGESIMA QUINTA',
     ];
     return numeros[numero] || numero.toString();
   }

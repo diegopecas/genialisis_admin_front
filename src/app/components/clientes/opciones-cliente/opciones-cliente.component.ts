@@ -8,15 +8,7 @@ import { ClientesService } from '../../../services/clientes.service';
 import { PlanesService } from '../../../services/planes.service';
 import { InstitucionConfigService } from '../../../services/institucion-config.service';
 import { PermisosService } from '../../../services/permisos.service';
-
-interface OpcionCliente {
-  id: string;
-  label: string;
-  icono: string;
-  categoria: string;
-  permiso: string | null; // null => visible para todos
-  ruta: string | null;    // null => acción en sitio (ej. cambio de plan)
-}
+import { OpcionCliente, OpcionesClienteService } from '../../../services/opciones-cliente.service';
 
 interface CategoriaOpciones {
   nombre: string;
@@ -46,24 +38,6 @@ export class OpcionesClienteComponent implements OnInit {
   // Registro recibido desde el listado por router state (evita re-consultar)
   private registroDesdeState: any = null;
 
-  // Catálogo completo de opciones, agrupado por categoría.
-  private opciones: OpcionCliente[] = [
-    { id: 'vista_360', label: 'Vista 360', icono: '/assets/images/vista_360.png', categoria: 'Información', permiso: 'clientes.vista_360', ruta: '/clientes/vista/' },
-    { id: 'registro_representantes', label: 'Representantes', icono: '/assets/images/familia.png', categoria: 'Información', permiso: 'clientes.representantes', ruta: '/clientes/representantes/' },
-    { id: 'registro_medidas', label: 'Medidas', icono: '/assets/images/medidas.png', categoria: 'Información', permiso: 'clientes.medidas', ruta: '/clientes/medidas/' },
-    { id: 'observaciones', label: 'Observaciones', icono: '/assets/images/observaciones.png', categoria: 'Información', permiso: 'clientes.observaciones', ruta: '/clientes/observaciones/' },
-    { id: 'pagos', label: 'Pagos', icono: '/assets/images/pagos.png', categoria: 'Servicios y cobros', permiso: 'clientes.pagos', ruta: '/clientes/pagos/' },
-    { id: 'productos_servicios', label: 'Productos', icono: '/assets/images/productos.png', categoria: 'Servicios y cobros', permiso: 'clientes.productos_servicios', ruta: '/clientes/productos-servicios/' },
-    { id: 'contratos', label: 'Contratos', icono: '/assets/images/contratos.png', categoria: 'Servicios y cobros', permiso: 'clientes.contratos', ruta: '/clientes/contratos/' },
-    { id: 'cursos_extra', label: 'Cursos Extra', icono: '/assets/images/cursos-extra.png', categoria: 'Servicios y cobros', permiso: null, ruta: '/clientes/cursos-extra/' },
-    { id: 'onces', label: 'Onces', icono: '/assets/images/onces.png', categoria: 'Servicios y cobros', permiso: 'clientes.onces', ruta: '/clientes/onces/' },
-    { id: 'editar', label: 'Editar', icono: '/assets/images/editar.png', categoria: 'Gestión', permiso: 'clientes.administrar', ruta: 'clientes/editar/' },
-    { id: 'cambiar_plan', label: 'Cambio Plan', icono: '/assets/images/cambio_plan.png', categoria: 'Gestión', permiso: 'clientes.cambio_plan', ruta: null },
-  ];
-
-  // Orden de presentación de las categorías
-  private ordenCategorias = ['Información', 'Servicios y cobros', 'Gestión'];
-
   public categorias: CategoriaOpciones[] = [];
 
   constructor(
@@ -72,7 +46,8 @@ export class OpcionesClienteComponent implements OnInit {
     private clientesService: ClientesService,
     private planesService: PlanesService,
     private institucionConfigService: InstitucionConfigService,
-    private permisosService: PermisosService
+    private permisosService: PermisosService,
+    private opcionesClienteService: OpcionesClienteService
   ) {
     // El registro enviado por el listado viaja en el state de la navegación.
     // Debe leerse con getCurrentNavigation() en el constructor; history.state
@@ -96,10 +71,13 @@ export class OpcionesClienteComponent implements OnInit {
   }
 
   configurarOpciones(): void {
-    this.categorias = this.ordenCategorias
+    // El catálogo vive en OpcionesClienteService porque también lo usa el
+    // buscador del menú principal.
+    const opciones = this.opcionesClienteService.getOpciones();
+    this.categorias = this.opcionesClienteService.getOrdenCategorias()
       .map((nombre) => ({
         nombre,
-        opciones: this.opciones.filter(
+        opciones: opciones.filter(
           (o) =>
             o.categoria === nombre &&
             (o.permiso === null || this.permisosService.tienePermiso(o.permiso))

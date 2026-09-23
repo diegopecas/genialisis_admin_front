@@ -101,6 +101,23 @@ export class TarifasPlanesService {
       );
   }
 
+  /**
+   * Guarda de un golpe todas las filas de tarifa de un plan en un año.
+   * Espera { id_plan, anio, tarifas: [], eliminar: [] }
+   */
+  guardarLote(datos: any) {
+    const body = JSON.stringify(datos);
+    return this.http.post<any>(this.servicio + '/guardar-lote', body, httpOptions).pipe(
+      tap((respuesta: any) => {
+        if (respuesta.error) {
+          throw respuesta.error;
+        }
+        return respuesta;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
   crear(tarifa: any) {
     const body = JSON.stringify(tarifa);
 

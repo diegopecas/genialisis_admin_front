@@ -1,0 +1,70 @@
+<div class="modulo">
+  <app-header
+    [tituloModulo]="titulo"
+    [mostrarCrear]="false"
+    [accion]="accion"
+    [raiz]="'/administracion/datos-maestros/planes'"
+    [regresar]="regresar"
+    [iconoTitulo]="'/assets/images/planes.png'">
+  </app-header>
+
+  <!-- Pestañas: Tarifas solo cuando el plan ya existe -->
+  <div class="container mt-4" *ngIf="model.id">
+    <div class="pestanas">
+      <button type="button" class="pestana" [class.activa]="pestanaActiva === 'datos'" (click)="cambiarPestana('datos')">
+        <i class="fas fa-layer-group me-1"></i> Datos del plan
+      </button>
+      <button type="button" class="pestana" [class.activa]="pestanaActiva === 'tarifas'" (click)="cambiarPestana('tarifas')">
+        <i class="fas fa-dollar-sign me-1"></i> Tarifas
+      </button>
+    </div>
+  </div>
+
+  <!-- Datos del plan -->
+  <div class="container mt-4" [hidden]="pestanaActiva !== 'datos'">
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+        <input class="form-control form-control-lg" type="text" id="nombre"
+          [(ngModel)]="model.nombre"
+          [ngClass]="{'is-invalid': !model.nombre && submitted}"
+          [disabled]="!editable">
+      </div>
+      <div class="col-6 col-md-3">
+        <label for="orden" class="form-label">Orden</label>
+        <input class="form-control form-control-lg" type="number" min="1" id="orden"
+          [(ngModel)]="model.orden" [disabled]="!editable">
+      </div>
+      <div class="col-6 col-md-3">
+        <label for="color" class="form-label">Color</label>
+        <input class="form-control form-control-lg form-control-color w-100" type="color" id="color"
+          [(ngModel)]="model.color" [disabled]="!editable">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarifas del plan: productos por año -->
+  <div class="container mt-4" *ngIf="model.id" [hidden]="pestanaActiva !== 'tarifas'">
+    <app-plan-tarifas
+      [idPlan]="model.id"
+      [editable]="editable">
+    </app-plan-tarifas>
+  </div>
+
+  <!-- Botones -->
+  <div class="container mt-5">
+    <div class="row g-2">
+      <div class="col-sm-6" *ngIf="editable">
+        <button class="btn btn-lg btn-warning w-100" (click)="guardar()" [disabled]="guardando">
+          <span *ngIf="!guardando">Grabar</span>
+          <span *ngIf="guardando"><i class="fas fa-spinner fa-spin"></i> Guardando...</span>
+        </button>
+      </div>
+      <div class="col-sm-6">
+        <button class="btn btn-lg btn-secondary w-100" (click)="volver()">
+          Volver
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

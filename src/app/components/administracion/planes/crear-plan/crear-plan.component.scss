@@ -1,0 +1,33 @@
+.modulo {
+  padding: 20px;
+}
+
+// Pestañas del plan: se apilan en móvil
+.pestanas {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.pestana {
+  border: none;
+  background: transparent;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  color: #7f8c8d;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+
+  &.activa {
+    color: #222;
+    border-bottom-color: #d4af37;
+  }
+}
+
+@media (max-width: 576px) {
+  .pestana {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}

@@ -19,6 +19,10 @@ export interface ContratoValor {
   id_periodicidad_cobro?: number;
   periodicidad?: string;
   es_implementacion?: boolean;
+  // Tipo de cobro del producto al que pertenece la cuota
+  id_tipo_cobro?: string;
+  codigo_tipo_cobro?: string;
+  orden?: number;
   mes?: number;
   anio?: number;
   // Para UI
@@ -28,8 +32,19 @@ export interface ContratoValor {
 export interface ResumenValores {
   total_implementacion: number;
   total_suscripcion: number;
+  // Total de los productos distintos de implementacion y suscripcion
+  total_otros: number;
   numero_cuotas: number;
   valor_total: number;
+}
+
+/** Linea del contrato que se envia para generar el calendario */
+export interface LineaGenerarValores {
+  id_producto_servicio: string;
+  id_tipo_cobro?: string;
+  codigo_tipo_cobro?: string;
+  valor_final: number;
+  orden?: number;
 }
 
 export interface GenerarValoresRequest {
@@ -38,8 +53,9 @@ export interface GenerarValoresRequest {
   fecha_inicio: string;
   fecha_fin: string;
   cuotas_implementacion?: number;
-  valor_implementacion?: number;  // Valor final con descuentos/recargos aplicados
-  valor_suscripcion?: number;    // Valor final con descuentos/recargos aplicados
+  // Lineas escogidas en el contrato, con descuentos/recargos ya aplicados.
+  // Si no vienen, el back usa las filas obligatorias de la tarifa del plan.
+  lineas?: LineaGenerarValores[];
 }
 
 export interface GenerarValoresResponse {
