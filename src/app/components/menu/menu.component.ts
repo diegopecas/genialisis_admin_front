@@ -417,8 +417,11 @@ export class MenuComponent implements OnInit {
         continue;
       }
 
-      const nombre = this.normalizar(fila.nombre_completo || '');
-      const documento = this.normalizar(fila.numero_identificacion || '');
+      // El back responde con JSON_NUMERIC_CHECK, así que un documento que
+      // solo tiene dígitos llega como número y no como texto. Se convierte
+      // antes de normalizar, porque normalize() solo existe en las cadenas.
+      const nombre = this.normalizar(String(fila.nombre_completo ?? ''));
+      const documento = this.normalizar(String(fila.numero_identificacion ?? ''));
       if (!nombre.includes(t) && !documento.includes(t)) {
         continue;
       }
@@ -428,7 +431,7 @@ export class MenuComponent implements OnInit {
         persona = {
           id_persona: fila.id_persona,
           nombre_completo: fila.nombre_completo,
-          numero_identificacion: fila.numero_identificacion,
+          numero_identificacion: String(fila.numero_identificacion ?? ''),
           destinos: [],
           resumen: [],
           destinosMostrados: [],
