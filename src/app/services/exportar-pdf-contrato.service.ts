@@ -38,8 +38,6 @@ export interface CoordenadaFirma {
   providedIn: 'root',
 })
 export class ExportarPdfContratoService {
-  private plantillaCache: PlantillaContrato | null = null;
-  
   // Contador global de campos de firma para todo el documento
   private signIndexGlobal: number = 0;
   
@@ -70,11 +68,12 @@ export class ExportarPdfContratoService {
     }
   }
 
+  /**
+   * Trae la plantilla en cada generación, sin guardarla en memoria: así un
+   * cambio en la plantilla (por ejemplo, por script) se ve en el siguiente PDF
+   * sin tener que recargar la página.
+   */
   private async cargarPlantilla(): Promise<PlantillaContrato> {
-    if (this.plantillaCache) {
-      return this.plantillaCache!;
-    }
-
     try {
       const response: any = await firstValueFrom(
         this.plantillasService.obtenerByTipoClave(
@@ -84,9 +83,7 @@ export class ExportarPdfContratoService {
       );
       console.log('cargarPlantilla', response);
       if (response && response.body && response.body.contenido) {
-        this.plantillaCache = response.body.contenido;
-        console.log('cargarPlantilla', this.plantillaCache);
-        return this.plantillaCache!;
+        return response.body.contenido as PlantillaContrato;
       }
 
       throw new Error('No se pudo cargar la plantilla del contrato');
