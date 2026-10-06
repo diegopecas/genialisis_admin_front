@@ -164,6 +164,9 @@ export class ExportarPdfContratoService {
           : contrato.valor_suscripcion
       ),
       '{{valor_otros_formateado}}': this.formatearMoneda(contrato.valor_otros || 0),
+      '{{valor_mensual_formateado}}': this.formatearMoneda(
+        this.calcularValorMensual((datos as any).productos || [], contrato)
+      ),
       '{{detalle_productos}}': this.armarDetalleProductos((datos as any).productos || []),
       '{{numero_cuotas}}': contrato.numero_cuotas.toString(),
       '{{texto_primera_cuota}}': textoPrimeraCuota,
@@ -200,7 +203,11 @@ export class ExportarPdfContratoService {
     // cuando esa es la opcion elegida (sirve para las casillas de la minuta).
     const campos = (datos as any).campos || {};
     Object.keys(campos).forEach((llave: string) => {
-      const valor = campos[llave] === null || campos[llave] === undefined ? '' : String(campos[llave]);
+      let valor = campos[llave] === null || campos[llave] === undefined ? '' : String(campos[llave]);
+      // El día de corte se guarda como número; en el contrato se lee "5 de cada mes"
+      if (llave === 'dia_corte' && /^\d+$/.test(valor.trim())) {
+        valor = `${valor.trim()} de cada mes`;
+      }
       reemplazos['{{campo_' + llave + '}}'] = valor;
     });
 
@@ -1896,15 +1903,46 @@ export class ExportarPdfContratoService {
    * periodicidad mensual) se marcan como mensuales. Alimenta el marcador
    * {{detalle_productos}} de la cláusula de valor.
    */
+  /**
+   * Lo que el cliente paga cada mes: la suma de las líneas que se cobran mes
+   * a mes (la suscripción y los productos de periodicidad mensual, como el
+   * portal web). Alimenta el marcador {{valor_mensual_formateado}}. Si el
+   * contrato no tiene líneas (contratos viejos) se usa la suscripción mensual.
+   */
+  private calcularValorMensual(productos: any[], contrato: any): number {
+    const mensuales = (productos || []).filter((p: any) =>
+      p.codigo_tipo_cobro === 'SUSCRIPCION' || Number(p.id_periodicidad_cobro) === 2
+    );
+
+    if (mensuales.length === 0) {
+      return contrato.numero_cuotas > 0
+        ? Math.round(contrato.valor_suscripcion / contrato.numero_cuotas)
+        : contrato.valor_suscripcion;
+    }
+
+    return mensuales.reduce((suma: number, p: any) => suma + (parseFloat(p.valor_final) || 0), 0);
+  }
+
   private armarDetalleProductos(productos: any[]): string {
     if (!productos || productos.length === 0) {
       return '';
     }
     return productos
+      // Los productos en 0 (por ejemplo, una implementación sin costo) no
+      // aportan nada al detalle y se omiten
+      .filter((p: any) => (parseFloat(p.valor_final) || 0) > 0)
       .map((p: any) => {
         const valor = parseFloat(p.valor_final) || 0;
+        const cantidad = parseInt(p.cantidad) || 1;
         const esMensual = p.codigo_tipo_cobro === 'SUSCRIPCION' || Number(p.id_periodicidad_cobro) === 2;
-        return `- ${p.nombre_producto}: ${this.formatearMoneda(valor)}${esMensual ? ' mensuales' : ''}`;
+        // Con varias unidades se muestra el desglose: "Portal web (3 x 60.000)"
+        const desglose = cantidad > 1
+          ? ` (${cantidad} x ${this.formatearMoneda(parseFloat(p.valor_base) || 0)})`
+          : '';
+        // La descripción distingue las líneas de un mismo producto
+        const descripcion = (p.descripcion || '').toString().trim();
+        const nombre = descripcion ? `${p.nombre_producto}, ${descripcion}` : p.nombre_producto;
+        return `- ${nombre}${desglose}: ${this.formatearMoneda(valor)}${esMensual ? ' mensuales' : ''}`;
       })
       .join('\n');
   }

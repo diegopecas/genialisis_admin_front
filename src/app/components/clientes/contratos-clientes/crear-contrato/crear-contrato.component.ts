@@ -30,22 +30,25 @@ import {
   LineaContrato
 } from '../../../../services/contratos-cliente-productos.service';
 
-// Producto que aparece como columna en la grilla mensual
+// Línea del contrato que aparece como columna en la grilla mensual. La clave
+// es el orden de la línea, porque un mismo producto puede estar en varias.
 interface ColumnaProducto {
+  clave: string;
   id_producto_servicio: string;
   nombre_producto: string;
+  descripcion?: string | null;
   codigo_tipo_cobro: string;
   orden: number;
 }
 
 // Interfaz para agrupar valores por mes.
-// Las celdas son dinámicas: una por producto que tenga cuota en ese mes.
+// Las celdas son dinámicas: una por línea que tenga cuota en ese mes.
 interface ValorMensual {
   fecha: string;
   fechaFormateada: string;
   mes: number;
   anio: number;
-  celdas: { [idProducto: string]: ContratoValor };
+  celdas: { [claveLinea: string]: ContratoValor };
   totalMes: number;
 }
 
@@ -532,7 +535,9 @@ export class CrearContratoComponent implements OnInit {
 
           this.lineas = guardadas.map((l: any) => ({
             ...l,
+            descripcion: l.descripcion || '',
             valor_base: parseFloat(l.valor_base) || 0,
+            cantidad: parseInt(l.cantidad) || 1,
             descuento: parseFloat(l.descuento) || 0,
             recargo: parseFloat(l.recargo) || 0,
             valor_final: parseFloat(l.valor_final) || 0,
@@ -541,9 +546,10 @@ export class CrearContratoComponent implements OnInit {
             // El obligatorio lo dice la tarifa del plan, no el hecho de estar
             // ya guardada: en un contrato sin firmar se debe poder cambiar de
             // jornada. Lo que protege un contrato firmado es `editable`.
-            obligatorio: this.obligatorioEnTarifa(l.id_producto_servicio),
+            obligatorio: 0,
             seleccionado: true
           }));
+          this.refrescarObligatorios();
 
           this.completarLineasOpcionales();
           this.actualizarFormatosLineas();
@@ -584,6 +590,10 @@ export class CrearContratoComponent implements OnInit {
           if (this.accion === 'crear') {
             // Las obligatorias entran solas, las demás las escoge el representante
             this.lineas = this.tarifaPlan.map((t: any) => this.lineaDesdeTarifa(t));
+            // El orden de la tarifa se puede repetir entre productos; en el
+            // contrato cada línea necesita el suyo porque amarra sus cuotas.
+            this.lineas.sort((a, b) => a.orden - b.orden);
+            this.lineas.forEach((l, indice) => l.orden = indice + 1);
             this.actualizarFormatosLineas();
           } else {
             // En editar y consultar mandan las líneas guardadas; la tarifa solo
@@ -615,6 +625,7 @@ export class CrearContratoComponent implements OnInit {
     const valorBase = parseFloat(t.valor) || 0;
     return {
       id_producto_servicio: t.id_producto_servicio,
+      descripcion: '',
       nombre_producto: t.nombre_producto,
       id_tipo_cobro: t.id_tipo_cobro,
       codigo_tipo_cobro: t.codigo_tipo_cobro,
@@ -622,6 +633,7 @@ export class CrearContratoComponent implements OnInit {
       id_periodicidad_cobro: t.id_periodicidad_cobro ? parseInt(t.id_periodicidad_cobro) : undefined,
       nombre_periodicidad: t.nombre_periodicidad,
       valor_base: valorBase,
+      cantidad: 1,
       descuento: 0,
       recargo: 0,
       valor_final: valorBase,
@@ -645,25 +657,137 @@ export class CrearContratoComponent implements OnInit {
       if (!yaEsta) {
         const linea = this.lineaDesdeTarifa(t);
         linea.seleccionado = false;
+        // Va de última y con un orden que no choque con las guardadas, cuyas
+        // cuotas ya están amarradas a su orden.
+        linea.orden = this.siguienteOrden();
         this.lineas.push(linea);
       }
     });
 
     // La tarifa puede llegar despues que las lineas guardadas: se refresca
     // el obligatorio de las que ya estaban.
-    this.lineas.forEach(l => {
-      l.obligatorio = this.obligatorioEnTarifa(l.id_producto_servicio);
-    });
+    this.refrescarObligatorios();
 
     this.lineas.sort((a, b) => a.orden - b.orden);
     this.actualizarFormatosLineas();
   }
 
+  /**
+   * Marca como obligatoria solo la primera línea de cada producto que la
+   * tarifa tenga como obligatorio. Las copias que se agregan con Duplicar
+   * siempre se pueden quitar.
+   */
+  private refrescarObligatorios() {
+    const vistos = new Set<string>();
+    this.lineas.forEach(l => {
+      const primera = !vistos.has(l.id_producto_servicio);
+      vistos.add(l.id_producto_servicio);
+      l.obligatorio = primera ? this.obligatorioEnTarifa(l.id_producto_servicio) : 0;
+    });
+  }
+
+  /** Orden siguiente al mayor de las líneas actuales */
+  private siguienteOrden(): number {
+    return this.lineas.reduce((max, l) => Math.max(max, l.orden || 0), 0) + 1;
+  }
+
+  /** Clave de una línea en la grilla de valores: su orden en el contrato */
+  claveLinea(linea: LineaContrato): string {
+    return String(linea.orden);
+  }
+
+  /**
+   * Clave de la línea a la que pertenece una cuota. Las cuotas traen el orden
+   * de su línea; si no lo traen (contrato viejo) se busca la línea del producto.
+   */
+  private claveValor(valor: ContratoValor): string {
+    if (valor.orden != null && String(valor.orden) !== '') {
+      return String(valor.orden);
+    }
+    const linea = this.lineas.find(l => l.id_producto_servicio === valor.id_producto_servicio);
+    return linea ? this.claveLinea(linea) : valor.id_producto_servicio;
+  }
+
+  /** Línea del contrato que corresponde a una clave de la grilla */
+  private lineaDeClave(clave: string): LineaContrato | undefined {
+    return this.lineas.find(l => this.claveLinea(l) === clave);
+  }
+
+  /**
+   * Agrega otra línea del mismo producto, justo debajo, para contratarlo de
+   * nuevo con otra descripción (por ejemplo, un portal web por cada sitio).
+   */
+  duplicarLinea(linea: LineaContrato) {
+    if (!this.editable) return;
+    const indice = this.lineas.indexOf(linea);
+    const copia: LineaContrato = {
+      ...linea,
+      id: undefined,
+      descripcion: '',
+      cantidad: 1,
+      descuento: 0,
+      recargo: 0,
+      obligatorio: 0,
+      seleccionado: true
+    };
+    this.calcularValorFinalLinea(copia);
+    this.lineas.splice(indice + 1, 0, copia);
+    this.renumerarLineas();
+    this.actualizarFormatosLineas();
+  }
+
+  /** Identidad de la línea para el ngFor, así no se repinta al duplicar */
+  trackByLinea(indice: number, linea: LineaContrato): any {
+    return linea;
+  }
+
+  /** Una línea se puede quitar cuando hay otra del mismo producto */
+  puedeQuitarLinea(linea: LineaContrato): boolean {
+    return this.lineas.filter(l => l.id_producto_servicio === linea.id_producto_servicio).length > 1;
+  }
+
+  quitarLinea(linea: LineaContrato) {
+    if (!this.editable || !this.puedeQuitarLinea(linea)) return;
+    const indice = this.lineas.indexOf(linea);
+    if (indice < 0) return;
+    this.lineas.splice(indice, 1);
+    this.renumerarLineas();
+  }
+
+  /**
+   * Numera las líneas de 1 en adelante, en el orden en que se ven. Como las
+   * cuotas se amarran al orden de su línea, si ya había valores generados se
+   * descartan y hay que volver a generarlos.
+   */
+  private renumerarLineas() {
+    this.lineas.forEach((l, indice) => l.orden = indice + 1);
+    this.refrescarObligatorios();
+
+    if (this.valores.length > 0) {
+      this.valores = [];
+      this.valoresMensuales = [];
+      this.columnasProductos = [];
+      this.valoresGenerados = false;
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'info',
+        title: 'Cambiaron los productos del contrato. Vuelve a generar los valores.',
+        showConfirmButton: false,
+        timer: 3500
+      });
+    }
+  }
+
   // ==================== GESTIÓN DE DESCUENTOS Y RECARGOS ====================
 
-  /** Recalcula el valor final de una línea: base menos descuento más recargo */
+  /**
+   * Recalcula el valor final de una línea: base por cantidad, menos descuento
+   * más recargo. El descuento y el recargo son de la línea completa.
+   */
   calcularValorFinalLinea(linea: LineaContrato) {
-    let final = (linea.valor_base || 0) - (linea.descuento || 0) + (linea.recargo || 0);
+    const cantidad = linea.cantidad && linea.cantidad > 0 ? linea.cantidad : 1;
+    let final = (linea.valor_base || 0) * cantidad - (linea.descuento || 0) + (linea.recargo || 0);
     if (final < 0) final = 0;
     linea.valor_final = final;
   }
@@ -690,6 +814,15 @@ export class CrearContratoComponent implements OnInit {
     this.calcularValorFinalLinea(linea);
     linea.descuentoFormateado = this.formatearNumeroInput(linea.descuento);
     event.target.value = linea.descuentoFormateado;
+  }
+
+  /** Cantidad de unidades del producto en el contrato; nunca menor que 1 */
+  onCantidadLineaInput(event: any, linea: LineaContrato) {
+    const valorStr = (event.target.value || '').toString().replace(/\D/g, '');
+    const cantidad = valorStr ? parseInt(valorStr) : 1;
+    linea.cantidad = cantidad > 0 ? cantidad : 1;
+    this.calcularValorFinalLinea(linea);
+    event.target.value = linea.cantidad;
   }
 
   onRecargoLineaInput(event: any, linea: LineaContrato) {
@@ -729,17 +862,17 @@ export class CrearContratoComponent implements OnInit {
     return valor.toLocaleString('es-CO');
   }
 
-  /** Cuota de un producto en un mes, si la tiene */
-  celdaDe(vm: ValorMensual, idProducto: string): ContratoValor | null {
-    return vm.celdas[idProducto] || null;
+  /** Cuota de una línea en un mes, si la tiene */
+  celdaDe(vm: ValorMensual, claveLinea: string): ContratoValor | null {
+    return vm.celdas[claveLinea] || null;
   }
 
-  onInputValorTabla(event: any, vm: ValorMensual, idProducto: string) {
+  onInputValorTabla(event: any, vm: ValorMensual, claveLinea: string) {
     // Obtener solo dígitos
     let valorStr = event.target.value.replace(/\./g, '').replace(/\D/g, '');
     const nuevoValor = valorStr ? parseInt(valorStr) : 0;
 
-    const celda = vm.celdas[idProducto];
+    const celda = vm.celdas[claveLinea];
     if (!celda) return;
 
     celda.valor = nuevoValor;
@@ -762,15 +895,15 @@ export class CrearContratoComponent implements OnInit {
     }
   }
 
-  onBlurValorTabla(event: any, vm: ValorMensual, idProducto: string) {
+  onBlurValorTabla(event: any, vm: ValorMensual, claveLinea: string) {
     // Al salir, asegurar formato correcto
-    const celda = vm.celdas[idProducto];
+    const celda = vm.celdas[claveLinea];
     event.target.value = this.formatearNumeroTabla(celda ? celda.valor : 0);
   }
 
   private totalDelMes(vm: ValorMensual): number {
     return Object.keys(vm.celdas)
-      .reduce((suma, idProducto) => suma + (vm.celdas[idProducto].valor || 0), 0);
+      .reduce((suma, claveLinea) => suma + (vm.celdas[claveLinea].valor || 0), 0);
   }
 
   // ==================== GESTIÓN DE VALORES ====================
@@ -816,13 +949,16 @@ export class CrearContratoComponent implements OnInit {
         fecha_inicio: this.model.fecha_inicio!,
         fecha_fin: this.model.fecha_fin!,
         cuotas_implementacion: this.cuotasImplementacion,
+        // Las cuotas vencen el día de corte del contrato
+        dia_vencimiento: this.diaCorte(),
         // Las lineas escogidas, con su descuento y recargo ya aplicados
         lineas: this.lineasSeleccionadas().map(l => ({
           id_producto_servicio: l.id_producto_servicio,
           id_tipo_cobro: l.id_tipo_cobro,
           codigo_tipo_cobro: l.codigo_tipo_cobro,
           valor_final: l.valor_final,
-          orden: l.orden
+          orden: l.orden,
+          descripcion: l.descripcion || null
         }))
       })
       .subscribe({
@@ -845,6 +981,17 @@ export class CrearContratoComponent implements OnInit {
   agruparValoresPorMes() {
     const planes: Map<string, ValorMensual> = new Map();
 
+    // Una línea tiene a lo sumo una cuota por mes. Si llegan repetidas (cuotas
+    // guardadas dos veces antes de amarrarse a su línea) se deja la primera,
+    // para que la pantalla muestre y guarde exactamente lo mismo.
+    const vistas = new Set<string>();
+    this.valores = this.valores.filter(valor => {
+      const llave = valor.fecha + '|' + this.claveValor(valor);
+      if (vistas.has(llave)) return false;
+      vistas.add(llave);
+      return true;
+    });
+
     this.valores.forEach(valor => {
       const fecha = valor.fecha;
 
@@ -862,8 +1009,8 @@ export class CrearContratoComponent implements OnInit {
 
       const plan = planes.get(fecha)!;
 
-      // Una celda por producto: el tipo de tarifa ya no define la columna
-      plan.celdas[valor.id_producto_servicio] = valor;
+      // Una celda por línea del contrato: un producto puede tener varias
+      plan.celdas[this.claveValor(valor)] = valor;
       plan.totalMes = this.totalDelMes(plan);
     });
 
@@ -875,22 +1022,23 @@ export class CrearContratoComponent implements OnInit {
   }
 
   /**
-   * Columnas de la grilla: un producto por columna, en el orden de la tarifa.
+   * Columnas de la grilla: una línea del contrato por columna, en su orden.
    * Se arma desde los valores para que un contrato viejo también pinte bien.
    */
   armarColumnasProductos() {
     const columnas: Map<string, ColumnaProducto> = new Map();
 
     this.valores.forEach((valor: any) => {
-      if (columnas.has(valor.id_producto_servicio)) return;
+      const clave = this.claveValor(valor);
+      if (columnas.has(clave)) return;
 
-      const linea = this.lineas.find(
-        l => l.id_producto_servicio === valor.id_producto_servicio
-      );
+      const linea = this.lineaDeClave(clave);
 
-      columnas.set(valor.id_producto_servicio, {
+      columnas.set(clave, {
+        clave: clave,
         id_producto_servicio: valor.id_producto_servicio,
         nombre_producto: valor.nombre_producto || linea?.nombre_producto || 'Producto',
+        descripcion: linea ? linea.descripcion : valor.descripcion,
         codigo_tipo_cobro: valor.codigo_tipo_cobro || linea?.codigo_tipo_cobro || '',
         orden: valor.orden != null ? parseInt(valor.orden) : (linea?.orden || 99)
       });
@@ -906,11 +1054,11 @@ export class CrearContratoComponent implements OnInit {
     return `${mes} ${anio}`;
   }
 
-  onValorChange(valorMensual: ValorMensual, idProducto: string, event: any) {
+  onValorChange(valorMensual: ValorMensual, claveLinea: string, event: any) {
     const inputValue = event.target.value.replace(/[^\d]/g, '');
     const nuevoValor = inputValue === '' ? 0 : parseFloat(inputValue);
 
-    const celda = valorMensual.celdas[idProducto];
+    const celda = valorMensual.celdas[claveLinea];
     if (celda) {
       celda.valor = nuevoValor;
     }
@@ -936,19 +1084,27 @@ export class CrearContratoComponent implements OnInit {
     let numeroCuotas = 0;
 
     this.valoresMensuales.forEach(vm => {
-      Object.keys(vm.celdas).forEach(idProducto => {
-        const celda: any = vm.celdas[idProducto];
-        const codigo = this.codigoTipoDeProducto(idProducto, celda);
+      // El número de cuotas son los meses con suscripción: dos líneas de
+      // suscripción en el mismo mes siguen siendo una sola cuota.
+      let mesConSuscripcion = false;
+
+      Object.keys(vm.celdas).forEach(claveLinea => {
+        const celda: any = vm.celdas[claveLinea];
+        const codigo = this.codigoTipoDeProducto(claveLinea, celda);
 
         if (codigo === 'IMPLEMENTACION') {
           totalImplementacion += celda.valor || 0;
         } else if (codigo === 'SUSCRIPCION') {
           totalSuscripcion += celda.valor || 0;
-          numeroCuotas++;
+          mesConSuscripcion = true;
         } else {
           totalOtros += celda.valor || 0;
         }
       });
+
+      if (mesConSuscripcion) {
+        numeroCuotas++;
+      }
     });
 
     this.resumenValores = {
@@ -964,12 +1120,12 @@ export class CrearContratoComponent implements OnInit {
    * Tipo de cobro de una cuota. Sale de la línea del contrato; si el contrato
    * es viejo y no tiene líneas, se cae a la periodicidad como se hacía antes.
    */
-  private codigoTipoDeProducto(idProducto: string, celda: any): string {
+  private codigoTipoDeProducto(claveLinea: string, celda: any): string {
     if (celda?.codigo_tipo_cobro) {
       return celda.codigo_tipo_cobro;
     }
 
-    const linea = this.lineas.find(l => l.id_producto_servicio === idProducto);
+    const linea = this.lineaDeClave(claveLinea);
     if (linea?.codigo_tipo_cobro) {
       return linea.codigo_tipo_cobro;
     }
@@ -1061,8 +1217,10 @@ export class CrearContratoComponent implements OnInit {
       const valorCuota = Math.round(linea.valor_final / this.cuotasImplementacion);
       let cuotasAsignadas = 0;
 
+      const clave = this.claveLinea(linea);
+
       this.valoresMensuales.forEach(vm => {
-        const celda = vm.celdas[linea.id_producto_servicio];
+        const celda = vm.celdas[clave];
 
         if (cuotasAsignadas < this.cuotasImplementacion) {
           // Agregar o actualizar la cuota de implementación del mes
@@ -1076,9 +1234,10 @@ export class CrearContratoComponent implements OnInit {
               id_tipo_cobro: linea.id_tipo_cobro,
               codigo_tipo_cobro: linea.codigo_tipo_cobro,
               orden: linea.orden,
+              descripcion: linea.descripcion || null,
               es_implementacion: true
             };
-            vm.celdas[linea.id_producto_servicio] = nueva;
+            vm.celdas[clave] = nueva;
             this.valores.push(nueva);
           } else {
             celda.valor = valorCuota;
@@ -1090,7 +1249,7 @@ export class CrearContratoComponent implements OnInit {
           if (idx > -1) {
             this.valores.splice(idx, 1);
           }
-          delete vm.celdas[linea.id_producto_servicio];
+          delete vm.celdas[clave];
         }
 
         vm.totalMes = this.totalDelMes(vm);
@@ -1259,6 +1418,43 @@ export class CrearContratoComponent implements OnInit {
     );
   }
 
+  /**
+   * Día de corte del contrato (campo dia_corte de la minuta). Si no se ha
+   * diligenciado o no es un día válido, las cuotas vencen el 1, como antes.
+   */
+  diaCorte(): number {
+    const campo = this.camposPlantilla.find((c: PlantillaCampo) => c.llave === 'dia_corte');
+    const dia = parseInt(String((campo as any)?.valor ?? ''), 10);
+    return dia >= 1 && dia <= 31 ? dia : 1;
+  }
+
+  /**
+   * Revisa que las cuotas venzan el día de corte. Si el día de corte cambió
+   * después de generar los valores, pide regenerarlos antes de guardar, para
+   * que el calendario y las cuentas por cobrar coincidan con el contrato.
+   * En los meses más cortos que el día de corte la cuota vence el último día.
+   */
+  validarDiaCorteValores(): boolean {
+    const diaCorte = this.diaCorte();
+
+    const desfasada = this.valores.some((v: ContratoValor) => {
+      const fecha = new Date(v.fecha + 'T00:00:00');
+      const ultimoDia = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
+      return fecha.getDate() !== Math.min(diaCorte, ultimoDia);
+    });
+
+    if (desfasada) {
+      Swal.fire({
+        title: 'Vuelve a generar los valores',
+        text: `Las cuotas deben vencer el día de corte (${diaCorte} de cada mes). Dale "Regenerar Valores" antes de guardar.`,
+        icon: 'warning'
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   validarSumaCuotasImplementacion(): boolean {
     // Cada línea de implementación tiene que cuadrar contra sus cuotas
     const lineasImplementacion = this.lineasSeleccionadas()
@@ -1266,7 +1462,7 @@ export class CrearContratoComponent implements OnInit {
 
     for (const linea of lineasImplementacion) {
       const sumaCuotas = this.valores
-        .filter(v => v.id_producto_servicio === linea.id_producto_servicio)
+        .filter(v => this.claveValor(v) === this.claveLinea(linea))
         .reduce((sum, v) => sum + (v.valor || 0), 0);
 
       // Tolerancia de 1 peso por el redondeo del reparto en cuotas
@@ -1327,6 +1523,10 @@ export class CrearContratoComponent implements OnInit {
 
     // Validar suma de cuotas de implementación
     if (!this.validarSumaCuotasImplementacion()) {
+      return;
+    }
+
+    if (!this.validarDiaCorteValores()) {
       return;
     }
 
@@ -1411,6 +1611,10 @@ export class CrearContratoComponent implements OnInit {
 
     // Validar suma de cuotas de implementación
     if (!this.validarSumaCuotasImplementacion()) {
+      return;
+    }
+
+    if (!this.validarDiaCorteValores()) {
       return;
     }
 
@@ -1653,6 +1857,10 @@ export class CrearContratoComponent implements OnInit {
         'Por favor complete todos los campos requeridos antes de generar el PDF',
         'error'
       );
+      return;
+    }
+
+    if (!this.validarDiaCorteValores()) {
       return;
     }
 

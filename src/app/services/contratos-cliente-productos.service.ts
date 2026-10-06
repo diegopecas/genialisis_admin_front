@@ -12,6 +12,10 @@ import { httpOptions } from './http';
 /**
  * Línea de producto de un contrato de implementación.
  * El descuento y el recargo son por línea, no de la cabecera.
+ * La cantidad multiplica el valor base: valor_final = valor_base x cantidad
+ * - descuento + recargo (el descuento y el recargo son de la línea completa).
+ * Un mismo producto puede ir en varias líneas, cada una con su descripción;
+ * el orden no se repite dentro del contrato porque amarra las cuotas.
  * En las líneas de SUSCRIPCION el valor es el mensual, igual que en la tarifa.
  * El tipo de cobro lo trae el producto; el back lo guarda como foto de la firma.
  */
@@ -19,6 +23,7 @@ export interface LineaContrato {
   id?: string;
   id_contrato?: string;
   id_producto_servicio: string;
+  descripcion?: string | null;
   nombre_producto?: string;
   id_tipo_cobro?: string;
   codigo_tipo_cobro?: string;
@@ -26,6 +31,7 @@ export interface LineaContrato {
   id_periodicidad_cobro?: number;
   nombre_periodicidad?: string;
   valor_base: number;
+  cantidad: number;
   descuento: number;
   recargo: number;
   valor_final: number;
@@ -85,7 +91,9 @@ export class ContratosClienteProductosService {
       id_contrato: idContrato,
       lineas: lineas.map(l => ({
         id_producto_servicio: l.id_producto_servicio,
+        descripcion: l.descripcion || null,
         valor_base: l.valor_base,
+        cantidad: l.cantidad || 1,
         descuento: l.descuento,
         recargo: l.recargo,
         valor_final: l.valor_final,

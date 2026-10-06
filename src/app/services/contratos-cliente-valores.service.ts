@@ -22,7 +22,10 @@ export interface ContratoValor {
   // Tipo de cobro del producto al que pertenece la cuota
   id_tipo_cobro?: string;
   codigo_tipo_cobro?: string;
+  // Orden de la línea del contrato a la que pertenece la cuota. Un producto
+  // puede estar en varias líneas, así que la cuota se amarra por el orden.
   orden?: number;
+  descripcion?: string | null;
   mes?: number;
   anio?: number;
   // Para UI
@@ -45,6 +48,7 @@ export interface LineaGenerarValores {
   codigo_tipo_cobro?: string;
   valor_final: number;
   orden?: number;
+  descripcion?: string | null;
 }
 
 export interface GenerarValoresRequest {
@@ -56,6 +60,8 @@ export interface GenerarValoresRequest {
   // Lineas escogidas en el contrato, con descuentos/recargos ya aplicados.
   // Si no vienen, el back usa las filas obligatorias de la tarifa del plan.
   lineas?: LineaGenerarValores[];
+  // Día del mes en que vence cada cuota (el día de corte del contrato)
+  dia_vencimiento?: number;
 }
 
 export interface GenerarValoresResponse {
@@ -99,7 +105,10 @@ export class ContratosClienteValoresService {
         id_producto_servicio: v.id_producto_servicio,
         fecha: v.fecha,
         valor: v.valor,
-        id_periodicidad_cobro: v.id_periodicidad_cobro
+        id_periodicidad_cobro: v.id_periodicidad_cobro,
+        // Orden de la línea del contrato: amarra la cuota con su línea cuando
+        // el mismo producto está en varias
+        orden: v.orden
       }))
     });
 

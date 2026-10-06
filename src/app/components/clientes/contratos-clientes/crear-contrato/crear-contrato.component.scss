@@ -443,3 +443,15 @@
     width: 145px;
   }
 }
+
+// Botones de duplicar y quitar una línea del contrato (íconos en dorado)
+.acciones-linea {
+  .btn-link {
+    color: #c9a227;
+    text-decoration: none;
+
+    &:hover {
+      color: #a8861b;
+    }
+  }
+}
